@@ -169,6 +169,7 @@
     <ClCompile Include="Source\Alien.cpp" />
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Game.cpp" />
+    <ClCompile Include="Source\GameWindow.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\Resources.cpp" />
@@ -181,6 +182,8 @@
     <ClInclude Include="Source\Alien.hpp" />
     <ClInclude Include="Source\Background.hpp" />
     <ClInclude Include="Source\Game.hpp" />
+    <ClInclude Include="Source\GameWindow.hpp" />
+    <ClInclude Include="Source\GameWindowException.hpp" />
     <ClInclude Include="Source\Projectile.hpp" />
     <ClInclude Include="Source\Resources.h" />
     <ClInclude Include="Source\Player.hpp" />
@@ -188,6 +191,7 @@
     <ClInclude Include="Source\Star.hpp" />
     <ClInclude Include="Source\TextureWrapper.hpp" />
     <ClInclude Include="Source\Wall.hpp" />
+    <ClInclude Include="Source\WindowConfig.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
