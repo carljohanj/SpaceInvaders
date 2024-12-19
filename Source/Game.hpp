@@ -7,6 +7,8 @@
 #include "Alien.hpp"
 #include "Projectile.hpp"
 #include "Wall.hpp"
+#include "Star.hpp"
+#include "Background.hpp"
 #include "EntityType.hpp"
 
 enum class State {
@@ -18,23 +20,6 @@ enum class State {
 struct PlayerData {
     std::string name;
     int score;
-};
-
-struct Star {
-    Vector2 initPosition = { 0, 0 };
-    Vector2 position = { 0, 0 };
-    Color color = GRAY;
-    float size = 0;
-    void Update(float starOffset);
-    void Render() const;
-};
-
-struct Background {
-    std::vector<Star> Stars;
-
-    void Initialize(int starAmount);
-    void Update(float offset);
-    void Render();
 };
 
 struct Game {

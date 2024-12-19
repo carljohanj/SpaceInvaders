@@ -167,20 +167,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Alien.cpp" />
+    <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\Resources.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\Star.cpp" />
     <ClCompile Include="Source\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Alien.hpp" />
+    <ClInclude Include="Source\Background.hpp" />
     <ClInclude Include="Source\Game.hpp" />
     <ClInclude Include="Source\Projectile.hpp" />
     <ClInclude Include="Source\Resources.h" />
     <ClInclude Include="Source\Player.hpp" />
     <ClInclude Include="Source\EntityType.hpp" />
+    <ClInclude Include="Source\Star.hpp" />
     <ClInclude Include="Source\Wall.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
