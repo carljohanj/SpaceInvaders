@@ -1,15 +1,43 @@
 #include "Game.hpp"
 #include <iostream>
+#include "WindowConfig.hpp"
 #include <vector>
 #include <cmath>
 #include <fstream>
 
+
+Game::Game()
+    : window("Space Invaders", screenWidth, screenHeight) 
+{
+    gameState = State::STARTSCREEN;
+    score = 0;
+    shootTimer = 0.0f;
+    wallCount = 5;
+}
+
+void Game::Run()
+{
+    Start();
+    while (!WindowShouldClose()) 
+    {
+        Update();
+        window.BeginDrawing();
+        ClearBackground(BLACK);
+        Render();
+        window.EndDrawing();
+    }
+    CloseAudioDevice();
+}
+
+
 // MATH FUNCTIONS
-float lineLength(Vector2 A, Vector2 B) {
+float lineLength(Vector2 A, Vector2 B) 
+{
     return sqrtf(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }
 
-bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) {
+bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) 
+{
     float distanceToCentre = lineLength(circlePos, point);
     return distanceToCentre < radius;
 }

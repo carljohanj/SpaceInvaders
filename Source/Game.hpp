@@ -10,19 +10,23 @@
 #include "Star.hpp"
 #include "Background.hpp"
 #include "EntityType.hpp"
+#include "GameWindow.hpp"
 
-enum class State {
+enum class State 
+{
     STARTSCREEN,
     GAMEPLAY,
     ENDSCREEN
 };
 
-struct PlayerData {
+struct PlayerData
+{
     std::string name;
     int score;
 };
 
-struct Game {
+struct Game 
+{
     // Gamestate
     State gameState = State::STARTSCREEN;
 
@@ -45,15 +49,13 @@ struct Game {
     // High score tracking
     bool newHighScore = false;
 
-    // Game entities
+    GameWindow window;
+    Resources resources;
     Player player;
     std::vector<Alien> Aliens;
     std::vector<Projectile> Projectiles;
     std::vector<Wall> Walls;
     Background background;
-
-    // Resources
-    Resources resources; // Resources included for asset management
 
     // Leaderboard
     std::vector<PlayerData> Leaderboard = { {"Player 1", 500}, {"Player 2", 400}, {"Player 3", 300}, {"Player 4", 200}, {"Player 5", 100} };
@@ -69,9 +71,12 @@ struct Game {
     Rectangle textBox = { 600, 500, 225, 50 };
     bool mouseOnText = false;
 
+    Game();
+
     // Methods
     void Start();
     void End();
+    void Run();
     void Continue();
     void Launch();
     void Update();
