@@ -6,6 +6,7 @@
 #include "Player.hpp"
 #include "Alien.hpp"
 #include "Projectile.hpp"
+#include "Wall.hpp"
 #include "EntityType.hpp"
 
 enum class State {
@@ -17,18 +18,6 @@ enum class State {
 struct PlayerData {
     std::string name;
     int score;
-};
-
-struct Wall {
-    Vector2 position;
-    Rectangle rec;
-    bool active = true;
-    Color color;
-    int health = 50;
-    int radius = 60;
-
-    void Render(Texture2D texture);
-    void Update();
 };
 
 struct Star {

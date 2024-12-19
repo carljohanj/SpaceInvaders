@@ -172,6 +172,7 @@
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\Resources.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Alien.hpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="Source\Resources.h" />
     <ClInclude Include="Source\Player.hpp" />
     <ClInclude Include="Source\EntityType.hpp" />
+    <ClInclude Include="Source\Wall.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
