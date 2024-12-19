@@ -1,54 +1,35 @@
 #include "Player.hpp"
-#include <iostream>
+#include <algorithm>
 
-void Player::Initialize() 
-{
-    float window_width = (float)GetScreenWidth();
-    x_pos = window_width / 2;
-    std::cout << "Find Player -X:" << GetScreenWidth() / 2 << "Find Player -Y" << GetScreenHeight() - player_base_height << std::endl;
+void Player::Initialize() {
+    x_pos = GetScreenWidth() / 2;
 }
 
 void Player::Update() {
-    // Movement
-    direction = 0;
     if (IsKeyDown(KEY_LEFT)) {
-        direction--;
+        x_pos -= speed;
     }
     if (IsKeyDown(KEY_RIGHT)) {
-        direction++;
+        x_pos += speed;
     }
 
-    x_pos += speed * direction;
-
-    if (x_pos < 0 + radius) {
-        x_pos = 0 + radius;
-    }
-    else if (x_pos > GetScreenWidth() - radius) {
-        x_pos = GetScreenWidth() - radius;
-    }
-
-    // Determine frame for animation
-    timer += GetFrameTime();
-
-    if (timer > 0.4 && activeTexture == 2) {
-        activeTexture = 0;
-        timer = 0;
-    }
-    else if (timer > 0.4) {
-        activeTexture++;
-        timer = 0;
-    }
+    x_pos = std::clamp(x_pos, radius, (float)GetScreenWidth() - radius);
 }
 
 void Player::Render(Texture2D texture) {
-    float window_height = GetScreenHeight();
-
-    DrawTexturePro(
-        texture,
+    DrawTexturePro(texture,
         { 0, 0, 352, 352 },
-        { x_pos, window_height - player_base_height, 100, 100 },
+        { x_pos, GetScreenHeight() - player_base_height, 100, 100 },
         { 50, 50 },
         0,
-        WHITE
-    );
+        WHITE);
+}
+
+Projectile Player::Shoot() {
+    Projectile newProjectile;
+    newProjectile.position = { x_pos, GetScreenHeight() - player_base_height - 10 };
+    newProjectile.speed = -15; // Player projectiles move upward
+    newProjectile.type = EntityType::PLAYER_PROJECTILE;
+    newProjectile.active = true;
+    return newProjectile;
 }
