@@ -2,6 +2,7 @@
 
 enum class EntityType 
 {
+
     PLAYER,
     ENEMY,
     PLAYER_PROJECTILE,
