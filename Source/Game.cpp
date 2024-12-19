@@ -10,7 +10,6 @@
 float lineLength(Vector2 A, Vector2 B) //Uses pythagoras to calculate the length of a line
 {
 	float length = sqrtf(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
-
 	return length;
 }
 
