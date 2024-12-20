@@ -1,10 +1,12 @@
 #include "Player.hpp"
 #include <algorithm>
+#include <TextureLoadingException.hpp>
 
 // Constructor
 Player::Player()
 {
     texture = LoadTexture("./Assets/Ship1.png");
+    if (texture.id == 0) { throw TextureLoadingException("Failed to load Player texture: ./Assets/Ship1.png"); }
 }
 
 // Destructor

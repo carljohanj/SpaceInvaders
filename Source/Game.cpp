@@ -145,10 +145,10 @@ void Game::Update() {
             if (Projectiles[i].type == EntityType::PLAYER_PROJECTILE) {
                 for (int a = 0; a < Aliens.size(); a++) {
                     if (Aliens[a].IsActive() && CheckCollision(Aliens[a].GetPosition(), Aliens[a].GetRadius(), Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
-                        Projectiles[i].active = false;
-                        Aliens[a].SetActive(false);
-                        score += 100;
-                        std::cout << "Alien hit by player projectile!" << std::endl;
+                        Projectiles[i].active = false;  // Deactivate the projectile
+                        Aliens[a].SetActive(false);  // Deactivate the alien
+                        score += 100;  // Increase score
+                        std::cout << "Alien " << &Aliens[a] << " hit by player projectile!" << std::endl;  // Print ID of the alien hit
                     }
                 }
             }
@@ -246,32 +246,35 @@ void Game::Render() {
     }
 }
 
-void Game::SpawnAliens() {
-    for (int row = 0; row < formationHeight; row++) {
-        for (int col = 0; col < formationWidth; col++) {
-            Alien newAlien;
-            newAlien.SetPosition({ static_cast<float>(formationX + 450 + (col * alienSpacing)),
-                                   static_cast<float>(formationY + (row * alienSpacing)) });
-            Aliens.push_back(newAlien);
-            Alien::IncrementInstanceCount();
+void Game::SpawnAliens()
+{
+    // Spawn aliens only if there are no active aliens
+    if (Aliens.empty()) {
+        for (int row = 0; row < formationHeight; row++) {
+            for (int col = 0; col < formationWidth; col++) {
+                Alien newAlien;
+                newAlien.SetPosition({ static_cast<float>(formationX + 450 + (col * alienSpacing)),
+                                       static_cast<float>(formationY + (row * alienSpacing)) });
+                Aliens.push_back(newAlien);
+                Alien::IncrementInstanceCount();
+            }
         }
     }
 }
 
-void Game::RemoveInactiveAliens() {
+void Game::RemoveInactiveAliens()
+{
     for (int i = 0; i < Aliens.size(); i++) {
         if (!Aliens[i].IsActive()) {
-            std::cout << "Removing Alien with ID: " << &Aliens[i] << std::endl;  // Print Alien ID
-
-            // Only decrement instance count when we remove an alien
-            Alien::DecrementInstanceCount();
+            std::cout << "Removing Alien with ID: " << &Aliens[i] << std::endl;  // Log alien ID (memory address)
             Aliens.erase(Aliens.begin() + i);
-            i--;  // Adjust index after removing an element to prevent skipping
+            i--;  // Adjust index after removing an element
         }
     }
 }
 
-bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd) {
+bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd) 
+{
     Vector2 A = lineStart;
     Vector2 B = lineEnd;
     Vector2 C = circlePos;

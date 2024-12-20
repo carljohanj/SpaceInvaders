@@ -80,9 +80,6 @@
     <ClInclude Include="Source\GameWindowException.hpp">
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="TextureLoadingException.hpp">
-      <Filter>Header Files\Exceptions</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Alien.hpp">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -97,6 +94,9 @@
     </ClInclude>
     <ClInclude Include="Source\Projectile.hpp">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\TextureLoadingException.hpp">
+      <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

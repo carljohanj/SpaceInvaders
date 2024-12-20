@@ -9,7 +9,7 @@ public:
     ~Alien();
 
     void Update();
-    void Render(); // No arguments
+    void Render();
 
     Projectile Shoot();
 

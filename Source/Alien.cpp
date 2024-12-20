@@ -1,28 +1,25 @@
 #include "Alien.hpp"
+#include "TextureLoadingException.hpp"
 #include <iostream>
 
-// Define static members
-Texture2D Alien::texture = { 0 };  // Initialize with an empty texture
-int Alien::instanceCount = 0;       // Initialize instance count to zero
+Texture2D Alien::texture = { 0 };
+int Alien::instanceCount = 0;
 
-Alien::Alien() {
-    // Load texture only once when the first instance is created
-    if (instanceCount == 0) {
+Alien::Alien() 
+{
+    if (instanceCount == 0) 
+    {
         texture = LoadTexture("./Assets/Alien.png");
-        if (texture.id == 0) {
-            std::cerr << "Failed to load Alien texture!" << std::endl;
-        }
-        else {
-            std::cout << "Alien texture loaded successfully: ID " << texture.id << std::endl;
-        }
+
+    if (texture.id == 0) { throw TextureLoadingException("Failed to load Alien texture!"); }
     }
     instanceCount++;
-    std::cout << "Alien instance created. Count: " << instanceCount << ", ID: " << this << std::endl; // Print unique ID (pointer)
 }
 
 Alien::~Alien() 
 {
     std::cout << "Alien instance destroyed. Count: " << instanceCount << ", ID: " << this << std::endl; // Print unique ID (pointer)
+    std::cout << "Current instance count: " << Alien::GetInstanceCount() << std::endl;
     if (instanceCount == 1 && texture.id != 0) {
         UnloadTexture(texture);
         texture = { 0 };
