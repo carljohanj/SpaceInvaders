@@ -5,9 +5,8 @@
 #include <cmath>
 #include <fstream>
 
-
 Game::Game()
-    : window("Space Invaders", screenWidth, screenHeight) 
+    : window("Space Invaders", screenWidth, screenHeight)
 {
     gameState = State::STARTSCREEN;
     score = 0;
@@ -18,7 +17,7 @@ Game::Game()
 void Game::Run()
 {
     Start();
-    while (!WindowShouldClose()) 
+    while (!WindowShouldClose())
     {
         Update();
         window.BeginDrawing();
@@ -29,14 +28,13 @@ void Game::Run()
     CloseAudioDevice();
 }
 
-
 // MATH FUNCTIONS
-float lineLength(Vector2 A, Vector2 B) 
+float lineLength(Vector2 A, Vector2 B)
 {
     return sqrtf(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }
 
-bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) 
+bool pointInCircle(Vector2 circlePos, float radius, Vector2 point)
 {
     float distanceToCentre = lineLength(circlePos, point);
     return distanceToCentre < radius;
@@ -108,7 +106,7 @@ void Game::Update() {
         if (shootTimer >= 1.0f) {
             if (!Aliens.empty()) {
                 int randomAlienIndex = rand() % Aliens.size();
-                if (Aliens[randomAlienIndex].active) {
+                if (Aliens[randomAlienIndex].IsActive()) {
                     Projectiles.push_back(Aliens[randomAlienIndex].Shoot());
                     std::cout << "Alien at index " << randomAlienIndex << " fired a projectile!" << std::endl;
                 }
@@ -120,7 +118,7 @@ void Game::Update() {
         for (int i = 0; i < Aliens.size(); i++) {
             Aliens[i].Update();
 
-            if (Aliens[i].position.y > GetScreenHeight() - player.GetPlayerBaseHeight()) {
+            if (Aliens[i].GetPosition().y > GetScreenHeight() - player.GetPlayerBaseHeight()) {
                 End();
             }
         }
@@ -142,16 +140,16 @@ void Game::Update() {
         for (int i = 0; i < Projectiles.size(); i++) {
             if (Projectiles[i].type == EntityType::PLAYER_PROJECTILE) {
                 for (int a = 0; a < Aliens.size(); a++) {
-                    if (Aliens[a].active && CheckCollision(Aliens[a].position, Aliens[a].radius, Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
+                    if (Aliens[a].IsActive() && CheckCollision(Aliens[a].GetPosition(), Aliens[a].GetRadius(), Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
                         Projectiles[i].active = false;
-                        Aliens[a].active = false;
+                        Aliens[a].SetActive(false);
                         score += 100;
                         std::cout << "Alien hit by player projectile!" << std::endl;
                     }
                 }
             }
             else if (Projectiles[i].type == EntityType::ENEMY_PROJECTILE) {
-                if (CheckCollision({ player.GetXPosition(), GetScreenHeight() - player.GetPlayerBaseHeight()}, player.GetRadius(), Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
+                if (CheckCollision({ player.GetXPosition(), GetScreenHeight() - player.GetPlayerBaseHeight() }, player.GetRadius(), Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
                     Projectiles[i].active = false;
                     player.SetLives(player.GetLives() - 1);
                     std::cout << "Player hit by alien projectile!" << std::endl;
@@ -179,7 +177,9 @@ void Game::Update() {
 
         // Remove inactive aliens
         for (int i = 0; i < Aliens.size(); i++) {
-            if (!Aliens[i].active) {
+            if (!Aliens[i].IsActive()) {
+                // Decrement instance count when an alien is removed
+                Alien::DecrementInstanceCount();
                 Aliens.erase(Aliens.begin() + i);
                 i--;
             }
@@ -199,8 +199,8 @@ void Game::Update() {
         }
 
         // Update background
-        playerPos = { player.GetXPosition(), player.GetPlayerBaseHeight()};
-        cornerPos = { 0, player.GetPlayerBaseHeight() };
+        playerPos = { player.GetXPosition(), (float)player.GetPlayerBaseHeight() };
+        cornerPos = { 0, (float)player.GetPlayerBaseHeight() };
         offset = lineLength(playerPos, cornerPos) * -1;
         background.Update(offset / 15);
 
@@ -239,7 +239,7 @@ void Game::Render() {
         }
 
         for (int i = 0; i < Aliens.size(); i++) {
-            Aliens[i].Render(resources.alienTexture);
+            Aliens[i].Render();
         }
         break;
 
@@ -255,10 +255,27 @@ void Game::Render() {
 void Game::SpawnAliens() {
     for (int row = 0; row < formationHeight; row++) {
         for (int col = 0; col < formationWidth; col++) {
+            // Explicitly cast integer values to float to avoid narrowing conversion errors
             Alien newAlien;
-            newAlien.position.x = formationX + 450 + (col * alienSpacing);
-            newAlien.position.y = formationY + (row * alienSpacing);
+            newAlien.SetPosition({
+                static_cast<float>(formationX + 450 + (col * alienSpacing)), // Cast the int to float
+                static_cast<float>(formationY + (row * alienSpacing))      // Cast the int to float
+                });
             Aliens.push_back(newAlien);
+
+            // Increment instance count when a new alien is added
+            Alien::IncrementInstanceCount();
+        }
+    }
+}
+
+void Game::RemoveInactiveAliens() {
+    for (int i = 0; i < Aliens.size(); i++) {
+        if (!Aliens[i].IsActive()) {
+            // Decrement instance count when an alien is removed
+            Alien::DecrementInstanceCount();
+            Aliens.erase(Aliens.begin() + i);
+            i--;  // Adjust index after removing an element
         }
     }
 }
@@ -298,7 +315,7 @@ void Game::InsertNewHighScore(std::string name)
     }
 }
 
-bool Game::CheckNewHighScore() 
+bool Game::CheckNewHighScore()
 {
     return score > Leaderboard.back().score;
 }

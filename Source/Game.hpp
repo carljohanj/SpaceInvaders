@@ -82,6 +82,7 @@ struct Game
     void Update();
     void Render();
     void SpawnAliens();
+    void RemoveInactiveAliens();
     bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
     bool CheckNewHighScore();
     void InsertNewHighScore(std::string name);
