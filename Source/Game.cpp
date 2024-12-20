@@ -54,7 +54,7 @@ void Game::Start() {
     }
 
     resources.Load();
-    player.Initialize();
+    player.RePosition();
     SpawnAliens();
     Background newBackground;
     newBackground.Initialize(600);

@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <TextureLoadingException.hpp>
 
-// Constructor
 Player::Player()
 {
     texture = LoadTexture("./Assets/Ship1.png");
@@ -10,24 +9,24 @@ Player::Player()
 }
 
 // Destructor
-Player::~Player()
+Player::~Player() 
 {
-    UnloadTexture(texture);
+    UnloadTexture(texture); 
 }
 
-void Player::Initialize()
+void Player::RePosition() noexcept
 {
     x_pos = GetScreenWidth() / 2;
 }
 
-void Player::Update()
+void Player::Update() noexcept
 {
     if (IsKeyDown(KEY_LEFT)) { x_pos -= speed; }
     if (IsKeyDown(KEY_RIGHT)) { x_pos += speed; }
     x_pos = std::clamp(x_pos, radius, (float)GetScreenWidth() - radius);
 }
 
-void Player::Render()
+void Player::Render() const noexcept
 {
     DrawTexturePro(texture,
         { 0, 0, (float)texture.width, (float)texture.height },
@@ -37,11 +36,11 @@ void Player::Render()
         WHITE);
 }
 
-Projectile Player::Shoot()
+Projectile Player::Shoot() const noexcept
 {
     Projectile projectile;
     projectile.position = { x_pos, GetScreenHeight() - player_base_height - 10 };
-    projectile.speed = -15; // Player projectiles move upward
+    projectile.speed = -15;
     projectile.type = EntityType::PLAYER_PROJECTILE;
     projectile.active = true;
     return projectile;
