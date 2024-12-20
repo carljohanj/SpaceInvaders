@@ -120,7 +120,7 @@ void Game::Update() {
         for (int i = 0; i < Aliens.size(); i++) {
             Aliens[i].Update();
 
-            if (Aliens[i].position.y > GetScreenHeight() - player.player_base_height) {
+            if (Aliens[i].position.y > GetScreenHeight() - player.GetPlayerBaseHeight()) {
                 End();
             }
         }
@@ -151,12 +151,12 @@ void Game::Update() {
                 }
             }
             else if (Projectiles[i].type == EntityType::ENEMY_PROJECTILE) {
-                if (CheckCollision({ player.x_pos, GetScreenHeight() - player.player_base_height }, player.radius, Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
+                if (CheckCollision({ player.GetXPosition(), GetScreenHeight() - player.GetPlayerBaseHeight()}, player.GetRadius(), Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
                     Projectiles[i].active = false;
-                    player.lives -= 1;
+                    player.SetLives(player.GetLives() - 1);
                     std::cout << "Player hit by alien projectile!" << std::endl;
 
-                    if (player.lives <= 0) {
+                    if (player.GetLives() <= 0) {
                         End();
                     }
                 }
@@ -199,8 +199,8 @@ void Game::Update() {
         }
 
         // Update background
-        playerPos = { player.x_pos, (float)player.player_base_height };
-        cornerPos = { 0, (float)player.player_base_height };
+        playerPos = { player.GetXPosition(), player.GetPlayerBaseHeight()};
+        cornerPos = { 0, player.GetPlayerBaseHeight() };
         offset = lineLength(playerPos, cornerPos) * -1;
         background.Update(offset / 15);
 
@@ -227,8 +227,8 @@ void Game::Render() {
     case State::GAMEPLAY:
         background.Render();
         DrawText(TextFormat("Score: %i", score), 50, 20, 40, YELLOW);
-        DrawText(TextFormat("Lives: %i", player.lives), 50, 70, 40, YELLOW);
-        player.Render(resources.shipTextures[player.activeTexture]);
+        DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, 40, YELLOW);
+        player.Render();
 
         for (int i = 0; i < Projectiles.size(); i++) {
             Projectiles[i].Render(resources.laserTexture);

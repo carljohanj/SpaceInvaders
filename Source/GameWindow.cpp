@@ -6,16 +6,10 @@ GameWindow::GameWindow(const char* gameTitle, int width, int height)
     SetTargetFPS(60);
 }
 
-GameWindow::~GameWindow() {
-    if (IsWindowReady()) {
-        CloseWindow();
-    }
+GameWindow::~GameWindow() 
+{ 
+    if (IsWindowReady()) { CloseWindow(); }
 }
 
-void GameWindow::BeginDrawing() const noexcept {
-    ::BeginDrawing();
-}
-
-void GameWindow::EndDrawing() const noexcept {
-    ::EndDrawing();
-}   
+void GameWindow::BeginDrawing() const noexcept { ::BeginDrawing(); }
+void GameWindow::EndDrawing()   const noexcept { ::EndDrawing(); }   

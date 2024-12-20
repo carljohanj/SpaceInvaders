@@ -179,6 +179,7 @@
     <ClCompile Include="Source\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="TextureLoadingException.hpp" />
     <ClInclude Include="Source\Alien.hpp" />
     <ClInclude Include="Source\Background.hpp" />
     <ClInclude Include="Source\Game.hpp" />
