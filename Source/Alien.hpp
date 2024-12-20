@@ -39,6 +39,6 @@ private:
 
     EntityType type = EntityType::ENEMY;
 
-    static Texture2D texture; // Shared texture
+    static Texture2D texture;
     static int instanceCount;
 };

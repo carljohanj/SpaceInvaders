@@ -16,29 +16,22 @@ Alien::Alien() {
             std::cout << "Alien texture loaded successfully: ID " << texture.id << std::endl;
         }
     }
-    // Increment instance count when a new Alien is created
-    std::cout << "Alien instance created. Count: " << instanceCount << std::endl;
+    instanceCount++;
+    std::cout << "Alien instance created. Count: " << instanceCount << ", ID: " << this << std::endl; // Print unique ID (pointer)
 }
 
-Alien::~Alien() {
-    if (instanceCount > 0) {
-        // Decrement instance count when an Alien is destroyed
-        std::cout << "Alien instance destroyed. Count: " << instanceCount << std::endl;
-
-        // If no more aliens exist, unload the texture
-        if (instanceCount == 0 && texture.id != 0) {
-            UnloadTexture(texture);
-            texture = { 0 }; // Reset texture to prevent accidental reuse
-            std::cout << "Alien texture unloaded." << std::endl;
-        }
-    }
-    else {
-        std::cerr << "Error: Attempted to destroy an Alien instance when none exist!" << std::endl;
+Alien::~Alien() 
+{
+    std::cout << "Alien instance destroyed. Count: " << instanceCount << ", ID: " << this << std::endl; // Print unique ID (pointer)
+    if (instanceCount == 1 && texture.id != 0) {
+        UnloadTexture(texture);
+        texture = { 0 };
+        std::cout << "Alien texture unloaded." << std::endl;
     }
 }
 
-void Alien::Update() {
-    // Update position based on movement direction
+void Alien::Update() 
+{
     if (moveRight) {
         position.x += speed; // Move right
         if (position.x >= GetScreenWidth() - radius) {
@@ -60,13 +53,13 @@ void Alien::Update() {
     }
 }
 
-void Alien::Render() {
+void Alien::Render() 
+{
     if (texture.id == 0) {
         std::cerr << "Alien texture is not valid!" << std::endl;
         return;
     }
 
-    // Draw the texture with the proper source and destination rectangles
     DrawTexturePro(texture,
         { 0, 0, (float)texture.width, (float)texture.height },
         { position.x, position.y, 100.0f, 100.0f }, // position and scale
@@ -75,7 +68,8 @@ void Alien::Render() {
         WHITE);
 }
 
-Projectile Alien::Shoot() {
+Projectile Alien::Shoot() 
+{
     Projectile newProjectile;
     newProjectile.position = { position.x, position.y + 40 };
     newProjectile.speed = 5;
@@ -84,14 +78,6 @@ Projectile Alien::Shoot() {
     return newProjectile;
 }
 
-void Alien::IncrementInstanceCount() {
-    instanceCount++;
-}
-
-void Alien::DecrementInstanceCount() {
-    instanceCount--;
-}
-
-int Alien::GetInstanceCount() {
-    return instanceCount;
-}
+void Alien::IncrementInstanceCount() { instanceCount++; }
+void Alien::DecrementInstanceCount() { instanceCount--; }
+int  Alien::GetInstanceCount()  { return instanceCount; }

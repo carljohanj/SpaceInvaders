@@ -123,6 +123,10 @@ void Game::Update() {
             }
         }
 
+        // Remove inactive aliens
+        RemoveInactiveAliens();
+
+        // If no more aliens, spawn new ones
         if (Aliens.empty()) {
             SpawnAliens();
         }
@@ -172,16 +176,6 @@ void Game::Update() {
                         std::cout << "Wall destroyed!" << std::endl;
                     }
                 }
-            }
-        }
-
-        // Remove inactive aliens
-        for (int i = 0; i < Aliens.size(); i++) {
-            if (!Aliens[i].IsActive()) {
-                // Decrement instance count when an alien is removed
-                Alien::DecrementInstanceCount();
-                Aliens.erase(Aliens.begin() + i);
-                i--;
             }
         }
 
@@ -255,15 +249,10 @@ void Game::Render() {
 void Game::SpawnAliens() {
     for (int row = 0; row < formationHeight; row++) {
         for (int col = 0; col < formationWidth; col++) {
-            // Explicitly cast integer values to float to avoid narrowing conversion errors
             Alien newAlien;
-            newAlien.SetPosition({
-                static_cast<float>(formationX + 450 + (col * alienSpacing)), // Cast the int to float
-                static_cast<float>(formationY + (row * alienSpacing))      // Cast the int to float
-                });
+            newAlien.SetPosition({ static_cast<float>(formationX + 450 + (col * alienSpacing)),
+                                   static_cast<float>(formationY + (row * alienSpacing)) });
             Aliens.push_back(newAlien);
-
-            // Increment instance count when a new alien is added
             Alien::IncrementInstanceCount();
         }
     }
@@ -272,10 +261,12 @@ void Game::SpawnAliens() {
 void Game::RemoveInactiveAliens() {
     for (int i = 0; i < Aliens.size(); i++) {
         if (!Aliens[i].IsActive()) {
-            // Decrement instance count when an alien is removed
+            std::cout << "Removing Alien with ID: " << &Aliens[i] << std::endl;  // Print Alien ID
+
+            // Only decrement instance count when we remove an alien
             Alien::DecrementInstanceCount();
             Aliens.erase(Aliens.begin() + i);
-            i--;  // Adjust index after removing an element
+            i--;  // Adjust index after removing an element to prevent skipping
         }
     }
 }
