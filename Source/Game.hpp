@@ -25,9 +25,10 @@ struct PlayerData
     int score;
 };
 
-struct Game 
+class Game 
 {
-    // Gamestate
+ 
+public:
     State gameState = State::STARTSCREEN;
 
     // Score
@@ -83,6 +84,7 @@ struct Game
     void Render();
     void SpawnAliens();
     void RemoveInactiveAliens();
+    void RemoveInactiveWalls();
     bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
     bool CheckNewHighScore();
     void InsertNewHighScore(std::string name);

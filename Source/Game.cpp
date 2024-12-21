@@ -41,19 +41,21 @@ bool pointInCircle(Vector2 circlePos, float radius, Vector2 point)
 }
 
 // Game Method Implementations
-void Game::Start() {
-    float window_width = (float)GetScreenWidth();
-    float window_height = (float)GetScreenHeight();
-    float wall_distance = window_width / (wallCount + 1);
+void Game::Start() 
+{
+    const auto window_width = (float)GetScreenWidth();
+    const auto window_height = (float)GetScreenHeight();
+    const auto wall_distance = window_width / (wallCount + 1);
 
+    // Create walls at the start
     for (int i = 0; i < wallCount; i++) {
         Wall newWall;
-        newWall.position.y = window_height - 250;
-        newWall.position.x = wall_distance * (i + 1);
+        newWall.SetPosition({ wall_distance * (i + 1), window_height - 250 });
         Walls.push_back(newWall);
+        Wall::IncrementInstanceCount();
     }
 
-    resources.Load();
+    resources.Load();  // Load resources (textures, fonts, etc.)
     player.RePosition();
     SpawnAliens();
     Background newBackground;
@@ -96,15 +98,13 @@ void Game::Update() {
         // Update player
         player.Update();
 
-        // Player shoots a projectile
-        if (IsKeyPressed(KEY_SPACE)) {
-            Projectiles.push_back(player.Shoot());
-        }
+        if (IsKeyPressed(KEY_SPACE)) { Projectiles.push_back(player.Shoot()); }
 
-        // Alien shooting logic
         shootTimer += GetFrameTime();
-        if (shootTimer >= 1.0f) {
-            if (!Aliens.empty()) {
+        if (shootTimer >= 1.0f)
+        {
+            if (!Aliens.empty())
+            {
                 int randomAlienIndex = rand() % Aliens.size();
                 if (Aliens[randomAlienIndex].IsActive()) {
                     Projectiles.push_back(Aliens[randomAlienIndex].Shoot());
@@ -123,13 +123,8 @@ void Game::Update() {
             }
         }
 
-        // Remove inactive aliens
         RemoveInactiveAliens();
-
-        // If no more aliens, spawn new ones
-        if (Aliens.empty()) {
-            SpawnAliens();
-        }
+        if (Aliens.empty()) { SpawnAliens(); }
 
         // Update projectiles
         for (int i = 0; i < Projectiles.size(); i++) {
@@ -166,26 +161,21 @@ void Game::Update() {
 
             // Check collisions with walls
             for (int w = 0; w < Walls.size(); w++) {
-                if (CheckCollision(Walls[w].position, Walls[w].radius, Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
+                if (CheckCollision(Walls[w].GetPosition(), Walls[w].GetRadius(), Projectiles[i].lineStart, Projectiles[i].lineEnd)) {
                     Projectiles[i].active = false;
-                    Walls[w].health -= 1; // Reduce health by 1
-                    std::cout << "Wall hit! Remaining health: " << Walls[w].health << std::endl;
+                    Walls[w].SetHealth(Walls[w].GetHealth() - 1);
+                    std::cout << "Wall hit! Remaining health: " << Walls[w].GetHealth() << std::endl;
 
-                    if (Walls[w].health <= 0) {
-                        Walls[w].active = false;
+                    if (Walls[w].GetHealth() <= 0) 
+                    {
+                        Walls[w].SetActive(false);
                         std::cout << "Wall destroyed!" << std::endl;
                     }
                 }
             }
         }
 
-        // Remove inactive walls
-        for (int i = 0; i < Walls.size(); i++) {
-            if (!Walls[i].active) {
-                Walls.erase(Walls.begin() + i);
-                i--;
-            }
-        }
+        RemoveInactiveWalls();
 
         // Update walls
         for (int i = 0; i < Walls.size(); i++) {
@@ -228,8 +218,9 @@ void Game::Render() {
             Projectiles[i].Render(resources.laserTexture);
         }
 
+        // Render Walls using their own texture
         for (int i = 0; i < Walls.size(); i++) {
-            Walls[i].Render(resources.barrierTexture);
+            Walls[i].Render();
         }
 
         for (int i = 0; i < Aliens.size(); i++) {
@@ -246,9 +237,8 @@ void Game::Render() {
     }
 }
 
-void Game::SpawnAliens()
+void Game::SpawnAliens() 
 {
-    // Spawn aliens only if there are no active aliens
     if (Aliens.empty()) {
         for (int row = 0; row < formationHeight; row++) {
             for (int col = 0; col < formationWidth; col++) {
@@ -262,19 +252,32 @@ void Game::SpawnAliens()
     }
 }
 
-void Game::RemoveInactiveAliens()
+void Game::RemoveInactiveAliens() 
 {
-    for (int i = 0; i < Aliens.size(); i++) {
+    for (int i = 0; i < Aliens.size(); i++) 
+    {
         if (!Aliens[i].IsActive()) {
-            std::cout << "Removing Alien with ID: " << &Aliens[i] << std::endl;  // Log alien ID (memory address)
+            std::cout << "Removing Alien with ID: " << &Aliens[i] << std::endl;
             Aliens.erase(Aliens.begin() + i);
-            i--;  // Adjust index after removing an element
+            Alien::DecrementInstanceCount();
+            i--;
         }
     }
 }
 
-bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd) 
+void Game::RemoveInactiveWalls()
 {
+    for (int i = 0; i < Walls.size(); i++) 
+    {
+        if (!Walls[i].IsActive()) {
+            Walls.erase(Walls.begin() + i);
+            Wall::DecrementInstanceCount();
+            i--;
+        }
+    }
+}
+
+bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd) {
     Vector2 A = lineStart;
     Vector2 B = lineEnd;
     Vector2 C = circlePos;
@@ -294,22 +297,6 @@ bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineSta
     return distance <= circleRadius;
 }
 
-void Game::InsertNewHighScore(std::string name)
-{
-    PlayerData newData;
-    newData.name = name;
-    newData.score = score;
-
-    for (int i = 0; i < Leaderboard.size(); i++) {
-        if (newData.score > Leaderboard[i].score) {
-            Leaderboard.insert(Leaderboard.begin() + i, newData);
-            Leaderboard.pop_back();
-            break;
-        }
-    }
-}
-
-bool Game::CheckNewHighScore()
-{
+bool Game::CheckNewHighScore() {
     return score > Leaderboard.back().score;
 }
