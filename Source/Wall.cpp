@@ -2,12 +2,11 @@
 #include "TextureLoadingException.hpp"
 #include <iostream>
 
-Texture2D Wall::texture = { 0 };  // Initialize static texture to 0
-int Wall::instanceCount = 0;  // Initialize instance count to 0
+Texture2D Wall::texture = { 0 };
+int Wall::instanceCount = 0;
 
 Wall::Wall()
 {
-    // Only load the texture the first time a Wall instance is created
     if (instanceCount == 0)
     {
         texture = LoadTexture("./Assets/Barrier.png");
