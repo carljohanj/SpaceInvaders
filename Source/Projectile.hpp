@@ -14,5 +14,5 @@ struct Projectile
     Vector2 lineEnd = { 0, 0 };
 
     void Update();
-    void Render(Texture2D texture);
+    void Render(Texture2D texture) const noexcept;
 };

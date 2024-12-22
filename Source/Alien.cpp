@@ -50,7 +50,7 @@ void Alien::Update()
     }
 }
 
-void Alien::Render() 
+void Alien::Render() const noexcept
 {
     if (texture.id == 0) {
         std::cerr << "Alien texture is not valid!" << std::endl;

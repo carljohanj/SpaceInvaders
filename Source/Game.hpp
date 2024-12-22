@@ -11,8 +11,9 @@
 #include "Background.hpp"
 #include "EntityType.hpp"
 #include "GameWindow.hpp"
+#include "WindowConfig.hpp"
 
-enum class State 
+enum class State
 {
     STARTSCREEN,
     GAMEPLAY,
@@ -25,67 +26,61 @@ struct PlayerData
     int score;
 };
 
-class Game 
+class Game
 {
- 
 public:
     State gameState = State::STARTSCREEN;
+    int score = 0;               // Current game score
+    float shootTimer = 0;        // Timer for alien shooting
+    bool newHighScore = false;   // Tracks if a new high score was achieved
 
-    // Score
-    int score;
+    GameWindow window;           // The game window
+    Resources resources;         // Game resources (textures, fonts, etc.)
+    Player player;               // The player entity
+    std::vector<Alien> Aliens;   // List of aliens in the game
+    std::vector<Projectile> Projectiles; // List of projectiles in the game
+    std::vector<Wall> Walls;     // List of walls in the game
+    Background background;       // The game background
 
-    // Walls
-    int wallCount = 5;
+    // Leaderboard (place in own struct?)
+    std::string_view name;
+    int letterCount = 0;
+    Rectangle textBox = { textBoxX, textBoxY, textBoxWidth, textBoxHeight };
+    bool mouseOnText = false;
+    std::vector<PlayerData> Leaderboard = { {"Player 1", initialHighScores[0]},
+                                            {"Player 2", initialHighScores[1]},
+                                            {"Player 3", initialHighScores[2]},
+                                            {"Player 4", initialHighScores[3]},
+                                            {"Player 5", initialHighScores[4]} };
 
-    // Alien formation
-    int formationWidth = 8;
-    int formationHeight = 5;
-    int alienSpacing = 80;
-    int formationX = 100;
-    int formationY = 50;
-
-    // Shooting
-    float shootTimer = 0;
-
-    // High score tracking
-    bool newHighScore = false;
-
-    GameWindow window;
-    Resources resources;
-    Player player;
-    std::vector<Alien> Aliens;
-    std::vector<Projectile> Projectiles;
-    std::vector<Wall> Walls;
-    Background background;
-
-    // Leaderboard
-    std::vector<PlayerData> Leaderboard = { {"Player 1", 500}, {"Player 2", 400}, {"Player 3", 300}, {"Player 4", 200}, {"Player 5", 100} };
-
-    // UI
+    // UI Elements
     Vector2 playerPos;
     Vector2 cornerPos;
     float offset;
 
-    char name[10] = "\0";
-    int letterCount = 0;
-
-    Rectangle textBox = { 600, 500, 225, 50 };
-    bool mouseOnText = false;
-
     Game();
-
-    // Methods
     void Start();
     void End();
     void Run();
-    void Continue();
+    void Continue() noexcept;
     void Launch();
     void Update();
     void Render();
+    void UpdatePlayerInput();
     void SpawnAliens();
+    void UpdateAliens();
+    void RandomizeAlienShot();
     void RemoveInactiveAliens();
+    void SpawnWalls();
+    void UpdateWalls();
     void RemoveInactiveWalls();
+    void UpdateProjectiles();
+    void DetectCollisions();
+    void CheckPlayerCollision(Projectile& projectile);
+    void CheckEnemyCollision(Projectile& projectile);
+    void CheckWallCollisions(Projectile& projectile);
     bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
+    void UpdateBackground();
     bool CheckNewHighScore();
     void InsertNewHighScore(std::string name);
 };

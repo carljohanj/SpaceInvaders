@@ -2,9 +2,10 @@
 #include "raylib.h"
 #include <string>
 
-class GameWindow {
+class GameWindow 
+{
 public:
-    GameWindow(const char* title, int width, int height);
+    GameWindow(std::string_view title, int width, int height);
     ~GameWindow();
     void BeginDrawing() const noexcept;
     void EndDrawing() const noexcept;

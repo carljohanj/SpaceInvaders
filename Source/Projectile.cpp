@@ -8,12 +8,13 @@ void Projectile::Update()
     lineStart.x = position.x;
     lineEnd.x = position.x;
 
-    if (position.y < 0 || position.y > GetScreenHeight()) {
+    if (position.y < 0 || position.y > GetScreenHeight()) 
+    {
         active = false;
     }
 }
 
-void Projectile::Render(Texture2D texture) 
+void Projectile::Render(Texture2D texture) const noexcept
 {
     DrawTexturePro(texture,
         { 0, 0, 176, 176 },

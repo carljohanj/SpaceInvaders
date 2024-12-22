@@ -1,8 +1,8 @@
 #include "GameWindow.hpp"
 
-GameWindow::GameWindow(const char* gameTitle, int width, int height)
+GameWindow::GameWindow(std::string_view gameTitle, int width, int height)
 {
-    InitWindow(width, height, gameTitle);
+    InitWindow(width, height, gameTitle.data());
     SetTargetFPS(60);
 }
 

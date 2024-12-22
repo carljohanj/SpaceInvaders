@@ -3,13 +3,14 @@
 #include "Projectile.hpp"
 #include "EntityType.hpp"
 
-class Alien {
+class Alien 
+{
 public:
     Alien();
     ~Alien();
 
     void Update();
-    void Render();
+    void Render() const noexcept;
 
     Projectile Shoot();
 

@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
+#include <string_view>
 
 // Screen dimensions
 constexpr int screenWidth = 1920;
 constexpr int screenHeight = 1080;
 
 // Game title
-const char* title = "SPACE INVADERS";
+inline constexpr std::string_view title = "SPACE INVADERS";
 
 // Walls
 constexpr int defaultWallCount = 5;
