@@ -1,11 +1,11 @@
+#include "Config.hpp"
 #include "Game.hpp"
 #include <algorithm>
-#include <iostream>
-#include "WindowConfig.hpp"
-#include <ranges>
-#include <vector>
 #include <cmath>
 #include <fstream>
+#include <iostream>
+#include <ranges>
+#include <vector>
 
 Game::Game()
     : window(title, screenWidth, screenHeight)
@@ -29,16 +29,16 @@ void Game::Run()
     CloseAudioDevice();
 }
 
-namespace 
+namespace
 {
-    float lineLength(Vector2 A, Vector2 B)
+    float lineLength(Vector2 A, Vector2 B) noexcept
     {
         const float dx = B.x - A.x;
         const float dy = B.y - A.y;
         return sqrtf(dx * dx + dy * dy);
     }
 
-    bool pointInCircle(Vector2 circlePos, float radius, Vector2 point)
+    bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) noexcept
     {
         const float dx = circlePos.x - point.x;
         const float dy = circlePos.y - point.y;
@@ -199,8 +199,9 @@ void Game::RandomizeAlienShot()
 
 void Game::RemoveInactiveAliens()
 {
-    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) {
-        return !alien.IsActive();
+    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien)
+        {
+            return !alien.IsActive();
         });
 
     for (auto removedIt = it; removedIt != Aliens.end(); ++removedIt) 
@@ -208,7 +209,6 @@ void Game::RemoveInactiveAliens()
         std::cout << "Removing Alien with ID: " << &(*removedIt) << std::endl;
         Alien::DecrementInstanceCount();
     }
-
     Aliens.erase(it, Aliens.end());
 }
 
@@ -286,7 +286,8 @@ void Game::CheckPlayerCollision(Projectile& projectile)
 
 void Game::CheckEnemyCollision(Projectile& projectile)
 {
-    if (CheckCollision({ player.GetXPosition(), screenHeight - player.GetPlayerBaseHeight() }, player.GetRadius(), projectile.lineStart, projectile.lineEnd)) 
+    if (CheckCollision({ player.GetXPosition(), screenHeight - player.GetPlayerBaseHeight() },
+        player.GetRadius(), projectile.lineStart, projectile.lineEnd)) 
     {
         projectile.active = false;
         player.SetLives(player.GetLives() - 1);
@@ -316,23 +317,17 @@ void Game::CheckWallCollisions(Projectile& projectile)
 
 bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd)
 {
-    Vector2 A = lineStart;
-    Vector2 B = lineEnd;
-    Vector2 C = circlePos;
+    const auto dx = lineEnd.x - lineStart.x;
+    const auto dy = lineEnd.y - lineStart.y;
+    const auto lineLengthSquared = dx * dx + dy * dy;
+    const auto dotP = ((circlePos.x - lineStart.x) * dx + (circlePos.y - lineStart.y) * dy) / lineLengthSquared;
+    const auto closestX = std::clamp(lineStart.x + dotP * dx, std::min(lineStart.x, lineEnd.x), std::max(lineStart.x, lineEnd.x));
+    const auto closestY = std::clamp(lineStart.y + dotP * dy, std::min(lineStart.y, lineEnd.y), std::max(lineStart.y, lineEnd.y));
 
-    float length = lineLength(A, B);
-    float dotP = (((C.x - A.x) * (B.x - A.x)) + ((C.y - A.y) * (B.y - A.y))) / pow(length, 2);
+    const float distanceSquared = (closestX - circlePos.x) * (closestX - circlePos.x) +
+                                  (closestY - circlePos.y) * (closestY - circlePos.y);
 
-    float closestX = A.x + (dotP * (B.x - A.x));
-    float closestY = A.y + (dotP * (B.y - A.y));
-
-    if (closestX < std::min(A.x, B.x) || closestX > std::max(A.x, B.x) ||
-        closestY < std::min(A.y, B.y) || closestY > std::max(A.y, B.y)) {
-        return false;
-    }
-
-    float distance = lineLength({ closestX, closestY }, C);
-    return distance <= circleRadius;
+    return distanceSquared <= circleRadius * circleRadius;
 }
 
 void Game::UpdateBackground()

@@ -11,7 +11,7 @@
 #include "Background.hpp"
 #include "EntityType.hpp"
 #include "GameWindow.hpp"
-#include "WindowConfig.hpp"
+#include "Config.hpp"
 
 enum class State
 {

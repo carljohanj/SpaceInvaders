@@ -192,7 +192,7 @@
     <ClInclude Include="Source\Star.hpp" />
     <ClInclude Include="Source\TextureWrapper.hpp" />
     <ClInclude Include="Source\Wall.hpp" />
-    <ClInclude Include="Source\WindowConfig.hpp" />
+    <ClInclude Include="Source\Config.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
