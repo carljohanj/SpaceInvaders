@@ -83,6 +83,6 @@ public:
     void CheckWallCollisions(Projectile& projectile);
     bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
     void UpdateBackground();
-    bool CheckNewHighScore();
+    bool CheckNewHighScore() noexcept;
     void InsertNewHighScore(std::string name);
 };

@@ -31,13 +31,6 @@ void Game::Run()
 
 namespace
 {
-    float lineLength(Vector2 A, Vector2 B) noexcept
-    {
-        const float dx = B.x - A.x;
-        const float dy = B.y - A.y;
-        return sqrtf(dx * dx + dy * dy);
-    }
-
     bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) noexcept
     {
         const float dx = circlePos.x - point.x;
@@ -332,13 +325,16 @@ bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineSta
 
 void Game::UpdateBackground()
 {
-    const Vector2 playerPos = { player.GetXPosition(), player.GetPlayerBaseHeight() };
-    const Vector2 cornerPos = { 0.0f, player.GetPlayerBaseHeight() };
-    const float offset = lineLength(playerPos, cornerPos) * -1.0f;
-
-    background.Update(offset / backgroundSpeed);
+    const float playerBaseHeight = player.GetPlayerBaseHeight();
+    const Vector2 playerPosition = { player.GetXPosition(), playerBaseHeight };
+    const Vector2 screenCorner = { 0.0f, playerBaseHeight };
+    const float dx = screenCorner.x - playerPosition.x;
+    const float dy = screenCorner.y - playerPosition.y;
+    const float backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
+    background.Update(backgroundOffset / backgroundSpeed);
 }
 
-bool Game::CheckNewHighScore() {
+bool Game::CheckNewHighScore() noexcept
+{
     return score > Leaderboard.back().score;
 }
