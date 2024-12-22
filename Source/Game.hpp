@@ -66,6 +66,8 @@ public:
     void Launch();
     void Update();
     void Render();
+    void RenderStartScreen() noexcept;
+    void RenderGameplay();
     void UpdatePlayerInput();
     void SpawnAliens();
     void UpdateAliens();

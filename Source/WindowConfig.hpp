@@ -8,6 +8,8 @@ constexpr int screenHeight = 1080;
 
 // Game title
 inline constexpr std::string_view title = "SPACE INVADERS";
+constexpr std::string_view beginMessage = "PRESS SPACE TO BEGIN";
+constexpr std::string_view continueMessage = "PRESS SPACE TO BEGIN";
 
 // Walls
 constexpr int defaultWallCount = 5;

@@ -29,16 +29,22 @@ void Game::Run()
     CloseAudioDevice();
 }
 
-// MATH FUNCTIONS
-float lineLength(Vector2 A, Vector2 B)
+namespace 
 {
-    return sqrtf(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
-}
+    float lineLength(Vector2 A, Vector2 B)
+    {
+        const float dx = B.x - A.x;
+        const float dy = B.y - A.y;
+        return sqrtf(dx * dx + dy * dy);
+    }
 
-bool pointInCircle(Vector2 circlePos, float radius, Vector2 point)
-{
-    float distanceToCentre = lineLength(circlePos, point);
-    return distanceToCentre < radius;
+    bool pointInCircle(Vector2 circlePos, float radius, Vector2 point)
+    {
+        const float dx = circlePos.x - point.x;
+        const float dy = circlePos.y - point.y;
+        const float squaredDistance = dx * dx + dy * dy;
+        return squaredDistance < radius * radius;
+    }
 }
 
 void Game::Start()
@@ -84,12 +90,7 @@ void Game::Update()
         break;
 
     case State::ENDSCREEN:
-        if (IsKeyReleased(KEY_ENTER)) {
-            Continue();
-        }
-        break;
-
-    default:
+        if (IsKeyReleased(KEY_ENTER)) { Continue(); }
         break;
     }
 }
@@ -99,37 +100,48 @@ void Game::Render()
     switch (gameState)
     {
     case State::STARTSCREEN:
-        DrawText("SPACE INVADERS", 200, 100, startScreenTitleFontSize, YELLOW);
-        DrawText("PRESS SPACE TO BEGIN", 200, 350, startScreenSubtitleFontSize, YELLOW);
+        RenderStartScreen();
         break;
 
     case State::GAMEPLAY:
-        background.Render();
-        DrawText(TextFormat("Score: %i", score), 50, 20, gameplayScoreFontSize, YELLOW);
-        DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, gameplayLivesFontSize, YELLOW);
-        player.Render();
-
-        for (int i = 0; i < Projectiles.size(); i++) {
-            Projectiles[i].Render(resources.laserTexture);
-        }
-
-        for (int i = 0; i < Walls.size(); i++) {
-            Walls[i].Render();
-        }
-
-        for (int i = 0; i < Aliens.size(); i++) {
-            Aliens[i].Render();
-        }
+        RenderGameplay();
         break;
 
     case State::ENDSCREEN:
-        DrawText("PRESS ENTER TO CONTINUE", textBoxX, 200, endScreenFontSize, YELLOW);
-        break;
-
-    default:
+        DrawText(continueMessage.data(), textBoxX, 200, endScreenFontSize, YELLOW);
         break;
     }
 }
+
+void Game::RenderStartScreen() noexcept
+{
+    DrawText(title.data(), 200, 100, startScreenTitleFontSize, YELLOW);
+    DrawText(beginMessage.data(), 200, 350, startScreenSubtitleFontSize, YELLOW);
+}
+
+void Game::RenderGameplay()
+{
+    background.Render();
+    DrawText(TextFormat("Score: %i", score), 50, 20, gameplayScoreFontSize, YELLOW);
+    DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, gameplayLivesFontSize, YELLOW);
+    player.Render();
+
+    for (const auto& projectile : Projectiles)
+    {
+        projectile.Render(resources.laserTexture);
+    }
+
+    for (const auto& wall : Walls) 
+    {
+        wall.Render();
+    }
+
+    for (const auto& alien : Aliens) 
+    {
+        alien.Render();
+    }
+}
+
 
 void Game::UpdatePlayerInput()
 {
@@ -159,14 +171,10 @@ void Game::SpawnAliens()
 void Game::UpdateAliens()
 {
     RandomizeAlienShot();
-
     for (auto& alien : Aliens)
     {
         alien.Update();
-        if (alien.GetPosition().y > screenHeight - player.GetPlayerBaseHeight())
-        {
-            End();
-        }
+        if (alien.GetPosition().y > screenHeight - player.GetPlayerBaseHeight()) { End(); }
     }
     RemoveInactiveAliens();
     if (Aliens.empty()) { SpawnAliens(); }
@@ -175,13 +183,13 @@ void Game::UpdateAliens()
 void Game::RandomizeAlienShot()
 {
     shootTimer += GetFrameTime();
-
     if (shootTimer >= alienShootInterval && !Aliens.empty())
     {
         const int randomAlienIndex = rand() % Aliens.size();
         auto& randomAlien = Aliens[randomAlienIndex];
 
-        if (randomAlien.IsActive()) {
+        if (randomAlien.IsActive()) 
+        {
             Projectiles.push_back(randomAlien.Shoot());
             std::cout << "Alien at index " << randomAlienIndex << " fired a projectile!" << std::endl;
         }
@@ -191,16 +199,19 @@ void Game::RandomizeAlienShot()
 
 void Game::RemoveInactiveAliens()
 {
-    for (int i = 0; i < Aliens.size(); i++)
+    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) {
+        return !alien.IsActive();
+        });
+
+    for (auto removedIt = it; removedIt != Aliens.end(); ++removedIt) 
     {
-        if (!Aliens[i].IsActive()) {
-            std::cout << "Removing Alien with ID: " << &Aliens[i] << std::endl;
-            Aliens.erase(Aliens.begin() + i);
-            Alien::DecrementInstanceCount();
-            i--;
-        }
+        std::cout << "Removing Alien with ID: " << &(*removedIt) << std::endl;
+        Alien::DecrementInstanceCount();
     }
+
+    Aliens.erase(it, Aliens.end());
 }
+
 
 void Game::SpawnWalls()
 {
@@ -211,8 +222,9 @@ void Game::SpawnWalls()
     Walls.clear();
     Walls.reserve(defaultWallCount);
 
-    for (const int i : std::views::iota(1, defaultWallCount + 1)) {
-        Walls.emplace_back(); // Construct Wall in place
+    for (const int i : std::views::iota(1, defaultWallCount + 1)) 
+    {
+        Walls.emplace_back();
         Walls.back().SetPosition({ wall_distance * static_cast<float>(i), window_height - 250.0f });
         Wall::IncrementInstanceCount();
     }
@@ -229,14 +241,14 @@ void Game::UpdateWalls()
 
 void Game::RemoveInactiveWalls()
 {
-    for (int i = 0; i < Walls.size(); i++)
+    auto it = std::remove_if(Walls.begin(), Walls.end(), [](const Wall& wall) {
+        return !wall.IsActive();
+        });
+    for (auto removedIt = it; removedIt != Walls.end(); ++removedIt) 
     {
-        if (!Walls[i].IsActive()) {
-            Walls.erase(Walls.begin() + i);
-            Wall::DecrementInstanceCount();
-            i--;
-        }
+        Wall::DecrementInstanceCount();
     }
+    Walls.erase(it, Walls.end());
 }
 
 void Game::UpdateProjectiles()
@@ -262,7 +274,8 @@ void Game::CheckPlayerCollision(Projectile& projectile)
 {
     for (auto& alien : Aliens) 
     {
-        if (alien.IsActive() && CheckCollision(alien.GetPosition(), alien.GetRadius(), projectile.lineStart, projectile.lineEnd)) {
+        if (alien.IsActive() && CheckCollision(alien.GetPosition(), alien.GetRadius(), projectile.lineStart, projectile.lineEnd))
+        {
             projectile.active = false;
             alien.SetActive(false);
             score += 100;
