@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <string_view>
+#include <array>
 
 // Screen dimensions
 constexpr int screenWidth = 1920;
@@ -9,7 +10,7 @@ constexpr int screenHeight = 1080;
 // Game title
 inline constexpr std::string_view title = "SPACE INVADERS";
 constexpr std::string_view beginMessage = "PRESS SPACE TO BEGIN";
-constexpr std::string_view continueMessage = "PRESS SPACE TO BEGIN";
+constexpr std::string_view continueMessage = "PRESS ENTER TO CONTINUE";
 
 // Walls
 constexpr int defaultWallCount = 5;
@@ -34,11 +35,11 @@ constexpr int gameplayScoreFontSize = 40;
 constexpr int gameplayLivesFontSize = 40;
 constexpr int endScreenFontSize = 40;
 
-// Other UI
+// Other UI stuff
 constexpr int textBoxWidth = 225;
 constexpr int textBoxHeight = 50;
 constexpr int textBoxX = 600;
 constexpr int textBoxY = 500;
 
 // High Scores
-constexpr int initialHighScores[5] = { 500, 400, 300, 200, 100 };
+constexpr std::array initialHighScores = { 500, 400, 300, 200, 100 };

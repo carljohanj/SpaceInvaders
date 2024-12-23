@@ -1,14 +1,16 @@
 #include "Config.hpp"
 #include "Game.hpp"
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <ranges>
 #include <vector>
 
 Game::Game()
-    : window(title, screenWidth, screenHeight)
+    : window()
 {
     gameState = State::STARTSCREEN;
     score = 0;
@@ -43,7 +45,7 @@ namespace
 void Game::Start()
 {
     SpawnWalls();
-    resources.Load();
+    resources.Load();       //ToDo: Remove
     player.RePosition();
     SpawnAliens();
     Background newBackground;
@@ -53,7 +55,7 @@ void Game::Start()
     gameState = State::GAMEPLAY;
 }
 
-void Game::End()
+void Game::End() noexcept
 {
     Projectiles.clear();
     Walls.clear();
@@ -63,7 +65,7 @@ void Game::End()
 }
 
 void Game::Continue() noexcept { gameState = State::STARTSCREEN; }
-void Game::Launch() { resources.Load(); }
+void Game::Launch() { resources.Load(); }   //ToDo: Remove
 
 void Game::Update()
 {
@@ -163,7 +165,7 @@ void Game::SpawnAliens()
 
 void Game::UpdateAliens()
 {
-    RandomizeAlienShot();
+    TriggerAlienShot();
     for (auto& alien : Aliens)
     {
         alien.Update();
@@ -173,15 +175,20 @@ void Game::UpdateAliens()
     if (Aliens.empty()) { SpawnAliens(); }
 }
 
-void Game::RandomizeAlienShot()
+void Game::TriggerAlienShot()
 {
     shootTimer += GetFrameTime();
     if (shootTimer >= alienShootInterval && !Aliens.empty())
     {
-        const int randomAlienIndex = rand() % Aliens.size();
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dist(0, Aliens.size() - 1);
+
+        const int randomAlienIndex = dist(gen);
+        assert(randomAlienIndex >= 0 && randomAlienIndex < Aliens.size());
         auto& randomAlien = Aliens[randomAlienIndex];
 
-        if (randomAlien.IsActive()) 
+        if (randomAlien.IsActive())
         {
             Projectiles.push_back(randomAlien.Shoot());
             std::cout << "Alien at index " << randomAlienIndex << " fired a projectile!" << std::endl;
@@ -204,7 +211,6 @@ void Game::RemoveInactiveAliens()
     }
     Aliens.erase(it, Aliens.end());
 }
-
 
 void Game::SpawnWalls()
 {
@@ -234,8 +240,9 @@ void Game::UpdateWalls()
 
 void Game::RemoveInactiveWalls()
 {
-    auto it = std::remove_if(Walls.begin(), Walls.end(), [](const Wall& wall) {
-        return !wall.IsActive();
+    auto it = std::remove_if(Walls.begin(), Walls.end(), [](const Wall& wall) noexcept
+        {
+            return !wall.IsActive();
         });
     for (auto removedIt = it; removedIt != Walls.end(); ++removedIt) 
     {
@@ -285,7 +292,6 @@ void Game::CheckEnemyCollision(Projectile& projectile)
         projectile.active = false;
         player.SetLives(player.GetLives() - 1);
         std::cout << "Player hit by alien projectile!" << std::endl;
-
         if (player.GetLives() <= 0) { End(); }
     }
 }
@@ -313,11 +319,11 @@ bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineSta
     const auto dx = lineEnd.x - lineStart.x;
     const auto dy = lineEnd.y - lineStart.y;
     const auto lineLengthSquared = dx * dx + dy * dy;
+
     const auto dotP = ((circlePos.x - lineStart.x) * dx + (circlePos.y - lineStart.y) * dy) / lineLengthSquared;
     const auto closestX = std::clamp(lineStart.x + dotP * dx, std::min(lineStart.x, lineEnd.x), std::max(lineStart.x, lineEnd.x));
     const auto closestY = std::clamp(lineStart.y + dotP * dy, std::min(lineStart.y, lineEnd.y), std::max(lineStart.y, lineEnd.y));
-
-    const float distanceSquared = (closestX - circlePos.x) * (closestX - circlePos.x) +
+    const auto distanceSquared = (closestX - circlePos.x) * (closestX - circlePos.x) +
                                   (closestY - circlePos.y) * (closestY - circlePos.y);
 
     return distanceSquared <= circleRadius * circleRadius;
@@ -325,12 +331,12 @@ bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineSta
 
 void Game::UpdateBackground()
 {
-    const float playerBaseHeight = player.GetPlayerBaseHeight();
+    const auto playerBaseHeight = player.GetPlayerBaseHeight();
     const Vector2 playerPosition = { player.GetXPosition(), playerBaseHeight };
     const Vector2 screenCorner = { 0.0f, playerBaseHeight };
-    const float dx = screenCorner.x - playerPosition.x;
-    const float dy = screenCorner.y - playerPosition.y;
-    const float backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
+    const auto dx = screenCorner.x - playerPosition.x;
+    const auto dy = screenCorner.y - playerPosition.y;
+    const auto backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
     background.Update(backgroundOffset / backgroundSpeed);
 }
 

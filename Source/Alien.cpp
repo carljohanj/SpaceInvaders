@@ -29,25 +29,26 @@ Alien::~Alien()
 
 void Alien::Update() 
 {
-    if (moveRight) {
+    if (moveRight) 
+    {
         position.x += speed; // Move right
-        if (position.x >= GetScreenWidth() - radius) {
+        if (position.x >= GetScreenWidth() - radius)
+        {
             moveRight = false;
             position.y += 50; // Move down
         }
     }
     else {
         position.x -= speed; // Move left
-        if (position.x <= radius) {
+        if (position.x <= radius) 
+        {
             moveRight = true;
             position.y += 50; // Move down
         }
     }
 
     // Mark alien as inactive if it moves off-screen
-    if (position.y > GetScreenHeight()) {
-        active = false;
-    }
+    if (position.y > GetScreenHeight()) { active = false; }
 }
 
 void Alien::Render() const noexcept
@@ -75,6 +76,6 @@ Projectile Alien::Shoot()
     return newProjectile;
 }
 
-void Alien::IncrementInstanceCount() { instanceCount++; }
-void Alien::DecrementInstanceCount() { instanceCount--; }
-int  Alien::GetInstanceCount()  { return instanceCount; }
+void Alien::IncrementInstanceCount() noexcept { instanceCount++; }
+void Alien::DecrementInstanceCount() noexcept { instanceCount--; }
+int  Alien::GetInstanceCount() noexcept { return instanceCount; }

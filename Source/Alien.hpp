@@ -8,28 +8,18 @@ class Alien
 public:
     Alien();
     ~Alien();
-
     void Update();
     void Render() const noexcept;
-
     Projectile Shoot();
-
-    // Getters
-    Vector2 GetPosition() const { return position; }
-    float GetRadius() const { return radius; }
-    bool IsActive() const { return active; }
-
-    // Setters
-    void SetPosition(Vector2 newPosition) { position = newPosition; }
-    void SetActive(bool isActive) { active = isActive; }
-
-    static int GetInstanceCount();
-
-    // Methods to update the instance count
-    static void IncrementInstanceCount();
-    static void DecrementInstanceCount();
-
-    void EnsureTextureLoaded();
+    static int GetInstanceCount() noexcept;
+    static void IncrementInstanceCount() noexcept;
+    static void DecrementInstanceCount() noexcept;
+    
+    Vector2 GetPosition() const noexcept { return position; }
+    float GetRadius() const noexcept { return radius; }
+    bool IsActive() const noexcept { return active; }
+    void SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
+    void SetActive(bool isActive) noexcept { active = isActive; }
 
 private:
     Vector2 position = { 0, 0 };
@@ -37,7 +27,6 @@ private:
     bool active = true;
     bool moveRight = true;
     int speed = 2;
-
     EntityType type = EntityType::ENEMY;
 
     static Texture2D texture;

@@ -1,11 +1,12 @@
 #pragma once
 #include "raylib.h"
 #include <string>
+#include "Config.hpp"
 
 class GameWindow 
 {
 public:
-    GameWindow(std::string_view title, int width, int height);
+    GameWindow();
     ~GameWindow();
     void BeginDrawing() const noexcept;
     void EndDrawing() const noexcept;

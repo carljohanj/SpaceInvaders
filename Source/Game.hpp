@@ -1,5 +1,5 @@
 #pragma once
-#include "raylib.h"
+#include <raylib.h>
 #include <vector>
 #include <string>
 #include "Resources.h"
@@ -59,8 +59,13 @@ public:
     float offset;
 
     Game();
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
+    Game(Game&&) = delete;
+    Game& operator=(Game&&) = delete;
+
     void Start();
-    void End();
+    void End() noexcept;
     void Run();
     void Continue() noexcept;
     void Launch();
@@ -71,7 +76,7 @@ public:
     void UpdatePlayerInput();
     void SpawnAliens();
     void UpdateAliens();
-    void RandomizeAlienShot();
+    void TriggerAlienShot();
     void RemoveInactiveAliens();
     void SpawnWalls();
     void UpdateWalls();
@@ -85,4 +90,9 @@ public:
     void UpdateBackground();
     bool CheckNewHighScore() noexcept;
     void InsertNewHighScore(std::string name);
+
+private:
+    struct Impl;
+    alignas(std::max_align_t) std::byte implBuffer[128];
+    Impl* pImpl;
 };
