@@ -9,7 +9,7 @@ Game::Game()
     : window(),
       background()
 {
-    Aliens.reserve(alienFormationWidth * alienFormationHeight);
+    Aliens.reserve(Config::alienFormationWidth * Config::alienFormationHeight);
     gameState = State::STARTSCREEN;
     score = 0;
     shootTimer = 0.0f;
@@ -107,19 +107,19 @@ void Game::RenderGameplay() noexcept
 
 void Game::RenderStartScreen() const noexcept
 {
-    DrawText(title.data(), 200, 100, startScreenTitleFontSize, YELLOW);
-    DrawText(beginMessage.data(), 200, 350, startScreenSubtitleFontSize, YELLOW);
+    DrawText(Config::title.data(), 200, 100, Config::startScreenTitleFontSize, YELLOW);
+    DrawText(Config::beginMessage.data(), 200, 350, Config::startScreenSubtitleFontSize, YELLOW);
 }
 
 void Game::RenderGameOverScreen() const noexcept
 {
-    DrawText(continueMessage.data(), textBoxX, 200, endScreenFontSize, YELLOW);
+    DrawText(Config::continueMessage.data(), Config::textBoxX, 200, Config::endScreenFontSize, YELLOW);
 }
 
 void Game::RenderHUD() const noexcept
 {
-    DrawText(TextFormat("Score: %i", score), 50, 20, gameplayScoreFontSize, YELLOW);
-    DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, gameplayLivesFontSize, YELLOW);
+    DrawText(TextFormat("Score: %i", score), 50, 20, Config::gameplayScoreFontSize, YELLOW);
+    DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, Config::gameplayLivesFontSize, YELLOW);
 }
 
 void Game::UpdatePlayerInput()
@@ -133,13 +133,13 @@ void Game::ResetAliens()
 {
     if (Aliens.empty()) 
     {
-        for (int row = 0; row < alienFormationHeight; row++)
+        for (int row = 0; row < Config::alienFormationHeight; row++)
         {
-            for (int col = 0; col < alienFormationWidth; col++)
+            for (int col = 0; col < Config::alienFormationWidth; col++)
             {
                 Alien newAlien;
-                newAlien.SetPosition({ static_cast<float>(alienFormationX + 450 + (col * alienSpacing)),
-                                       static_cast<float>(alienFormationY + (row * alienSpacing)) });
+                newAlien.SetPosition({ static_cast<float>(Config::alienFormationX + 450 + (col * Config::alienSpacing)),
+                                       static_cast<float>(Config::alienFormationY + (row * Config::alienSpacing)) });
                 Aliens.push_back(std::move(newAlien));
             }
         }
@@ -161,7 +161,7 @@ void Game::UpdateAliens()
     for (auto& alien : Aliens)
     {
         alien.Update();
-        if (alien.GetPosition().y > screenHeight - player.GetPlayerBaseHeight()) { End(); }
+        if (alien.GetPosition().y > Config::screenHeight - player.GetPlayerBaseHeight()) { End(); }
     }
     if (Aliens.empty()) { ResetAliens(); }
 }
@@ -170,7 +170,7 @@ void Game::UpdateAliens()
 void Game::TriggerAlienShot()
 {
     shootTimer += GetFrameTime();
-    if (shootTimer >= alienShootInterval && !Aliens.empty())
+    if (shootTimer >= Config::alienShootInterval && !Aliens.empty())
     {
         static std::random_device rd;
         static std::mt19937 gen(rd());
@@ -203,14 +203,14 @@ void Game::RemoveInactiveAliens()
 
 void Game::ResetWalls()
 {
-    constexpr auto window_width = static_cast<float>(screenWidth);
-    constexpr auto window_height = static_cast<float>(screenHeight);
-    constexpr auto wall_distance = window_width / (defaultWallCount + 1);
+    constexpr auto window_width = static_cast<float>(Config::screenWidth);
+    constexpr auto window_height = static_cast<float>(Config::screenHeight);
+    constexpr auto wall_distance = window_width / (Config::defaultWallCount + 1);
 
     Walls.clear();
-    Walls.reserve(defaultWallCount);
+    Walls.reserve(Config::defaultWallCount);
 
-    for (const int i : std::views::iota(1, defaultWallCount + 1)) 
+    for (const int i : std::views::iota(1, Config::defaultWallCount + 1))
     {
         Walls.emplace_back();
         Walls.back().SetPosition({ wall_distance * static_cast<float>(i), window_height - 250.0f });
@@ -286,7 +286,7 @@ void Game::CheckPlayerCollision(Projectile& projectile)
 
 void Game::CheckEnemyCollision(Projectile& projectile)
 {
-    if (CheckCollision({ player.GetXPosition(), screenHeight - player.GetPlayerBaseHeight() },
+    if (CheckCollision({ player.GetXPosition(), Config::screenHeight - player.GetPlayerBaseHeight() },
         player.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
     {
         projectile.SetActive(false);
@@ -333,7 +333,7 @@ void Game::UpdateBackground()
     const auto dx = screenCorner.x - playerPosition.x;
     const auto dy = screenCorner.y - playerPosition.y;
     const auto backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
-    background.Update(backgroundOffset / backgroundSpeed);
+    background.Update(backgroundOffset / Config::backgroundSpeed);
 }
 
 bool Game::CheckNewHighScore() noexcept

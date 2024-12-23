@@ -48,13 +48,13 @@ private:
     // Leaderboard (place in own struct?)
     std::string_view name;
     int letterCount = 0;
-    Rectangle textBox = { textBoxX, textBoxY, textBoxWidth, textBoxHeight };
+    Rectangle textBox = { Config::textBoxX, Config::textBoxY, Config::textBoxWidth, Config::textBoxHeight };
     bool mouseOnText = false;
-    std::vector<PlayerData> Leaderboard = { {"Player 1", initialHighScores[0]},
-                                            {"Player 2", initialHighScores[1]},
-                                            {"Player 3", initialHighScores[2]},
-                                            {"Player 4", initialHighScores[3]},
-                                            {"Player 5", initialHighScores[4]} };
+    std::vector<PlayerData> Leaderboard = { {"Player 1", Config::initialHighScores[0]},
+                                            {"Player 2", Config::initialHighScores[1]},
+                                            {"Player 3", Config::initialHighScores[2]},
+                                            {"Player 4", Config::initialHighScores[3]},
+                                            {"Player 5", Config::initialHighScores[4]} };
 
     // UI Elements
     Vector2 playerPos;

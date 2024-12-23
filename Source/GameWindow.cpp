@@ -3,7 +3,7 @@
 
 GameWindow::GameWindow()
 {
-    InitWindow(screenWidth, screenHeight, title.data());
+    InitWindow(Config::screenWidth, Config::screenHeight, Config::title.data());
     SetTargetFPS(60);
 }
 

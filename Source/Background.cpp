@@ -6,10 +6,10 @@
 
 Background::Background()
     : Stars(),
-      starAmount(backgroundStarAmount),
-      xMinOffset(backgroundXMinOffset),
-      xMaxOffset(backgroundXMaxOffset),
-      bgSpeed(backgroundSpeed)
+      starAmount(Config::backgroundStarAmount),
+      xMinOffset(Config::backgroundXMinOffset),
+      xMaxOffset(Config::backgroundXMaxOffset),
+      bgSpeed(Config::backgroundSpeed)
 {
     Stars.reserve(starAmount);
     for ([[maybe_unused]] auto i : std::views::iota(0, starAmount))
