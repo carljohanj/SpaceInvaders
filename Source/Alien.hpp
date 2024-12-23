@@ -2,20 +2,23 @@
 #include "raylib.h"
 #include "Projectile.hpp"
 #include "EntityType.hpp"
+#include "TextureWrapper.hpp"
 #include <iostream>
 
-class Alien 
+class Alien
 {
 public:
     Alien();
     Alien(const Alien&);
     Alien(Alien&& other) noexcept;
-    ~Alien();
+    ~Alien() = default; // No need for custom destructor
     Alien& operator=(const Alien&);
     Alien& operator=(Alien&& other) noexcept;
+
     void Update();
     void Render() const noexcept;
     Projectile Shoot();
+
     void SetPosition(Vector2 pos) noexcept { position = pos; }
     Vector2 GetPosition() const noexcept { return position; }
     float GetRadius() const noexcept { return radius; }
@@ -28,6 +31,6 @@ private:
     float speed = 2.0f;
     bool active = true;
     bool moveRight = true;
-    static Texture2D texture;
-    static int instanceCount;
+
+    TextureWrapper texture;
 };

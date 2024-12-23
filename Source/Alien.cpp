@@ -1,38 +1,18 @@
 #include "Alien.hpp"
 #include "Config.hpp"
-#include "TextureLoadingException.hpp"
-#include <iostream>
 #include <utility>
 #include <print>
 
-Texture2D Alien::texture = { 0 };
-int Alien::instanceCount = 0;
-
+// Constructor
 Alien::Alien()
-    : position({ 0.0f, 0.0f }), radius(20.0f), speed(2.0f), active(true), moveRight(true)
+    : position({ 0.0f, 0.0f }),
+    radius(20.0f),
+    speed(2.0f),
+    active(true),
+    moveRight(true),
+    texture(Config::alienTexturePath)
 {
-    if (instanceCount == 0)
-    {
-        texture = LoadTexture(Config::alienTexturePath.data());
-        if (texture.id == 0)
-        {
-            throw TextureLoadingException("Failed to load Alien texture!");
-        }
-    }
-    instanceCount++;
-    std::println("Alien born! Wohoo! Instance count: {}", instanceCount);
-}
-
-// Copy Constructor
-Alien::Alien(const Alien& other)
-    : position(other.position),
-    radius(other.radius),
-    speed(other.speed),
-    active(other.active),
-    moveRight(other.moveRight)
-{
-    instanceCount++;
-    std::println("Alien copied! Instance count: {}", instanceCount);
+    std::println("Alien created!");
 }
 
 // Move Constructor
@@ -41,56 +21,30 @@ Alien::Alien(Alien&& other) noexcept
     radius(std::move(other.radius)),
     speed(std::move(other.speed)),
     active(std::move(other.active)),
-    moveRight(std::move(other.moveRight))
+    moveRight(std::move(other.moveRight)),
+    texture(std::move(other.texture))
 {
-    instanceCount++;
-    std::println("Alien moved! Instance count remains: {}", instanceCount);
+    std::println("Alien moved!");
 }
 
-// Destructor
-Alien::~Alien()
-{
-    instanceCount--;
-    std::println("Alien instance destroyed! Oh no! Instance count: {}", instanceCount);
-
-    if (instanceCount == 0 && texture.id != 0)
-    {
-        UnloadTexture(texture);
-        texture = { 0 };
-        std::println("Alien texture unloaded");
-    }
-}
-
-Alien& Alien::operator=(const Alien& other)
-{
-    if (this != &other)
-    {
-        position = other.position;
-        radius = other.radius;
-        speed = other.speed;
-        active = other.active;
-        moveRight = other.moveRight;
-
-        std::println("Alien assigned via copy!");
-    }
-    return *this;
-}
-
+// Move Assignment
 Alien& Alien::operator=(Alien&& other) noexcept
 {
     if (this != &other)
     {
-        std::swap(position, other.position);
-        std::swap(radius, other.radius);
-        std::swap(speed, other.speed);
-        std::swap(active, other.active);
-        std::swap(moveRight, other.moveRight);
+        position = std::move(other.position);
+        radius = std::move(other.radius);
+        speed = std::move(other.speed);
+        active = std::move(other.active);
+        moveRight = std::move(other.moveRight);
+        texture = std::move(other.texture);
 
-        std::println("Alien assigned via move using std::swap!");
+        std::println("Alien move-assigned!");
     }
     return *this;
 }
 
+// Update Method
 void Alien::Update()
 {
     if (moveRight)
@@ -114,22 +68,18 @@ void Alien::Update()
     if (position.y > GetScreenHeight()) { active = false; }
 }
 
+// Render Method
 void Alien::Render() const noexcept
 {
-    if (texture.id == 0)
-    {
-        std::cerr << "Alien texture is not valid!" << std::endl;
-        return;
-    }
-
-    DrawTexturePro(texture,
-        { 0, 0, (float)texture.width, (float)texture.height },
+    DrawTexturePro(texture.GetTexture(), // Use the texture from TextureWrapper
+        { 0, 0, (float)texture.GetTexture().width, (float)texture.GetTexture().height },
         { position.x, position.y, 100.0f, 100.0f },
         { 50.0f, 50.0f },
         0.0f,
         WHITE);
 }
 
+// Shoot Method
 Projectile Alien::Shoot()
 {
     Projectile newProjectile;

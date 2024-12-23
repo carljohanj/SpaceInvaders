@@ -1,10 +1,9 @@
 #pragma once
 #include "raylib.h"
 #include <string>
-#include <stdexcept>
+#include <unordered_map>
 
-class TextureWrapper 
-{
+class TextureWrapper {
 public:
     explicit TextureWrapper(const std::string_view texturePath);
     ~TextureWrapper();
@@ -18,6 +17,9 @@ public:
     const Texture2D& GetTexture() const noexcept;
 
 private:
-    static Texture2D texture;
-    static int instanceCount;
+    std::string texturePath;
+
+    static std::unordered_map<std::string, std::pair<Texture2D, int>> textureCache;
+    void IncrementReference(const std::string& path);
+    void DecrementReference(const std::string& path);
 };

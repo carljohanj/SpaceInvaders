@@ -1,49 +1,70 @@
 #include "TextureWrapper.hpp"
-#include "TextureLoadingException.hpp"
-#include <print>
+#include <stdexcept>
+#include <iostream>
 
-Texture2D TextureWrapper::texture = { 0 };
-int TextureWrapper::instanceCount = 0;
+std::unordered_map<std::string, std::pair<Texture2D, int>> TextureWrapper::textureCache;
 
-TextureWrapper::TextureWrapper(std::string_view filePath)
+TextureWrapper::TextureWrapper(const std::string_view texturePath)
+    : texturePath(texturePath)
 {
-    texture = LoadTexture(filePath.data());
-
-    if (texture.id == 0) 
-    {
-        throw TextureLoadingException(std::string("Failed to load texture: ").append(filePath));
-    }
-    instanceCount++;
-    std::println("Texture loaded: {}", filePath);
+    IncrementReference(texturePath.data());
 }
 
 TextureWrapper::~TextureWrapper()
 {
-    instanceCount--;
-    if (instanceCount == 0 && texture.id != 0)
-    {
-        UnloadTexture(texture);
-        texture = { 0 };
-        std::println("Texture unloaded");
-    }
+    DecrementReference(texturePath);
 }
 
-TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept 
+TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept
+    : texturePath(std::move(other.texturePath))
 {
-    instanceCount++;
-    std::println("TextureWrapper moved! Instance count: {}", instanceCount);
+    other.texturePath.clear();
 }
 
-TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept 
+TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept
 {
     if (this != &other) 
     {
-        std::println("TextureWrapper move-assigned! Instance count remains: {}", instanceCount);
+        DecrementReference(texturePath);
+        texturePath = std::move(other.texturePath);
+        other.texturePath.clear();
     }
     return *this;
 }
 
 const Texture2D& TextureWrapper::GetTexture() const noexcept
 {
-    return texture;
+    return textureCache.at(texturePath).first;
+}
+
+void TextureWrapper::IncrementReference(const std::string& path)
+{
+    auto it = textureCache.find(path);
+    if (it != textureCache.end()) { it->second.second++; }
+    else 
+    {
+        Texture2D texture = LoadTexture(path.c_str());
+        if (texture.id == 0) 
+        {
+            throw std::runtime_error("Failed to load texture: " + path);
+        }
+        textureCache[path] = { texture, 1 };
+        std::cout << "Texture loaded: " << path << std::endl;
+    }
+}
+
+void TextureWrapper::DecrementReference(const std::string& path)
+{
+    auto it = textureCache.find(path);
+    if (it != textureCache.end()) {
+        // Decrement reference count
+        it->second.second--;
+
+        // If no more references, unload the texture
+        if (it->second.second == 0) {
+            UnloadTexture(it->second.first);
+            textureCache.erase(it);
+            std::cout << "Texture unloaded: " << path << std::endl;
+        }
+    }
 }
