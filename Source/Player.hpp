@@ -1,12 +1,12 @@
 #pragma once
 #include "raylib.h"
 #include "Projectile.hpp"
+#include "TextureWrapper.hpp"
 
 class Player
 {
 public:
     Player();
-    ~Player();
 
     void Reset() noexcept;
     void Update() noexcept;
@@ -25,6 +25,5 @@ private:
     float player_base_height = 70.0f;
     float radius = 50;
     int lives = 3;
-    int activeTexture = 0;
-    Texture2D texture;
+    TextureWrapper texture;
 };

@@ -1,18 +1,21 @@
 #pragma once
 #include "raylib.h"
+#include "TextureWrapper.hpp"
 
 class Wall
 {
 public:
     Wall();
-    ~Wall();
-    Wall(const Wall&) = delete;
-    Wall& operator=(const Wall&) = delete;
     Wall(Wall&& other) noexcept;
     Wall& operator=(Wall&& other) noexcept;
+    ~Wall();
 
-    void Update();
+    Wall(const Wall&) = delete;
+    Wall& operator=(const Wall&) = delete;
+
+    void Update() noexcept;
     void Render() const noexcept;
+
     Vector2 GetPosition() const noexcept { return position; }
     void SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
     bool IsActive() const noexcept { return active; }
@@ -27,6 +30,5 @@ private:
     int health = 50;
     int radius = 60;
 
-    static Texture2D texture;
-    static int instanceCount;
+    TextureWrapper texture;
 };

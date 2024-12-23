@@ -1,6 +1,10 @@
 #include "Game.hpp"
+#include "TextureLoadingException.hpp"
+#include "GameWindowException.hpp"
+#include <iostream>
+#include <print>
 
-int main() 
+int main()
 {
     Game game;
     game.Run();

@@ -1,18 +1,11 @@
 #include "Player.hpp"
 #include <algorithm>
 #include "Config.hpp"
-#include <TextureLoadingException.hpp>
 
 Player::Player()
+    : texture(Config::playerTexturePath)
 {
-    texture = LoadTexture(Config::playerTexturePath.data());
-    if (texture.id == 0) { throw TextureLoadingException("Failed to load Player texture!"); }
-}
-
-// Destructor
-Player::~Player() 
-{
-    UnloadTexture(texture); 
+    x_pos = GetScreenWidth() / 2;
 }
 
 void Player::Reset() noexcept
@@ -29,8 +22,8 @@ void Player::Update() noexcept
 
 void Player::Render() const noexcept
 {
-    DrawTexturePro(texture,
-        { 0, 0, (float)texture.width, (float)texture.height },
+    DrawTexturePro(texture.GetTexture(),
+        { 0, 0, (float)texture.GetTexture().width, (float)texture.GetTexture().height },
         { x_pos, GetScreenHeight() - player_base_height, 100, 100 },
         { 50, 50 },
         0,

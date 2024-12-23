@@ -3,10 +3,9 @@
 #include <utility>
 #include <print>
 
-// Constructor
 Alien::Alien()
     : position({ 0.0f, 0.0f }),
-    radius(20.0f),
+    radius(20.0f),  
     speed(2.0f),
     active(true),
     moveRight(true),
@@ -15,28 +14,27 @@ Alien::Alien()
     std::println("Alien created!");
 }
 
-// Move Constructor
 Alien::Alien(Alien&& other) noexcept
     : position(std::move(other.position)),
-    radius(std::move(other.radius)),
-    speed(std::move(other.speed)),
-    active(std::move(other.active)),
-    moveRight(std::move(other.moveRight)),
+    radius(other.radius),
+    speed(other.speed),
+    active(other.active),
+    moveRight(other.moveRight),
     texture(std::move(other.texture))
 {
     std::println("Alien moved!");
 }
 
-// Move Assignment
+
 Alien& Alien::operator=(Alien&& other) noexcept
 {
     if (this != &other)
     {
         position = std::move(other.position);
-        radius = std::move(other.radius);
-        speed = std::move(other.speed);
-        active = std::move(other.active);
-        moveRight = std::move(other.moveRight);
+        radius = other.radius;
+        speed = other.speed;
+        active = other.active;
+        moveRight = other.moveRight;
         texture = std::move(other.texture);
 
         std::println("Alien move-assigned!");
@@ -44,7 +42,6 @@ Alien& Alien::operator=(Alien&& other) noexcept
     return *this;
 }
 
-// Update Method
 void Alien::Update()
 {
     if (moveRight)
@@ -68,7 +65,6 @@ void Alien::Update()
     if (position.y > GetScreenHeight()) { active = false; }
 }
 
-// Render Method
 void Alien::Render() const noexcept
 {
     DrawTexturePro(texture.GetTexture(), // Use the texture from TextureWrapper
@@ -79,7 +75,6 @@ void Alien::Render() const noexcept
         WHITE);
 }
 
-// Shoot Method
 Projectile Alien::Shoot()
 {
     Projectile newProjectile;

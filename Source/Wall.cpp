@@ -1,47 +1,28 @@
-#include "Config.hpp"
-#include "TextureLoadingException.hpp"
 #include "Wall.hpp"
-#include <iostream>
+#include "Config.hpp"
+#include <print>
 #include <utility>
-
-Texture2D Wall::texture = { 0 };
-int Wall::instanceCount = 0;
+#include <iostream>
 
 Wall::Wall()
+    : texture(Config::wallTexturePath)
 {
-    if (instanceCount == 0)
-    {
-        texture = LoadTexture(Config::wallTexturePath.data());
-        if (texture.id == 0)
-        {
-            throw TextureLoadingException("Failed to load Wall texture!");
-        }
-        std::cout << "Wall texture loaded successfully." << std::endl;
-    }
-    instanceCount++;
+    std::println("Wall created!");
 }
 
 Wall::~Wall()
 {
-    instanceCount--;
-    std::cout << "Wall instance destroyed. Count: " << instanceCount << ", ID: " << this << std::endl;
-    std::cout << "Current instance count: " << instanceCount << std::endl;
-
-    if (instanceCount == 0 && texture.id != 0) {
-        UnloadTexture(texture);
-        texture = { 0 };
-        std::cout << "Wall texture unloaded." << std::endl;
-    }
+    std::println("Wall instance destroyed.");
 }
 
 Wall::Wall(Wall&& other) noexcept
     : position(std::exchange(other.position, { 0, 0 })),
-    active(std::exchange(other.active, false)),
-    health(std::exchange(other.health, 50)),
-    radius(std::exchange(other.radius, 60))
+      active(std::exchange(other.active, false)),
+      health(std::exchange(other.health, 50)),
+      radius(std::exchange(other.radius, 60)),
+      texture(std::move(other.texture))
 {
-    instanceCount++;
-    std::cout << "Wall moved! Instance count: " << instanceCount << std::endl;
+    std::println("Wall moved!");;
 }
 
 Wall& Wall::operator=(Wall&& other) noexcept
@@ -52,27 +33,29 @@ Wall& Wall::operator=(Wall&& other) noexcept
         active = std::exchange(other.active, false);
         health = std::exchange(other.health, 50);
         radius = std::exchange(other.radius, 60);
-        std::cout << "Wall move-assigned! Instance count: " << instanceCount << std::endl;
+        texture = std::move(other.texture);
+        std::println("Wall move-assigned!");
     }
     return *this;
 }
 
-void Wall::Update()
+void Wall::Update() noexcept
 {
     if (health <= 0) { active = false; }
 }
 
 void Wall::Render() const noexcept
 {
-    if (texture.id == 0)
+    const auto& textureRef = texture.GetTexture();
+    if (textureRef.id == 0)
     {
         std::cerr << "Wall texture is not valid!" << std::endl;
         return;
     }
 
     // Render the wall with texture
-    DrawTexturePro(texture,
-        { 0, 0, (float)texture.width, (float)texture.height },
+    DrawTexturePro(textureRef,
+        { 0, 0, (float)textureRef.width, (float)textureRef.height },
         { position.x, position.y, 200.0f, 200.0f },
         { 100.0f, 100.0f },
         0.0f,
