@@ -1,4 +1,5 @@
 #pragma once
+#include "Gun.hpp"
 #include "raylib.h"
 #include "Projectile.hpp"
 #include "EntityType.hpp"
@@ -17,7 +18,7 @@ public:
 
     void Update();
     void Render() const noexcept;
-    Projectile Shoot();
+    Projectile Shoot() const noexcept;
 
     void SetPosition(Vector2 pos) noexcept { position = pos; }
     Vector2 GetPosition() const noexcept { return position; }
@@ -31,6 +32,6 @@ private:
     float speed = 2.0f;
     bool active = true;
     bool moveRight = true;
-
+    Gun gun;
     TextureWrapper texture;
 };

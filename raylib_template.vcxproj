@@ -172,6 +172,7 @@
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\GameWindow.cpp" />
+    <ClCompile Include="Source\Gun.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Projectile.cpp" />
     <ClCompile Include="Source\Player.cpp" />
@@ -181,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\AudioDevice.hpp" />
+    <ClInclude Include="Source\Gun.hpp" />
     <ClInclude Include="Source\TextureLoadingException.hpp" />
     <ClInclude Include="Source\Alien.hpp" />
     <ClInclude Include="Source\Background.hpp" />

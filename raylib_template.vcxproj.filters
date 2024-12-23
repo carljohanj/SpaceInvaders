@@ -57,6 +57,9 @@
     <ClCompile Include="Source\AudioDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Gun.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Background.hpp">
@@ -99,6 +102,9 @@
       <Filter>Header Files\Exceptions</Filter>
     </ClInclude>
     <ClInclude Include="Source\AudioDevice.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Gun.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

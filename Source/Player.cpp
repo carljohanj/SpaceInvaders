@@ -3,7 +3,8 @@
 #include "Config.hpp"
 
 Player::Player()
-    : texture(Config::playerTexturePath)
+    : gun(-15.0f, EntityType::PLAYER_PROJECTILE, { 0, -10 }),
+      texture(Config::playerTexturePath)
 {
     x_pos = GetScreenWidth() / 2;
 }
@@ -30,12 +31,7 @@ void Player::Render() const noexcept
         WHITE);
 }
 
-Projectile Player::Shoot() const noexcept
+Projectile Player::Shoot() const noexcept 
 {
-    Projectile projectile;
-    projectile.SetPosition({ x_pos, GetScreenHeight() - player_base_height - 10 });
-    projectile.SetSpeed(-15);
-    projectile.SetType(EntityType::PLAYER_PROJECTILE);
-    projectile.SetActive(true);
-    return projectile;
+    return gun.Shoot({ x_pos, GetScreenHeight() - player_base_height });
 }

@@ -5,22 +5,24 @@
 
 Alien::Alien()
     : position({ 0.0f, 0.0f }),
-    radius(20.0f),  
-    speed(2.0f),
-    active(true),
-    moveRight(true),
-    texture(Config::alienTexturePath)
+      radius(20.0f),  
+      speed(2.0f),
+      active(true),
+      moveRight(true),
+      gun(5.0f, EntityType::ENEMY_PROJECTILE, { 0, 40 }),
+      texture(Config::alienTexturePath)
 {
     std::println("Alien created!");
 }
 
 Alien::Alien(Alien&& other) noexcept
     : position(std::move(other.position)),
-    radius(other.radius),
-    speed(other.speed),
-    active(other.active),
-    moveRight(other.moveRight),
-    texture(std::move(other.texture))
+      radius(other.radius),
+      speed(other.speed),
+      active(other.active),
+      moveRight(other.moveRight),
+      gun(5.0f, EntityType::ENEMY_PROJECTILE, { 0, 40 }),
+      texture(std::move(other.texture))
 {
     std::println("Alien moved!");
 }
@@ -67,7 +69,7 @@ void Alien::Update()
 
 void Alien::Render() const noexcept
 {
-    DrawTexturePro(texture.GetTexture(), // Use the texture from TextureWrapper
+    DrawTexturePro(texture.GetTexture(),
         { 0, 0, (float)texture.GetTexture().width, (float)texture.GetTexture().height },
         { position.x, position.y, 100.0f, 100.0f },
         { 50.0f, 50.0f },
@@ -75,12 +77,4 @@ void Alien::Render() const noexcept
         WHITE);
 }
 
-Projectile Alien::Shoot()
-{
-    Projectile newProjectile;
-    newProjectile.SetPosition({ position.x, position.y + 40 });
-    newProjectile.SetSpeed(5);
-    newProjectile.SetType(EntityType::ENEMY_PROJECTILE);
-    newProjectile.SetActive(true);
-    return newProjectile;
-}
+Projectile Alien::Shoot() const noexcept { return gun.Shoot(position); }
