@@ -29,6 +29,11 @@ struct PlayerData
 class Game
 {
 public:
+    Game();
+    void Run();
+    void Launch();
+
+private:
     State gameState = State::STARTSCREEN;
     int score = 0;               // Current game score
     float shootTimer = 0;        // Timer for alien shooting
@@ -58,40 +63,36 @@ public:
     Vector2 cornerPos;
     float offset;
 
-    Game();
-    Game(const Game&) = delete;
-    Game& operator=(const Game&) = delete;
-    Game(Game&&) = delete;
-    Game& operator=(Game&&) = delete;
-
     void Start();
     void End() noexcept;
-    void Run();
     void Continue() noexcept;
-    void Launch();
     void Update();
-    void Render();
-    void RenderStartScreen() noexcept;
-    void RenderGameplay();
-    void UpdatePlayerInput();
-    void SpawnAliens();
     void UpdateAliens();
+    void UpdateBackground();
+    void UpdatePlayerInput();
+    void UpdateProjectiles();
+    void UpdateWalls();
+    void Render();
+    void RenderAliens() noexcept;
+    void RenderGameplay();
+    void RenderHUD() const noexcept;
+    void RenderProjectiles() const noexcept;
+    void RenderStartScreen() const noexcept;
+    void RenderWalls() noexcept;
+    void DrawAliens();
+    void DrawWalls();
     void TriggerAlienShot();
     void RemoveInactiveAliens();
-    void SpawnWalls();
-    void UpdateWalls();
     void RemoveInactiveWalls();
-    void UpdateProjectiles();
     void DetectCollisions();
     void CheckPlayerCollision(Projectile& projectile);
     void CheckEnemyCollision(Projectile& projectile);
     void CheckWallCollisions(Projectile& projectile);
     bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
-    void UpdateBackground();
     bool CheckNewHighScore() noexcept;
     void InsertNewHighScore(std::string name);
 
-private:
+    //ToDo: Hide all of the above private members and functions in this struct:
     struct Impl;
     alignas(std::max_align_t) std::byte implBuffer[128];
     Impl* pImpl;

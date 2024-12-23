@@ -2,16 +2,13 @@
 #include "Game.hpp"
 #include <algorithm>
 #include <cassert>
-#include <cmath>
-#include <fstream>
-#include <iostream>
 #include <random>
 #include <ranges>
-#include <vector>
 
 Game::Game()
     : window()
 {
+    Aliens.reserve(alienFormationWidth * alienFormationHeight);
     gameState = State::STARTSCREEN;
     score = 0;
     shootTimer = 0.0f;
@@ -31,41 +28,18 @@ void Game::Run()
     CloseAudioDevice();
 }
 
-namespace
-{
-    bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) noexcept
-    {
-        const float dx = circlePos.x - point.x;
-        const float dy = circlePos.y - point.y;
-        const float squaredDistance = dx * dx + dy * dy;
-        return squaredDistance < radius * radius;
-    }
-}
-
 void Game::Start()
 {
-    SpawnWalls();
+    DrawWalls();
     resources.Load();       //ToDo: Remove
     player.RePosition();
-    SpawnAliens();
+    DrawAliens();
     Background newBackground;
     newBackground.Initialize(backgroundSpeed);
     background = newBackground;
     score = 0;
     gameState = State::GAMEPLAY;
 }
-
-void Game::End() noexcept
-{
-    Projectiles.clear();
-    Walls.clear();
-    Aliens.clear();
-    newHighScore = CheckNewHighScore();
-    gameState = State::ENDSCREEN;
-}
-
-void Game::Continue() noexcept { gameState = State::STARTSCREEN; }
-void Game::Launch() { resources.Load(); }   //ToDo: Remove
 
 void Game::Update()
 {
@@ -108,35 +82,40 @@ void Game::Render()
     }
 }
 
-void Game::RenderStartScreen() noexcept
+void Game::End() noexcept
+{
+    Projectiles.clear();
+    Walls.clear();
+    Aliens.clear();
+    newHighScore = CheckNewHighScore();
+    gameState = State::ENDSCREEN;
+}
+
+void Game::Continue() noexcept { gameState = State::STARTSCREEN; }
+void Game::Launch() { resources.Load(); }   //ToDo: Remove
+
+
+void Game::RenderGameplay()
+{
+    background.Render();
+    RenderHUD();
+    player.Render();
+    RenderProjectiles();
+    RenderWalls();
+    RenderAliens();
+}
+
+void Game::RenderStartScreen() const noexcept
 {
     DrawText(title.data(), 200, 100, startScreenTitleFontSize, YELLOW);
     DrawText(beginMessage.data(), 200, 350, startScreenSubtitleFontSize, YELLOW);
 }
 
-void Game::RenderGameplay()
+void Game::RenderHUD() const noexcept
 {
-    background.Render();
     DrawText(TextFormat("Score: %i", score), 50, 20, gameplayScoreFontSize, YELLOW);
     DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, gameplayLivesFontSize, YELLOW);
-    player.Render();
-
-    for (const auto& projectile : Projectiles)
-    {
-        projectile.Render(resources.laserTexture);
-    }
-
-    for (const auto& wall : Walls) 
-    {
-        wall.Render();
-    }
-
-    for (const auto& alien : Aliens) 
-    {
-        alien.Render();
-    }
 }
-
 
 void Game::UpdatePlayerInput()
 {
@@ -145,7 +124,7 @@ void Game::UpdatePlayerInput()
     if (IsKeyPressed(KEY_SPACE)) { Projectiles.push_back(player.Shoot()); }
 }
 
-void Game::SpawnAliens()
+void Game::DrawAliens()
 {
     if (Aliens.empty()) 
     {
@@ -156,23 +135,30 @@ void Game::SpawnAliens()
                 Alien newAlien;
                 newAlien.SetPosition({ static_cast<float>(alienFormationX + 450 + (col * alienSpacing)),
                                        static_cast<float>(alienFormationY + (row * alienSpacing)) });
-                Aliens.push_back(newAlien);
-                Alien::IncrementInstanceCount();
+                Aliens.push_back(std::move(newAlien));
             }
         }
     }
 }
 
+void Game::RenderAliens() noexcept
+{
+    for (const auto& alien : Aliens)
+    {
+        alien.Render();
+    }
+}
+
 void Game::UpdateAliens()
 {
+    RemoveInactiveAliens();
     TriggerAlienShot();
     for (auto& alien : Aliens)
     {
         alien.Update();
         if (alien.GetPosition().y > screenHeight - player.GetPlayerBaseHeight()) { End(); }
     }
-    RemoveInactiveAliens();
-    if (Aliens.empty()) { SpawnAliens(); }
+    if (Aliens.empty()) { DrawAliens(); }
 }
 
 void Game::TriggerAlienShot()
@@ -191,7 +177,6 @@ void Game::TriggerAlienShot()
         if (randomAlien.IsActive())
         {
             Projectiles.push_back(randomAlien.Shoot());
-            std::cout << "Alien at index " << randomAlienIndex << " fired a projectile!" << std::endl;
         }
         shootTimer = 0.0f;
     }
@@ -199,20 +184,20 @@ void Game::TriggerAlienShot()
 
 void Game::RemoveInactiveAliens()
 {
-    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien)
-        {
-            return !alien.IsActive();
+    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) noexcept {
+        return !alien.IsActive();
         });
 
-    for (auto removedIt = it; removedIt != Aliens.end(); ++removedIt) 
+    // Debugging: Print out the removed aliens
+    for (auto removedIt = it; removedIt != Aliens.end(); ++removedIt)
     {
         std::cout << "Removing Alien with ID: " << &(*removedIt) << std::endl;
-        Alien::DecrementInstanceCount();
     }
+
     Aliens.erase(it, Aliens.end());
 }
 
-void Game::SpawnWalls()
+void Game::DrawWalls()
 {
     constexpr auto window_width = static_cast<float>(screenWidth);
     constexpr auto window_height = static_cast<float>(screenHeight);
@@ -226,6 +211,14 @@ void Game::SpawnWalls()
         Walls.emplace_back();
         Walls.back().SetPosition({ wall_distance * static_cast<float>(i), window_height - 250.0f });
         Wall::IncrementInstanceCount();
+    }
+}
+
+void Game::RenderWalls() noexcept
+{
+    for (const auto& wall : Walls)
+    {
+        wall.Render();
     }
 }
 
@@ -249,6 +242,14 @@ void Game::RemoveInactiveWalls()
         Wall::DecrementInstanceCount();
     }
     Walls.erase(it, Walls.end());
+}
+
+void Game::RenderProjectiles() const noexcept
+{
+    for (const auto& projectile : Projectiles)
+    {
+        projectile.Render(resources.laserTexture);
+    }
 }
 
 void Game::UpdateProjectiles()
@@ -279,7 +280,6 @@ void Game::CheckPlayerCollision(Projectile& projectile)
             projectile.active = false;
             alien.SetActive(false);
             score += 100;
-            std::cout << "Alien " << &alien << " hit by player projectile!" << std::endl;
         }
     }
 }
@@ -291,7 +291,6 @@ void Game::CheckEnemyCollision(Projectile& projectile)
     {
         projectile.active = false;
         player.SetLives(player.GetLives() - 1);
-        std::cout << "Player hit by alien projectile!" << std::endl;
         if (player.GetLives() <= 0) { End(); }
     }
 }
@@ -304,11 +303,8 @@ void Game::CheckWallCollisions(Projectile& projectile)
         {
             projectile.active = false;
             wall.SetHealth(wall.GetHealth() - 1);
-            std::cout << "Wall hit! Remaining health: " << wall.GetHealth() << std::endl;
-
             if (wall.GetHealth() <= 0) {
                 wall.SetActive(false);
-                std::cout << "Wall destroyed!" << std::endl;
             }
         }
     }
@@ -343,4 +339,16 @@ void Game::UpdateBackground()
 bool Game::CheckNewHighScore() noexcept
 {
     return score > Leaderboard.back().score;
+}
+
+
+namespace
+{
+    bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) noexcept
+    {
+        const float dx = circlePos.x - point.x;
+        const float dy = circlePos.y - point.y;
+        const float squaredDistance = dx * dx + dy * dy;
+        return squaredDistance < radius * radius;
+    }
 }

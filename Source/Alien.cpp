@@ -1,35 +1,103 @@
 #include "Alien.hpp"
 #include "TextureLoadingException.hpp"
 #include <iostream>
+#include <utility>
+#include <print>
 
+// Static Members
 Texture2D Alien::texture = { 0 };
 int Alien::instanceCount = 0;
 
-Alien::Alien() 
+// Default Constructor
+Alien::Alien()
+    : position({ 0.0f, 0.0f }), radius(20.0f), speed(2.0f), active(true), moveRight(true)
 {
-    if (instanceCount == 0) 
+    if (instanceCount == 0)
     {
         texture = LoadTexture("./Assets/Alien.png");
-
-    if (texture.id == 0) { throw TextureLoadingException("Failed to load Alien texture!"); }
+        if (texture.id == 0)
+        {
+            throw TextureLoadingException("Failed to load Alien texture!");
+        }
     }
     instanceCount++;
+    std::println("Alien born! Wohoo! Instance count: {}", instanceCount);
 }
 
-Alien::~Alien() 
+// Copy Constructor
+Alien::Alien(const Alien& other)
+    : position(other.position),
+    radius(other.radius),
+    speed(other.speed),
+    active(other.active),
+    moveRight(other.moveRight)
 {
-    std::cout << "Alien instance destroyed. Count: " << instanceCount << ", ID: " << this << std::endl; // Print unique ID (pointer)
-    std::cout << "Current instance count: " << Alien::GetInstanceCount() << std::endl;
-    if (instanceCount == 1 && texture.id != 0) {
+    instanceCount++;
+    std::println("Alien copied! Instance count: {}", instanceCount);
+}
+
+// Move Constructor
+Alien::Alien(Alien&& other) noexcept
+    : position(std::move(other.position)),
+    radius(std::move(other.radius)),
+    speed(std::move(other.speed)),
+    active(std::move(other.active)),
+    moveRight(std::move(other.moveRight))
+{
+    instanceCount++;
+    std::println("Alien moved! Instance count remains: {}", instanceCount);
+}
+
+// Destructor
+Alien::~Alien()
+{
+    instanceCount--;
+    std::println("Alien instance destroyed! Oh no! Instance count: {}", instanceCount);
+
+    if (instanceCount == 0 && texture.id != 0)
+    {
         UnloadTexture(texture);
         texture = { 0 };
-        std::cout << "Alien texture unloaded." << std::endl;
+        std::println("Alien texture unloaded");
     }
 }
 
-void Alien::Update() 
+// Copy Assignment Operator
+Alien& Alien::operator=(const Alien& other)
 {
-    if (moveRight) 
+    if (this != &other)
+    {
+        position = other.position;
+        radius = other.radius;
+        speed = other.speed;
+        active = other.active;
+        moveRight = other.moveRight;
+
+        std::println("Alien assigned via copy!");
+    }
+    return *this;
+}
+
+// Move Assignment Operator
+Alien& Alien::operator=(Alien&& other) noexcept
+{
+    if (this != &other)
+    {
+        std::swap(position, other.position);
+        std::swap(radius, other.radius);
+        std::swap(speed, other.speed);
+        std::swap(active, other.active);
+        std::swap(moveRight, other.moveRight);
+
+        std::println("Alien assigned via move using std::swap!");
+    }
+    return *this;
+}
+
+// Update Method
+void Alien::Update()
+{
+    if (moveRight)
     {
         position.x += speed; // Move right
         if (position.x >= GetScreenWidth() - radius)
@@ -38,35 +106,37 @@ void Alien::Update()
             position.y += 50; // Move down
         }
     }
-    else {
+    else
+    {
         position.x -= speed; // Move left
-        if (position.x <= radius) 
+        if (position.x <= radius)
         {
             moveRight = true;
             position.y += 50; // Move down
         }
     }
-
-    // Mark alien as inactive if it moves off-screen
     if (position.y > GetScreenHeight()) { active = false; }
 }
 
+// Render Method
 void Alien::Render() const noexcept
 {
-    if (texture.id == 0) {
+    if (texture.id == 0)
+    {
         std::cerr << "Alien texture is not valid!" << std::endl;
         return;
     }
 
     DrawTexturePro(texture,
         { 0, 0, (float)texture.width, (float)texture.height },
-        { position.x, position.y, 100.0f, 100.0f }, // position and scale
-        { 50.0f, 50.0f }, // origin (center of the texture)
-        0.0f, // rotation (no rotation)
+        { position.x, position.y, 100.0f, 100.0f },
+        { 50.0f, 50.0f },
+        0.0f,
         WHITE);
 }
 
-Projectile Alien::Shoot() 
+// Shoot Method
+Projectile Alien::Shoot()
 {
     Projectile newProjectile;
     newProjectile.position = { position.x, position.y + 40 };
@@ -75,7 +145,3 @@ Projectile Alien::Shoot()
     newProjectile.active = true;
     return newProjectile;
 }
-
-void Alien::IncrementInstanceCount() noexcept { instanceCount++; }
-void Alien::DecrementInstanceCount() noexcept { instanceCount--; }
-int  Alien::GetInstanceCount() noexcept { return instanceCount; }

@@ -1,15 +1,23 @@
 #pragma once
 #include "raylib.h"
-#include <iostream>
 #include <string>
+#include <stdexcept>
 
 class TextureWrapper 
 {
 public:
-    explicit TextureWrapper(const char* filePath);
+    explicit TextureWrapper(const std::string_view texturePath);
     ~TextureWrapper();
-    Texture2D& GetTexture();
+
+    TextureWrapper(const TextureWrapper&) = delete;
+    TextureWrapper& operator=(const TextureWrapper&) = delete;
+
+    TextureWrapper(TextureWrapper&& other) noexcept;
+    TextureWrapper& operator=(TextureWrapper&& other) noexcept;
+
+    const Texture2D& GetTexture() const noexcept;
 
 private:
-    Texture2D texture;
+    static Texture2D texture;
+    static int instanceCount;
 };

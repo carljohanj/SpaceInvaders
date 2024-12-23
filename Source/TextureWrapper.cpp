@@ -1,24 +1,49 @@
 #include "TextureWrapper.hpp"
+#include "TextureLoadingException.hpp"
+#include <print>
 
-TextureWrapper::TextureWrapper(const char* filePath)
+Texture2D TextureWrapper::texture = { 0 };
+int TextureWrapper::instanceCount = 0;
+
+TextureWrapper::TextureWrapper(std::string_view filePath)
 {
-    texture = LoadTexture(filePath);
+    texture = LoadTexture(filePath.data());
 
     if (texture.id == 0) 
     {
-        throw std::runtime_error(std::string("Failed to load texture: ") + filePath);
+        throw TextureLoadingException(std::string("Failed to load texture: ").append(filePath));
     }
-
-    std::cout << "Texture loaded: " << filePath << std::endl;
+    instanceCount++;
+    std::println("Texture loaded: {}", filePath);
 }
 
-TextureWrapper::~TextureWrapper() 
+TextureWrapper::~TextureWrapper()
 {
-    UnloadTexture(texture);
-    std::cout << "Texture unloaded." << std::endl;
+    instanceCount--;
+    if (instanceCount == 0 && texture.id != 0)
+    {
+        UnloadTexture(texture);
+        texture = { 0 };
+        std::println("Texture unloaded");
+    }
 }
 
-Texture2D& TextureWrapper::GetTexture() 
+TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept 
+{
+    instanceCount++;
+    std::println("TextureWrapper moved! Instance count: {}", instanceCount);
+}
+
+TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept 
+{
+    if (this != &other) 
+    {
+        std::println("TextureWrapper move-assigned! Instance count remains: {}", instanceCount);
+    }
+    return *this;
+}
+
+const Texture2D& TextureWrapper::GetTexture() const noexcept
 {
     return texture;
 }
