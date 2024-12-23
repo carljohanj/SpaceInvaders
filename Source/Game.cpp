@@ -30,13 +30,15 @@ void Game::Run()
 
 void Game::Start()
 {
-    DrawWalls();
+    LoadWalls();
     resources.Load();       //ToDo: Remove
     player.RePosition();
-    DrawAliens();
+    LoadAliens();
+    //LoadBackground();
     Background newBackground;
     newBackground.Initialize(backgroundSpeed);
     background = newBackground;
+    //LoadGameState();
     score = 0;
     gameState = State::GAMEPLAY;
 }
@@ -77,7 +79,7 @@ void Game::Render()
         break;
 
     case State::ENDSCREEN:
-        DrawText(continueMessage.data(), textBoxX, 200, endScreenFontSize, YELLOW);
+        RenderGameOverScreen();
         break;
     }
 }
@@ -111,6 +113,11 @@ void Game::RenderStartScreen() const noexcept
     DrawText(beginMessage.data(), 200, 350, startScreenSubtitleFontSize, YELLOW);
 }
 
+void Game::RenderGameOverScreen() const noexcept
+{
+    DrawText(continueMessage.data(), textBoxX, 200, endScreenFontSize, YELLOW);
+}
+
 void Game::RenderHUD() const noexcept
 {
     DrawText(TextFormat("Score: %i", score), 50, 20, gameplayScoreFontSize, YELLOW);
@@ -124,7 +131,7 @@ void Game::UpdatePlayerInput()
     if (IsKeyPressed(KEY_SPACE)) { Projectiles.push_back(player.Shoot()); }
 }
 
-void Game::DrawAliens()
+void Game::LoadAliens()
 {
     if (Aliens.empty()) 
     {
@@ -158,7 +165,7 @@ void Game::UpdateAliens()
         alien.Update();
         if (alien.GetPosition().y > screenHeight - player.GetPlayerBaseHeight()) { End(); }
     }
-    if (Aliens.empty()) { DrawAliens(); }
+    if (Aliens.empty()) { LoadAliens(); }
 }
 
 void Game::TriggerAlienShot()
@@ -168,27 +175,25 @@ void Game::TriggerAlienShot()
     {
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dist(0, Aliens.size() - 1);
+        std::uniform_int_distribution<size_t> dist(0, Aliens.size() - 1);
 
         const int randomAlienIndex = dist(gen);
         assert(randomAlienIndex >= 0 && randomAlienIndex < Aliens.size());
         auto& randomAlien = Aliens[randomAlienIndex];
 
-        if (randomAlien.IsActive())
-        {
-            Projectiles.push_back(randomAlien.Shoot());
-        }
+        if (randomAlien.IsActive()) { Projectiles.push_back(randomAlien.Shoot()); }
         shootTimer = 0.0f;
     }
 }
 
 void Game::RemoveInactiveAliens()
 {
-    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) noexcept {
-        return !alien.IsActive();
+    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) noexcept 
+        {
+            return !alien.IsActive();
         });
 
-    // Debugging: Print out the removed aliens
+    // Debugging: Printing out the removed aliens to make sure they get erased
     for (auto removedIt = it; removedIt != Aliens.end(); ++removedIt)
     {
         std::cout << "Removing Alien with ID: " << &(*removedIt) << std::endl;
@@ -197,7 +202,7 @@ void Game::RemoveInactiveAliens()
     Aliens.erase(it, Aliens.end());
 }
 
-void Game::DrawWalls()
+void Game::LoadWalls()
 {
     constexpr auto window_width = static_cast<float>(screenWidth);
     constexpr auto window_height = static_cast<float>(screenHeight);
@@ -210,7 +215,6 @@ void Game::DrawWalls()
     {
         Walls.emplace_back();
         Walls.back().SetPosition({ wall_distance * static_cast<float>(i), window_height - 250.0f });
-        Wall::IncrementInstanceCount();
     }
 }
 
@@ -237,10 +241,6 @@ void Game::RemoveInactiveWalls()
         {
             return !wall.IsActive();
         });
-    for (auto removedIt = it; removedIt != Walls.end(); ++removedIt) 
-    {
-        Wall::DecrementInstanceCount();
-    }
     Walls.erase(it, Walls.end());
 }
 
@@ -339,16 +339,4 @@ void Game::UpdateBackground()
 bool Game::CheckNewHighScore() noexcept
 {
     return score > Leaderboard.back().score;
-}
-
-
-namespace
-{
-    bool pointInCircle(Vector2 circlePos, float radius, Vector2 point) noexcept
-    {
-        const float dx = circlePos.x - point.x;
-        const float dy = circlePos.y - point.y;
-        const float squaredDistance = dx * dx + dy * dy;
-        return squaredDistance < radius * radius;
-    }
 }

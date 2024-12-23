@@ -4,11 +4,9 @@
 #include <utility>
 #include <print>
 
-// Static Members
 Texture2D Alien::texture = { 0 };
 int Alien::instanceCount = 0;
 
-// Default Constructor
 Alien::Alien()
     : position({ 0.0f, 0.0f }), radius(20.0f), speed(2.0f), active(true), moveRight(true)
 {
@@ -62,7 +60,6 @@ Alien::~Alien()
     }
 }
 
-// Copy Assignment Operator
 Alien& Alien::operator=(const Alien& other)
 {
     if (this != &other)
@@ -78,7 +75,6 @@ Alien& Alien::operator=(const Alien& other)
     return *this;
 }
 
-// Move Assignment Operator
 Alien& Alien::operator=(Alien&& other) noexcept
 {
     if (this != &other)
@@ -94,7 +90,6 @@ Alien& Alien::operator=(Alien&& other) noexcept
     return *this;
 }
 
-// Update Method
 void Alien::Update()
 {
     if (moveRight)
@@ -118,7 +113,6 @@ void Alien::Update()
     if (position.y > GetScreenHeight()) { active = false; }
 }
 
-// Render Method
 void Alien::Render() const noexcept
 {
     if (texture.id == 0)
@@ -135,7 +129,6 @@ void Alien::Render() const noexcept
         WHITE);
 }
 
-// Shoot Method
 Projectile Alien::Shoot()
 {
     Projectile newProjectile;

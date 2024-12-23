@@ -1,6 +1,7 @@
 #include "Wall.hpp"
 #include "TextureLoadingException.hpp"
 #include <iostream>
+#include <utility>
 
 Texture2D Wall::texture = { 0 };
 int Wall::instanceCount = 0;
@@ -15,50 +16,66 @@ Wall::Wall()
         }
         std::cout << "Wall texture loaded successfully." << std::endl;
     }
-    instanceCount++;  // Increment instance count
+    instanceCount++;
 }
 
 Wall::~Wall()
 {
-    // Decrement instance count on destruction
+    instanceCount--;
     std::cout << "Wall instance destroyed. Count: " << instanceCount << ", ID: " << this << std::endl;
-    std::cout << "Current instance count: " << Wall::GetInstanceCount() << std::endl;
-    DecrementInstanceCount();
+    std::cout << "Current instance count: " << instanceCount << std::endl;
 
-    // If this is the last instance, unload the texture
-    if (instanceCount == 1 && texture.id != 0) {
-        UnloadTexture(texture);  // Unload texture from GPU memory
-        texture = { 0 };  // Reset the texture handle to avoid using an invalid texture
+    if (instanceCount == 0 && texture.id != 0) {
+        UnloadTexture(texture);
+        texture = { 0 };
         std::cout << "Wall texture unloaded." << std::endl;
     }
 }
 
+Wall::Wall(Wall&& other) noexcept
+    : position(std::exchange(other.position, { 0, 0 })),
+    active(std::exchange(other.active, false)),
+    health(std::exchange(other.health, 50)),
+    radius(std::exchange(other.radius, 60))
+{
+    instanceCount++;
+    std::cout << "Wall moved! Instance count: " << instanceCount << std::endl;
+}
+
+Wall& Wall::operator=(Wall&& other) noexcept
+{
+    if (this != &other)
+    {
+        position = std::exchange(other.position, { 0, 0 });
+        active = std::exchange(other.active, false);
+        health = std::exchange(other.health, 50);
+        radius = std::exchange(other.radius, 60);
+        std::cout << "Wall move-assigned! Instance count: " << instanceCount << std::endl;
+    }
+    return *this;
+}
+
 void Wall::Update()
 {
-    if (health <= 0) {
-        active = false;  // Mark wall as inactive if health is 0 or below
-    }
+    if (health <= 0) { active = false; }
 }
 
 void Wall::Render() const noexcept
 {
-    if (texture.id == 0) {
+    if (texture.id == 0)
+    {
         std::cerr << "Wall texture is not valid!" << std::endl;
-        return;  // Skip rendering if texture is invalid
+        return;
     }
 
     // Render the wall with texture
     DrawTexturePro(texture,
         { 0, 0, (float)texture.width, (float)texture.height },
-        { position.x, position.y, 200.0f, 200.0f },  // Position and size
-        { 100.0f, 100.0f },  // Origin (center of the texture)
-        0.0f,  // No rotation
+        { position.x, position.y, 200.0f, 200.0f },
+        { 100.0f, 100.0f },
+        0.0f,
         WHITE);
 
     // Render health
     DrawText(TextFormat("%i", health), position.x - 21, position.y + 10, 40, RED);
 }
-
-void Wall::IncrementInstanceCount() { instanceCount++; }
-void Wall::DecrementInstanceCount() { instanceCount--; }
-int Wall::GetInstanceCount() { return instanceCount; }

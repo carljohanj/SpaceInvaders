@@ -78,9 +78,10 @@ private:
     void RenderHUD() const noexcept;
     void RenderProjectiles() const noexcept;
     void RenderStartScreen() const noexcept;
+    void RenderGameOverScreen() const noexcept;
     void RenderWalls() noexcept;
-    void DrawAliens();
-    void DrawWalls();
+    void LoadAliens();
+    void LoadWalls();
     void TriggerAlienShot();
     void RemoveInactiveAliens();
     void RemoveInactiveWalls();

@@ -1,5 +1,3 @@
-// Wall.hpp
-
 #pragma once
 #include "raylib.h"
 
@@ -8,6 +6,11 @@ class Wall
 public:
     Wall();
     ~Wall();
+    Wall(const Wall&) = delete;
+    Wall& operator=(const Wall&) = delete;
+    Wall(Wall&& other) noexcept;
+    Wall& operator=(Wall&& other) noexcept;
+
     void Update();
     void Render() const noexcept;
     Vector2 GetPosition() const noexcept { return position; }
@@ -17,9 +20,6 @@ public:
     int GetHealth() const noexcept { return health; }
     void SetHealth(int newHealth) noexcept { health = newHealth; }
     int GetRadius() const noexcept { return radius; }
-    static void IncrementInstanceCount();
-    static void DecrementInstanceCount();
-    static int GetInstanceCount();
 
 private:
     Vector2 position = { 0, 0 };
