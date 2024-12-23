@@ -8,6 +8,12 @@ namespace Config
     inline constexpr int screenWidth = 1920;
     inline constexpr int screenHeight = 1080;
 
+    // Assets
+    constexpr std::string_view playerTexturePath = "./Assets/Ship1.png";
+    constexpr std::string_view projectileTexturePath = "./Assets/Laser.png";
+    constexpr std::string_view alienTexturePath = "./Assets/Alien.png";
+    constexpr std::string_view wallTexturePath = "./Assets/Barrier.png";
+
     // Game title and messages
     inline constexpr std::string_view title = "SPACE INVADERS";
     inline constexpr std::string_view beginMessage = "PRESS SPACE TO BEGIN";

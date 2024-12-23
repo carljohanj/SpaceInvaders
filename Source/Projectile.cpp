@@ -1,3 +1,4 @@
+#include "Config.hpp"
 #include "Projectile.hpp"
 #include "TextureLoadingException.hpp"
 #include <iostream>
@@ -10,7 +11,7 @@ Projectile::Projectile()
 {
     if (instanceCount == 0)
     {
-        texture = LoadTexture("./Assets/Laser.png");
+        texture = LoadTexture(Config::projectileTexturePath.data());
         if (texture.id == 0)
         {
             throw TextureLoadingException("Failed to load Projectile texture!");

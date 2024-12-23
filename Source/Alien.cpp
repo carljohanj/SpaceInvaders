@@ -1,4 +1,5 @@
 #include "Alien.hpp"
+#include "Config.hpp"
 #include "TextureLoadingException.hpp"
 #include <iostream>
 #include <utility>
@@ -12,7 +13,7 @@ Alien::Alien()
 {
     if (instanceCount == 0)
     {
-        texture = LoadTexture("./Assets/Alien.png");
+        texture = LoadTexture(Config::alienTexturePath.data());
         if (texture.id == 0)
         {
             throw TextureLoadingException("Failed to load Alien texture!");

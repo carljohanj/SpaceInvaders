@@ -2,7 +2,6 @@
 #include <raylib.h>
 #include <vector>
 #include <string>
-#include "Resources.h"
 #include "Player.hpp"
 #include "Alien.hpp"
 #include "Projectile.hpp"
@@ -71,7 +70,7 @@ private:
     void UpdatePlayerInput();
     void UpdateProjectiles();
     void UpdateWalls();
-    void Render();
+    void Render() noexcept;
     void RenderAliens() noexcept;
     void RenderGameplay() noexcept;
     void RenderHUD() const noexcept;

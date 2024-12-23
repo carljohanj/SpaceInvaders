@@ -1,5 +1,6 @@
-#include "Wall.hpp"
+#include "Config.hpp"
 #include "TextureLoadingException.hpp"
+#include "Wall.hpp"
 #include <iostream>
 #include <utility>
 
@@ -10,9 +11,10 @@ Wall::Wall()
 {
     if (instanceCount == 0)
     {
-        texture = LoadTexture("./Assets/Barrier.png");
-        if (texture.id == 0) {
-            throw TextureLoadingException("Failed to load Wall texture: ./Assets/Barrier.png");
+        texture = LoadTexture(Config::wallTexturePath.data());
+        if (texture.id == 0)
+        {
+            throw TextureLoadingException("Failed to load Wall texture!");
         }
         std::cout << "Wall texture loaded successfully." << std::endl;
     }
