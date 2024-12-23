@@ -132,9 +132,9 @@ void Alien::Render() const noexcept
 Projectile Alien::Shoot()
 {
     Projectile newProjectile;
-    newProjectile.position = { position.x, position.y + 40 };
-    newProjectile.speed = 5;
-    newProjectile.type = EntityType::ENEMY_PROJECTILE;
-    newProjectile.active = true;
+    newProjectile.SetPosition({ position.x, position.y + 40 });
+    newProjectile.SetSpeed(5);
+    newProjectile.SetType(EntityType::ENEMY_PROJECTILE);
+    newProjectile.SetActive(true);
     return newProjectile;
 }

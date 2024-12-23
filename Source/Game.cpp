@@ -248,7 +248,7 @@ void Game::RenderProjectiles() const noexcept
 {
     for (const auto& projectile : Projectiles)
     {
-        projectile.Render(resources.laserTexture);
+        projectile.Render();
     }
 }
 
@@ -258,15 +258,15 @@ void Game::UpdateProjectiles()
     {
         projectile.Update();
     }
-    std::erase_if(Projectiles, [](const Projectile& p) { return !p.active; });
+    std::erase_if(Projectiles, [](const Projectile& p) { return !p.IsActive(); });
 }
 
 void Game::DetectCollisions()
 {
     for (auto& projectile : Projectiles) 
     {
-        if (projectile.type == EntityType::PLAYER_PROJECTILE)     { CheckPlayerCollision(projectile); }
-        else if (projectile.type == EntityType::ENEMY_PROJECTILE) { CheckEnemyCollision(projectile); }
+        if (projectile.GetType() == EntityType::PLAYER_PROJECTILE) { CheckPlayerCollision(projectile); }
+        else if (projectile.GetType() == EntityType::ENEMY_PROJECTILE) { CheckEnemyCollision(projectile); }
         CheckWallCollisions(projectile);
     }
 }
@@ -275,9 +275,10 @@ void Game::CheckPlayerCollision(Projectile& projectile)
 {
     for (auto& alien : Aliens) 
     {
-        if (alien.IsActive() && CheckCollision(alien.GetPosition(), alien.GetRadius(), projectile.lineStart, projectile.lineEnd))
+        if (alien.IsActive() && CheckCollision(alien.GetPosition(), 
+            alien.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
         {
-            projectile.active = false;
+            projectile.SetActive(false);
             alien.SetActive(false);
             score += 100;
         }
@@ -287,9 +288,9 @@ void Game::CheckPlayerCollision(Projectile& projectile)
 void Game::CheckEnemyCollision(Projectile& projectile)
 {
     if (CheckCollision({ player.GetXPosition(), screenHeight - player.GetPlayerBaseHeight() },
-        player.GetRadius(), projectile.lineStart, projectile.lineEnd)) 
+        player.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
     {
-        projectile.active = false;
+        projectile.SetActive(false);
         player.SetLives(player.GetLives() - 1);
         if (player.GetLives() <= 0) { End(); }
     }
@@ -299,13 +300,11 @@ void Game::CheckWallCollisions(Projectile& projectile)
 {
     for (auto& wall : Walls) 
     {
-        if (CheckCollision(wall.GetPosition(), wall.GetRadius(), projectile.lineStart, projectile.lineEnd)) 
+        if (CheckCollision(wall.GetPosition(), wall.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
         {
-            projectile.active = false;
+            projectile.SetActive(false);
             wall.SetHealth(wall.GetHealth() - 1);
-            if (wall.GetHealth() <= 0) {
-                wall.SetActive(false);
-            }
+            if (wall.GetHealth() <= 0) { wall.SetActive(false); }
         }
     }
 }

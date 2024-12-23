@@ -39,9 +39,9 @@ void Player::Render() const noexcept
 Projectile Player::Shoot() const noexcept
 {
     Projectile projectile;
-    projectile.position = { x_pos, GetScreenHeight() - player_base_height - 10 };
-    projectile.speed = -15;
-    projectile.type = EntityType::PLAYER_PROJECTILE;
-    projectile.active = true;
+    projectile.SetPosition({ x_pos, GetScreenHeight() - player_base_height - 10 });
+    projectile.SetSpeed(-15);
+    projectile.SetType(EntityType::PLAYER_PROJECTILE);
+    projectile.SetActive(true);
     return projectile;
 }
