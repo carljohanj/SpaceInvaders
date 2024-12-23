@@ -27,6 +27,10 @@ constexpr float alienShootInterval = 1.0f;
 
 // Background
 constexpr int backgroundSpeed = 15;
+constexpr int starAmount = 100;
+constexpr int backgroundStarAmount = 100;
+constexpr int backgroundXMinOffset = -150;
+constexpr int backgroundXMaxOffset = 150;
 
 // Text positions and sizes
 constexpr int startScreenTitleFontSize = 160;

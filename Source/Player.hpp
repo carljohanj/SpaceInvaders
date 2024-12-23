@@ -8,7 +8,7 @@ public:
     Player();
     ~Player();
 
-    void RePosition() noexcept;
+    void Reset() noexcept;
     void Update() noexcept;
     void Render() const noexcept;
     Projectile Shoot() const noexcept;

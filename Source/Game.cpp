@@ -6,7 +6,8 @@
 #include <ranges>
 
 Game::Game()
-    : window()
+    : window(),
+      background()
 {
     Aliens.reserve(alienFormationWidth * alienFormationHeight);
     gameState = State::STARTSCREEN;
@@ -25,21 +26,15 @@ void Game::Run()
         Render();
         window.EndDrawing();
     }
-    CloseAudioDevice();
 }
 
 void Game::Start()
 {
-    LoadWalls();
-    player.RePosition();
-    LoadAliens();
-    //LoadBackground();
-    Background newBackground;
-    newBackground.Initialize(backgroundSpeed);
-    background = newBackground;
-    //LoadGameState();
-    score = 0;
-    gameState = State::GAMEPLAY;
+    ResetWalls();
+    player.Reset();
+    ResetAliens();
+    background.Reset();
+    ResetGameState();
 }
 
 void Game::Update()
@@ -94,7 +89,13 @@ void Game::End() noexcept
 
 void Game::Continue() noexcept { gameState = State::STARTSCREEN; }
 
-void Game::RenderGameplay()
+void Game::ResetGameState() noexcept
+{
+    score = 0;
+    gameState = State::GAMEPLAY;
+}
+
+void Game::RenderGameplay() noexcept
 {
     background.Render();
     RenderHUD();
@@ -128,7 +129,7 @@ void Game::UpdatePlayerInput()
     if (IsKeyPressed(KEY_SPACE)) { Projectiles.push_back(player.Shoot()); }
 }
 
-void Game::LoadAliens()
+void Game::ResetAliens()
 {
     if (Aliens.empty()) 
     {
@@ -162,9 +163,10 @@ void Game::UpdateAliens()
         alien.Update();
         if (alien.GetPosition().y > screenHeight - player.GetPlayerBaseHeight()) { End(); }
     }
-    if (Aliens.empty()) { LoadAliens(); }
+    if (Aliens.empty()) { ResetAliens(); }
 }
 
+//ToDo: See if I can refactor this method a little more
 void Game::TriggerAlienShot()
 {
     shootTimer += GetFrameTime();
@@ -199,7 +201,7 @@ void Game::RemoveInactiveAliens()
     Aliens.erase(it, Aliens.end());
 }
 
-void Game::LoadWalls()
+void Game::ResetWalls()
 {
     constexpr auto window_width = static_cast<float>(screenWidth);
     constexpr auto window_height = static_cast<float>(screenHeight);
@@ -306,6 +308,7 @@ void Game::CheckWallCollisions(Projectile& projectile)
     }
 }
 
+//ToDo: See if I can refactor this method a little because it's currently not clean enough
 bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd)
 {
     const auto dx = lineEnd.x - lineStart.x;
@@ -321,6 +324,7 @@ bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineSta
     return distanceSquared <= circleRadius * circleRadius;
 }
 
+//ToDo: Perhaps some additional refactoring here as well
 void Game::UpdateBackground()
 {
     const auto playerBaseHeight = player.GetPlayerBaseHeight();

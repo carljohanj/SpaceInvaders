@@ -168,6 +168,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Alien.cpp" />
+    <ClCompile Include="Source\AudioDevice.cpp" />
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\GameWindow.cpp" />
@@ -180,6 +181,7 @@
     <ClCompile Include="Source\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AudioDevice.hpp" />
     <ClInclude Include="Source\TextureLoadingException.hpp" />
     <ClInclude Include="Source\Alien.hpp" />
     <ClInclude Include="Source\Background.hpp" />

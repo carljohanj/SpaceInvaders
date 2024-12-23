@@ -1,27 +1,55 @@
 #include "Background.hpp"
+#include <algorithm>
+#include "Config.hpp"
+#include <random>
+#include <ranges>
 
-void Background::Initialize(int starAmount) 
+Background::Background()
+    : Stars(),
+      starAmount(backgroundStarAmount),
+      xMinOffset(backgroundXMinOffset),
+      xMaxOffset(backgroundXMaxOffset),
+      bgSpeed(backgroundSpeed)
 {
-    for (int i = 0; i < starAmount; i++) {
+    Stars.reserve(starAmount);
+    for ([[maybe_unused]] auto i : std::views::iota(0, starAmount))
+    {
         Star newStar;
-        newStar.initPosition.x = GetRandomValue(-150, GetScreenWidth() + 150);
+        newStar.initPosition.x = GetRandomValue(xMinOffset, GetScreenWidth() + xMaxOffset);
         newStar.initPosition.y = GetRandomValue(0, GetScreenHeight());
         newStar.color = SKYBLUE;
-        newStar.size = GetRandomValue(1, 4) / 2;
-        Stars.push_back(newStar);
+        newStar.size = GetRandomValue(1, 4) / 2.0f;
+        Stars.push_back(std::move(newStar));
     }
 }
 
-void Background::Update(float offset) 
+void Background::Reset() noexcept
 {
-    for (auto& star : Stars) {
-        star.Update(offset);
+    Stars.clear();
+    Stars.reserve(starAmount);
+    for ([[maybe_unused]] auto i : std::views::iota(0, starAmount))
+    {
+        Star newStar;
+        newStar.initPosition.x = GetRandomValue(xMinOffset, GetScreenWidth() + xMaxOffset);
+        newStar.initPosition.y = GetRandomValue(0, GetScreenHeight());
+        newStar.color = SKYBLUE;
+        newStar.size = GetRandomValue(1, 4) / 2.0f;
+        Stars.push_back(std::move(newStar));
     }
 }
 
-void Background::Render() 
+void Background::Update(float playerOffset) noexcept
 {
-    for (const auto& star : Stars) {
+    for (auto& star : Stars | std::views::all)
+    {
+        star.Update(playerOffset);
+    }
+}
+
+void Background::Render() const noexcept
+{
+    for (const auto& star : Stars)
+    {
         star.Render();
     }
 }

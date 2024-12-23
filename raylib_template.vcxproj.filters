@@ -57,6 +57,9 @@
     <ClCompile Include="Source\Wall.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AudioDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Resources.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="Source\TextureLoadingException.hpp">
       <Filter>Header Files\Exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AudioDevice.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

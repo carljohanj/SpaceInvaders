@@ -1,14 +1,21 @@
 #pragma once
 #include "raylib.h"
 #include "Star.hpp"
+#include "Config.hpp"
 #include <vector>
 
-class Background 
+class Background
 {
 public:
-    std::vector<Star> Stars;
+    Background();
+    void Reset() noexcept;
+    void Update(float offset) noexcept;
+    void Render() const noexcept;
 
-    void Initialize(int starAmount);
-    void Update(float offset);
-    void Render();
+private:
+    std::vector<Star> Stars;
+    int starAmount;
+    int xMinOffset;
+    int xMaxOffset;
+    float bgSpeed;
 };

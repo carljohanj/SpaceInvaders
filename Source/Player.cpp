@@ -14,7 +14,7 @@ Player::~Player()
     UnloadTexture(texture); 
 }
 
-void Player::RePosition() noexcept
+void Player::Reset() noexcept
 {
     x_pos = GetScreenWidth() / 2;
 }

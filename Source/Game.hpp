@@ -40,10 +40,10 @@ private:
 
     GameWindow window;
     Player player;
+    Background background;
     std::vector<Alien> Aliens;
     std::vector<Projectile> Projectiles;
     std::vector<Wall> Walls;
-    Background background;
 
     // Leaderboard (place in own struct?)
     std::string_view name;
@@ -64,6 +64,7 @@ private:
     void Start();
     void End() noexcept;
     void Continue() noexcept;
+    void ResetGameState() noexcept;
     void Update();
     void UpdateAliens();
     void UpdateBackground();
@@ -72,14 +73,14 @@ private:
     void UpdateWalls();
     void Render();
     void RenderAliens() noexcept;
-    void RenderGameplay();
+    void RenderGameplay() noexcept;
     void RenderHUD() const noexcept;
     void RenderProjectiles() const noexcept;
     void RenderStartScreen() const noexcept;
     void RenderGameOverScreen() const noexcept;
     void RenderWalls() noexcept;
-    void LoadAliens();
-    void LoadWalls();
+    void ResetAliens();
+    void ResetWalls();
     void TriggerAlienShot();
     void RemoveInactiveAliens();
     void RemoveInactiveWalls();
