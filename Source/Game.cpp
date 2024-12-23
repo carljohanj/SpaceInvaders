@@ -31,7 +31,6 @@ void Game::Run()
 void Game::Start()
 {
     LoadWalls();
-    resources.Load();       //ToDo: Remove
     player.RePosition();
     LoadAliens();
     //LoadBackground();
@@ -94,8 +93,6 @@ void Game::End() noexcept
 }
 
 void Game::Continue() noexcept { gameState = State::STARTSCREEN; }
-void Game::Launch() { resources.Load(); }   //ToDo: Remove
-
 
 void Game::RenderGameplay()
 {

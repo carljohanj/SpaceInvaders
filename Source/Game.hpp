@@ -31,21 +31,19 @@ class Game
 public:
     Game();
     void Run();
-    void Launch();
 
 private:
     State gameState = State::STARTSCREEN;
-    int score = 0;               // Current game score
-    float shootTimer = 0;        // Timer for alien shooting
-    bool newHighScore = false;   // Tracks if a new high score was achieved
+    int score = 0;
+    float shootTimer = 0;
+    bool newHighScore = false;
 
-    GameWindow window;           // The game window
-    Resources resources;         // Game resources (textures, fonts, etc.)
-    Player player;               // The player entity
-    std::vector<Alien> Aliens;   // List of aliens in the game
-    std::vector<Projectile> Projectiles; // List of projectiles in the game
-    std::vector<Wall> Walls;     // List of walls in the game
-    Background background;       // The game background
+    GameWindow window;
+    Player player;
+    std::vector<Alien> Aliens;
+    std::vector<Projectile> Projectiles;
+    std::vector<Wall> Walls;
+    Background background;
 
     // Leaderboard (place in own struct?)
     std::string_view name;

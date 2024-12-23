@@ -13,7 +13,7 @@ Projectile::Projectile()
         texture = LoadTexture("./Assets/Laser.png");
         if (texture.id == 0)
         {
-            throw std::runtime_error("Failed to load Projectile texture.");
+            throw TextureLoadingException("Failed to load Projectile texture!");
         }
     }
     ++instanceCount;
