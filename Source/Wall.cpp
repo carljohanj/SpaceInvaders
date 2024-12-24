@@ -10,7 +10,7 @@ Wall::Wall()
     std::println("Wall created!");
 }
 
-Wall::~Wall()
+Wall::~Wall()       //ToDo: Remove destructor once I no longer need debugging because this does not need a definition anymore
 {
     std::println("Wall instance destroyed.");
 }
@@ -53,7 +53,7 @@ void Wall::Render() const noexcept
         return;
     }
 
-    // Render the wall with texture
+    // Render the wall with texture; maybe make this a new method
     DrawTexturePro(textureRef,
         { 0, 0, (float)textureRef.width, (float)textureRef.height },
         { position.x, position.y, 200.0f, 200.0f },
@@ -61,6 +61,6 @@ void Wall::Render() const noexcept
         0.0f,
         WHITE);
 
-    // Render health
+    // Render health text (why isn't player health updated in the corresponding place in Player class??)
     DrawText(TextFormat("%i", health), position.x - 21, position.y + 10, 40, RED);
 }

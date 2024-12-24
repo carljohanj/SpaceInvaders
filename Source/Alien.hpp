@@ -12,7 +12,7 @@ public:
     Alien();
     Alien(const Alien&);
     Alien(Alien&& other) noexcept;
-    ~Alien() = default; // No need for custom destructor
+    ~Alien() = default;
     Alien& operator=(const Alien&);
     Alien& operator=(Alien&& other) noexcept;
 

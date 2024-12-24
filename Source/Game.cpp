@@ -2,33 +2,77 @@
 #include "Game.hpp"
 #include <algorithm>
 #include <cassert>
+#include "ImplWrapper.hpp"
 #include <random>
 #include <ranges>
 
-Game::Game()
-    : window(),
-      background()
+struct Game::Private
 {
-    Aliens.reserve(Config::alienFormationWidth * Config::alienFormationHeight);
-    gameState = State::STARTSCREEN;
-    score = 0;
-    shootTimer = 0.0f;
+    State gameState = State::STARTSCREEN;
+    int score = 0;
+    float shootTimer = 0;
+    bool newHighScore = false;
+
+    GameWindow window;
+    Background background;
+    Player player;
+    std::vector<Alien> Aliens;
+    std::vector<Projectile> Projectiles;
+    std::vector<Wall> Walls;
+
+    void Start();
+    void Update();
+    void Render() noexcept;
+    void End() noexcept;
+    void Continue() noexcept;
+    void ResetGameState() noexcept;
+    void ResetAliens();
+    void RenderGameplay() noexcept;
+    void RenderStartScreen() const noexcept;
+    void RenderGameOverScreen() const noexcept;
+    void RenderHUD() const noexcept;
+    void UpdatePlayerInput();
+    void RenderAliens() noexcept;
+    void UpdateAliens();
+    void TriggerAlienShot();
+    void RemoveInactiveAliens();
+    void ResetWalls();
+    void RenderWalls() noexcept;
+    void UpdateWalls();
+    void RemoveInactiveWalls();
+    void RenderProjectiles() const noexcept;
+    void UpdateProjectiles();
+    void DetectCollisions();
+    void CheckPlayerCollision(Projectile& projectile);
+    void CheckEnemyCollision(Projectile& projectile);
+    void CheckWallCollisions(Projectile& projectile);
+    bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
+    void UpdateBackground();
+    bool CheckNewHighScore() noexcept;
+};
+
+Game::Game()
+{
+    impl.initialize<Private>();
 }
 
 void Game::Run()
 {
-    Start();
+    auto* game = impl.get<Private>();
+    assert(game != nullptr);
+
+    game->Start();
     while (!WindowShouldClose())
     {
-        Update();
-        window.BeginDrawing();
+        game->Update();
+        game->window.BeginDrawing();
         ClearBackground(BLACK);
-        Render();
-        window.EndDrawing();
+        game->Render();
+        game->window.EndDrawing();
     }
 }
 
-void Game::Start()
+void Game::Private::Start()
 {
     ResetWalls();
     player.Reset();
@@ -37,14 +81,13 @@ void Game::Start()
     ResetGameState();
 }
 
-void Game::Update()
+void Game::Private::Update()
 {
     switch (gameState)
     {
     case State::STARTSCREEN:
         if (IsKeyReleased(KEY_SPACE)) { Start(); }
         break;
-
     case State::GAMEPLAY:
         UpdatePlayerInput();
         UpdateAliens();
@@ -53,32 +96,29 @@ void Game::Update()
         UpdateWalls();
         UpdateBackground();
         break;
-
     case State::ENDSCREEN:
         if (IsKeyReleased(KEY_ENTER)) { Continue(); }
         break;
     }
 }
 
-void Game::Render() noexcept
+void Game::Private::Render() noexcept
 {
     switch (gameState)
     {
     case State::STARTSCREEN:
         RenderStartScreen();
         break;
-
     case State::GAMEPLAY:
         RenderGameplay();
         break;
-
     case State::ENDSCREEN:
         RenderGameOverScreen();
         break;
     }
 }
 
-void Game::End() noexcept
+void Game::Private::End() noexcept
 {
     Projectiles.clear();
     Walls.clear();
@@ -87,15 +127,15 @@ void Game::End() noexcept
     gameState = State::ENDSCREEN;
 }
 
-void Game::Continue() noexcept { gameState = State::STARTSCREEN; }
+void Game::Private::Continue() noexcept { gameState = State::STARTSCREEN; }
 
-void Game::ResetGameState() noexcept
+void Game::Private::ResetGameState() noexcept
 {
     score = 0;
     gameState = State::GAMEPLAY;
 }
 
-void Game::RenderGameplay() noexcept
+void Game::Private::RenderGameplay() noexcept
 {
     background.Render();
     RenderHUD();
@@ -105,33 +145,33 @@ void Game::RenderGameplay() noexcept
     RenderAliens();
 }
 
-void Game::RenderStartScreen() const noexcept
+void Game::Private::RenderStartScreen() const noexcept
 {
     DrawText(Config::title.data(), 200, 100, Config::startScreenTitleFontSize, YELLOW);
     DrawText(Config::beginMessage.data(), 200, 350, Config::startScreenSubtitleFontSize, YELLOW);
 }
 
-void Game::RenderGameOverScreen() const noexcept
+void Game::Private::RenderGameOverScreen() const noexcept
 {
     DrawText(Config::continueMessage.data(), Config::textBoxX, 200, Config::endScreenFontSize, YELLOW);
 }
 
-void Game::RenderHUD() const noexcept
+void Game::Private::RenderHUD() const noexcept
 {
     DrawText(TextFormat("Score: %i", score), 50, 20, Config::gameplayScoreFontSize, YELLOW);
     DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, Config::gameplayLivesFontSize, YELLOW);
 }
 
-void Game::UpdatePlayerInput()
+void Game::Private::UpdatePlayerInput()
 {
     if (IsKeyReleased(KEY_Q)) { End(); }
     player.Update();
     if (IsKeyPressed(KEY_SPACE)) { Projectiles.push_back(player.Shoot()); }
 }
 
-void Game::ResetAliens()
+void Game::Private::ResetAliens()
 {
-    if (Aliens.empty()) 
+    if (Aliens.empty())
     {
         for (int row = 0; row < Config::alienFormationHeight; row++)
         {
@@ -146,7 +186,7 @@ void Game::ResetAliens()
     }
 }
 
-void Game::RenderAliens() noexcept
+void Game::Private::RenderAliens() noexcept
 {
     for (const auto& alien : Aliens)
     {
@@ -154,7 +194,7 @@ void Game::RenderAliens() noexcept
     }
 }
 
-void Game::UpdateAliens()
+void Game::Private::UpdateAliens()
 {
     RemoveInactiveAliens();
     TriggerAlienShot();
@@ -166,8 +206,7 @@ void Game::UpdateAliens()
     if (Aliens.empty()) { ResetAliens(); }
 }
 
-//ToDo: See if I can refactor this method a little more
-void Game::TriggerAlienShot()
+void Game::Private::TriggerAlienShot()
 {
     shootTimer += GetFrameTime();
     if (shootTimer >= Config::alienShootInterval && !Aliens.empty())
@@ -185,23 +224,17 @@ void Game::TriggerAlienShot()
     }
 }
 
-void Game::RemoveInactiveAliens()
+void Game::Private::RemoveInactiveAliens()
 {
-    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) noexcept 
+    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) noexcept
         {
             return !alien.IsActive();
         });
 
-    // Debugging: Printing out the removed aliens to make sure they get erased
-    for (auto removedIt = it; removedIt != Aliens.end(); ++removedIt)
-    {
-        std::cout << "Removing Alien with ID: " << &(*removedIt) << std::endl;
-    }
-
     Aliens.erase(it, Aliens.end());
 }
 
-void Game::ResetWalls()
+void Game::Private::ResetWalls()
 {
     constexpr auto window_width = static_cast<float>(Config::screenWidth);
     constexpr auto window_height = static_cast<float>(Config::screenHeight);
@@ -217,7 +250,7 @@ void Game::ResetWalls()
     }
 }
 
-void Game::RenderWalls() noexcept
+void Game::Private::RenderWalls() noexcept
 {
     for (const auto& wall : Walls)
     {
@@ -225,16 +258,16 @@ void Game::RenderWalls() noexcept
     }
 }
 
-void Game::UpdateWalls()
+void Game::Private::UpdateWalls()
 {
-    for (auto& wall : Walls) 
+    for (auto& wall : Walls)
     {
         wall.Update();
     }
     RemoveInactiveWalls();
 }
 
-void Game::RemoveInactiveWalls()
+void Game::Private::RemoveInactiveWalls()
 {
     auto it = std::remove_if(Walls.begin(), Walls.end(), [](const Wall& wall) noexcept
         {
@@ -243,7 +276,7 @@ void Game::RemoveInactiveWalls()
     Walls.erase(it, Walls.end());
 }
 
-void Game::RenderProjectiles() const noexcept
+void Game::Private::RenderProjectiles() const noexcept
 {
     for (const auto& projectile : Projectiles)
     {
@@ -251,7 +284,7 @@ void Game::RenderProjectiles() const noexcept
     }
 }
 
-void Game::UpdateProjectiles()
+void Game::Private::UpdateProjectiles()
 {
     for (auto& projectile : Projectiles)
     {
@@ -260,9 +293,9 @@ void Game::UpdateProjectiles()
     std::erase_if(Projectiles, [](const Projectile& p) { return !p.IsActive(); });
 }
 
-void Game::DetectCollisions()
+void Game::Private::DetectCollisions()
 {
-    for (auto& projectile : Projectiles) 
+    for (auto& projectile : Projectiles)
     {
         if (projectile.GetType() == EntityType::PLAYER_PROJECTILE) { CheckPlayerCollision(projectile); }
         else if (projectile.GetType() == EntityType::ENEMY_PROJECTILE) { CheckEnemyCollision(projectile); }
@@ -270,11 +303,11 @@ void Game::DetectCollisions()
     }
 }
 
-void Game::CheckPlayerCollision(Projectile& projectile)
+void Game::Private::CheckPlayerCollision(Projectile& projectile)
 {
-    for (auto& alien : Aliens) 
+    for (auto& alien : Aliens)
     {
-        if (alien.IsActive() && CheckCollision(alien.GetPosition(), 
+        if (alien.IsActive() && CheckCollision(alien.GetPosition(),
             alien.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
         {
             projectile.SetActive(false);
@@ -284,7 +317,7 @@ void Game::CheckPlayerCollision(Projectile& projectile)
     }
 }
 
-void Game::CheckEnemyCollision(Projectile& projectile)
+void Game::Private::CheckEnemyCollision(Projectile& projectile)
 {
     if (CheckCollision({ player.GetXPosition(), Config::screenHeight - player.GetPlayerBaseHeight() },
         player.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
@@ -295,9 +328,9 @@ void Game::CheckEnemyCollision(Projectile& projectile)
     }
 }
 
-void Game::CheckWallCollisions(Projectile& projectile)
+void Game::Private::CheckWallCollisions(Projectile& projectile)
 {
-    for (auto& wall : Walls) 
+    for (auto& wall : Walls)
     {
         if (CheckCollision(wall.GetPosition(), wall.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
         {
@@ -308,8 +341,7 @@ void Game::CheckWallCollisions(Projectile& projectile)
     }
 }
 
-//ToDo: See if I can refactor this method a little because it's currently not clean enough
-bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd)
+bool Game::Private::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd)
 {
     const auto dx = lineEnd.x - lineStart.x;
     const auto dy = lineEnd.y - lineStart.y;
@@ -319,13 +351,12 @@ bool Game::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineSta
     const auto closestX = std::clamp(lineStart.x + dotP * dx, std::min(lineStart.x, lineEnd.x), std::max(lineStart.x, lineEnd.x));
     const auto closestY = std::clamp(lineStart.y + dotP * dy, std::min(lineStart.y, lineEnd.y), std::max(lineStart.y, lineEnd.y));
     const auto distanceSquared = (closestX - circlePos.x) * (closestX - circlePos.x) +
-                                  (closestY - circlePos.y) * (closestY - circlePos.y);
+        (closestY - circlePos.y) * (closestY - circlePos.y);
 
     return distanceSquared <= circleRadius * circleRadius;
 }
 
-//ToDo: Perhaps some additional refactoring here as well
-void Game::UpdateBackground()
+void Game::Private::UpdateBackground()
 {
     const auto playerBaseHeight = player.GetPlayerBaseHeight();
     const Vector2 playerPosition = { player.GetXPosition(), playerBaseHeight };
@@ -336,7 +367,7 @@ void Game::UpdateBackground()
     background.Update(backgroundOffset / Config::backgroundSpeed);
 }
 
-bool Game::CheckNewHighScore() noexcept
+bool Game::Private::CheckNewHighScore() noexcept
 {
-    return score > Leaderboard.back().score;
+    return true;
 }
