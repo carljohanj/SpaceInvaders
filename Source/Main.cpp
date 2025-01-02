@@ -6,7 +6,14 @@
 
 int main()
 {
-    Game game;
-    game.Run();
+    try
+    {
+        Game game;
+        game.Run();
+    }
+    catch (const TextureLoadingException& e)
+    {
+        std::println("Exception caught:\n {}:", e.what());
+    }
     return 0;
 }
