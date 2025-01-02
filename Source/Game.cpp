@@ -10,7 +10,7 @@ struct Game::Private
 {
     State gameState = State::STARTSCREEN;
     int score = 0;
-    float shootTimer = 0;
+    float shootTimer = Config::defaultCooldown;
     bool newHighScore = false;
 
     GameWindow window;
@@ -31,6 +31,7 @@ struct Game::Private
     void RenderStartScreen() const noexcept;
     void RenderGameOverScreen() const noexcept;
     void RenderHUD() const noexcept;
+    void UpdateEverything();
     void UpdatePlayerInput();
     void RenderAliens() noexcept;
     void UpdateAliens();
@@ -87,12 +88,7 @@ void Game::Private::Update()
         if (IsKeyReleased(KEY_SPACE)) { Start(); }
         break;
     case State::GAMEPLAY:
-        UpdatePlayerInput();
-        UpdateAliens();
-        UpdateProjectiles();
-        DetectCollisions();
-        UpdateWalls();
-        UpdateBackground();
+        UpdateEverything();
         break;
     case State::ENDSCREEN:
         if (IsKeyReleased(KEY_ENTER)) { Continue(); }
@@ -141,6 +137,16 @@ void Game::Private::RenderGameplay() noexcept
     RenderProjectiles();
     RenderWalls();
     RenderAliens();
+}
+
+void Game::Private::UpdateEverything()
+{
+    UpdatePlayerInput();
+    UpdateAliens();
+    UpdateProjectiles();
+    DetectCollisions();
+    UpdateWalls();
+    UpdateBackground();
 }
 
 void Game::Private::RenderStartScreen() const noexcept
@@ -285,10 +291,10 @@ void Game::Private::DetectCollisions() noexcept
         if (!projectile.IsActive()) { continue; }
         switch (projectile.GetType())
         {
-        case EntityType::PLAYER_PROJECTILE:
+        case ProjectileType::PLAYER_PROJECTILE:
             CheckEnemyCollision(projectile);
             break;
-        case EntityType::ENEMY_PROJECTILE:
+        case ProjectileType::ENEMY_PROJECTILE:
             CheckPlayerCollision(projectile);
             break;
         }

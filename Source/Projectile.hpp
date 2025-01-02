@@ -18,20 +18,20 @@ public:
     Vector2 GetPosition() const noexcept { return position; }
     bool IsActive() const noexcept { return active; }
     int GetSpeed() const noexcept { return speed; }
-    EntityType GetType() const noexcept { return type; }
+    ProjectileType GetType() const noexcept { return type; }
     Vector2 GetLineStart() const noexcept { return lineStart; }
     Vector2 GetLineEnd() const noexcept { return lineEnd; }
 
     void SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
     void SetSpeed(int newSpeed) noexcept { speed = newSpeed; }
-    void SetType(EntityType newType) noexcept { type = newType; }
+    void SetType(ProjectileType newType) noexcept { type = newType; }
     void SetActive(bool isActive) noexcept { active = isActive; }
 
 private:
     Vector2 position = { 0, 0 };
     int speed = 15;
     bool active = true;
-    EntityType type;
+    ProjectileType type;
 
     Vector2 lineStart = { 0, 0 };
     Vector2 lineEnd = { 0, 0 };

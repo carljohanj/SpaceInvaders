@@ -1,6 +1,6 @@
 #include "Gun.hpp"
 
-Gun::Gun(float projectileSpeed, EntityType projectileType, Vector2 offset)
+Gun::Gun(float projectileSpeed, ProjectileType projectileType, Vector2 offset)
     : projectileSpeed(projectileSpeed), projectileType(projectileType), offset(offset) 
 {}
 

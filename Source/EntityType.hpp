@@ -1,3 +1,3 @@
 #pragma once
 
-enum class EntityType { PLAYER_PROJECTILE, ENEMY_PROJECTILE };
+enum class ProjectileType { PLAYER_PROJECTILE, ENEMY_PROJECTILE };

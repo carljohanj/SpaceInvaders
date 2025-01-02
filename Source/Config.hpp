@@ -11,7 +11,7 @@ namespace Config
     // Assets
     constexpr std::string_view playerTexturePath = "./Assets/Ship1.png";
     constexpr std::string_view projectileTexturePath = "./Assets/Laser.png";
-    constexpr std::string_view alienTexturePath = "./Assets/Alien.png";
+    constexpr std::string_view alienTexturePath = "./Assets/notAlien.png";
     constexpr std::string_view wallTexturePath = "./Assets/Barrier.png";
 
     // Game title and messages
@@ -39,6 +39,7 @@ namespace Config
     // Shooting settings
     inline constexpr float alienShootInterval = 1.0f;
     inline constexpr int projectileSpeed = 15;
+    inline constexpr float defaultCooldown = 1.0f;
 
     // Background settings
     inline constexpr int backgroundSpeed = 15;
