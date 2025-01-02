@@ -39,11 +39,6 @@ Wall& Wall::operator=(Wall&& other) noexcept
     return *this;
 }
 
-void Wall::Update() noexcept
-{
-    if (health <= 0) { active = false; }
-}
-
 void Wall::Render() const noexcept
 {
     const auto& textureRef = texture.GetTexture();

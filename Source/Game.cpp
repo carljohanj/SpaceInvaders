@@ -38,8 +38,7 @@ struct Game::Private
     void RemoveInactiveAliens();
     void ResetWalls();
     void RenderWalls() noexcept;
-    void UpdateWalls();
-    void RemoveInactiveWalls();
+    void UpdateWalls() noexcept;
     void RenderProjectiles() const noexcept;
     void UpdateProjectiles();
     void DetectCollisions() noexcept;
@@ -257,22 +256,9 @@ void Game::Private::RenderWalls() noexcept
     }
 }
 
-void Game::Private::UpdateWalls()
+void Game::Private::UpdateWalls() noexcept
 {
-    for (auto& wall : Walls)
-    {
-        wall.Update();
-    }
-    RemoveInactiveWalls();
-}
-
-void Game::Private::RemoveInactiveWalls()
-{
-    auto it = std::remove_if(Walls.begin(), Walls.end(), [](const Wall& wall) noexcept
-        {
-            return !wall.IsActive();
-        });
-    Walls.erase(it, Walls.end());
+    std::erase_if(Walls, [](const Wall& wall) noexcept { return !wall.IsActive(); });
 }
 
 void Game::Private::RenderProjectiles() const noexcept
@@ -289,7 +275,7 @@ void Game::Private::UpdateProjectiles()
     {
         projectile.Update();
     }
-    std::erase_if(Projectiles, [](const Projectile& p) { return !p.IsActive(); });
+    std::erase_if(Projectiles, [](const Projectile& p) noexcept { return !p.IsActive(); });
 }
 
 void Game::Private::DetectCollisions() noexcept
