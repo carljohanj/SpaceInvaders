@@ -1,13 +1,14 @@
 #include "Gun.hpp"
+#include "Config.hpp"
 
-Gun::Gun(float projectileSpeed, ProjectileType projectileType, Vector2 offset)
-    : projectileSpeed(projectileSpeed), projectileType(projectileType), offset(offset) 
-{}
+Gun::Gun(float speed, ProjectileType projectile, Vector2 offset)
+    : projectileSpeed(speed), projectileType(projectile), offset(offset) {
+}
 
-Projectile Gun::Shoot(Vector2 origin) const noexcept 
+Projectile Gun::Shoot(Vector2 whoIsShooting) const noexcept 
 {
     Projectile projectile;
-    projectile.SetPosition({ origin.x + offset.x, origin.y + offset.y });
+    projectile.SetPosition({ whoIsShooting.x + offset.x, whoIsShooting.y + offset.y });
     projectile.SetSpeed(projectileSpeed);
     projectile.SetType(projectileType);
     projectile.SetActive(true);

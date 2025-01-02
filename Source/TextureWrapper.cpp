@@ -1,33 +1,29 @@
 #include "TextureWrapper.hpp"
-#include <algorithm>
-#include "TextureLoadingException.hpp"
 #include <stdexcept>
 #include <iostream>
-#include <ranges>
+#include "TextureLoadingException.hpp"
 
-std::unordered_map<std::string, std::pair<Texture2D, int>> TextureWrapper::textureCache;
+std::unordered_map<std::filesystem::path, TextureWrapper::TextureData> TextureWrapper::textureCache;
 
-TextureWrapper::TextureWrapper(const std::string_view texturePath)
-    : texturePath(texturePath)
+TextureWrapper::TextureWrapper(const std::filesystem::path& path)
+    : texturePath(path)
 {
-    const bool textureExists = std::ranges::contains(textureCache | std::views::keys, std::string(texturePath));
-    if (textureExists) { textureCache[texturePath.data()].second++; }
-    else 
+    if (TextureIsInCache(path)) 
     {
-        Texture2D texture = LoadTexture(texturePath.data());
+        textureCache[path].referenceCount++;
+    }
+    else
+    {
+        const Texture2D texture = LoadTexture(path.string().c_str());
         if (texture.id == 0)
         {
-            throw TextureLoadingException("Failed to load " + std::string(texturePath));
+            throw TextureLoadingException("Failed to load " + path.string());
         }
-        textureCache[texturePath.data()] = { texture, 1 };
-        std::cout << "Texture loaded: " << texturePath << std::endl;
+        textureCache[path] = { texture, 1 };
     }
 }
 
-TextureWrapper::~TextureWrapper()
-{
-    DecrementReference(texturePath);
-}
+TextureWrapper::~TextureWrapper() { DecrementTextureReference(texturePath); }
 
 TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept
     : texturePath(std::move(other.texturePath))
@@ -37,47 +33,39 @@ TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept
 
 TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept
 {
-    if (this != &other) 
-    {
-        DecrementReference(texturePath);
-        texturePath = std::move(other.texturePath);
-        other.texturePath.clear();
-    }
+    DecrementTextureReference(texturePath);
+    texturePath = std::move(other.texturePath);
+    other.texturePath.clear();
     return *this;
 }
 
-const Texture2D& TextureWrapper::GetTexture() const noexcept
+const Texture2D& TextureWrapper::GetTexture() const
 {
-    return textureCache.at(texturePath).first;
-}
-
-void TextureWrapper::IncrementReference(const std::string& path)
-{
-    auto it = textureCache.find(path);
-    if (it != textureCache.end()) { it->second.second++; }
-    else 
+    const auto textureEntry = textureCache.find(texturePath);
+    if (textureEntry == textureCache.end())
     {
-        Texture2D texture = LoadTexture(path.c_str());
-        if (texture.id == 0) 
-        {
-            throw std::runtime_error("Failed to load texture: " + path);
-        }
-        textureCache[path] = { texture, 1 };
-        std::cout << "Texture loaded: " << path << std::endl;
+        throw TextureLoadingException("Texture not found in cache: " + texturePath.string());
     }
+    return textureEntry->second.texture;
 }
 
-void TextureWrapper::DecrementReference(const std::string& path)
+void TextureWrapper::DecrementTextureReference(const std::filesystem::path& path) noexcept
 {
-    auto it = textureCache.find(path);
-    if (it != textureCache.end()) 
+    if (TextureIsInCache(path)) { MaybeUnload(path); }
+}
+
+inline bool TextureWrapper::TextureIsInCache(const std::filesystem::path& path) const
+{
+    return textureCache.find(path) != textureCache.end();
+}
+
+inline void TextureWrapper::MaybeUnload(const std::filesystem::path& path) noexcept
+{
+    auto& textureData = textureCache[path];
+    textureData.referenceCount--;
+    if (textureData.referenceCount == 0)
     {
-        it->second.second--;
-        if (it->second.second == 0) 
-        {
-            UnloadTexture(it->second.first);
-            textureCache.erase(it);
-            std::cout << "Texture unloaded: " << path << std::endl;
-        }
+        UnloadTexture(textureData.texture);
+        textureCache.erase(path);
     }
 }

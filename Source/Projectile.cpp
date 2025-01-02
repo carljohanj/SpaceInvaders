@@ -46,23 +46,17 @@ Projectile::Projectile(Projectile&& other) noexcept
     type(std::move(other.type)),
     lineStart(std::move(other.lineStart)),
     lineEnd(std::move(other.lineEnd)),
-    texture(std::move(other.texture))
-{
-    std::cout << "Projectile moved!" << std::endl;
-}
+    texture(std::move(other.texture)) {
+    }
 
 Projectile& Projectile::operator=(Projectile&& other) noexcept
 {
-    if (this != &other)
-    {
-        position = std::move(other.position);
-        speed = std::exchange(other.speed, 0);
-        active = std::exchange(other.active, false);
-        type = std::move(other.type);
-        lineStart = std::move(other.lineStart);
-        lineEnd = std::move(other.lineEnd);
-        texture = std::move(other.texture);
-        std::cout << "Projectile move-assigned!" << std::endl;
-    }
+    position = std::move(other.position);
+    speed = std::exchange(other.speed, 0);
+    active = std::exchange(other.active, false);
+    type = std::move(other.type);
+    lineStart = std::move(other.lineStart);
+    lineEnd = std::move(other.lineEnd);
+    texture = std::move(other.texture);
     return *this;
 }

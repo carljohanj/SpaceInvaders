@@ -1,25 +1,29 @@
 #pragma once
 #include "raylib.h"
-#include <string>
+#include <filesystem>
 #include <unordered_map>
 
-class TextureWrapper {
+class TextureWrapper
+{
 public:
-    explicit TextureWrapper(const std::string_view texturePath);
+    explicit TextureWrapper(const std::filesystem::path& texturePath);
     ~TextureWrapper();
-
     TextureWrapper(const TextureWrapper&) = delete;
     TextureWrapper& operator=(const TextureWrapper&) = delete;
-
     TextureWrapper(TextureWrapper&& other) noexcept;
     TextureWrapper& operator=(TextureWrapper&& other) noexcept;
-
-    const Texture2D& GetTexture() const noexcept;
+    const Texture2D& GetTexture() const;
 
 private:
-    std::string texturePath;
+    struct TextureData
+    {
+        Texture2D texture;
+        int referenceCount;
+    };
 
-    static std::unordered_map<std::string, std::pair<Texture2D, int>> textureCache;
-    void IncrementReference(const std::string& path);
-    void DecrementReference(const std::string& path);
+    std::filesystem::path texturePath;
+    static std::unordered_map<std::filesystem::path, TextureData> textureCache;
+    void DecrementTextureReference(const std::filesystem::path& path) noexcept;
+    bool TextureIsInCache(const std::filesystem::path& path) const;
+    void MaybeUnload(const std::filesystem::path& path) noexcept;
 };

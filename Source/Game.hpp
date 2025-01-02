@@ -34,5 +34,5 @@ public:
 
 private:
     struct Private;
-    StackManager<256> impl;
+    StackManager<300> impl;
 };

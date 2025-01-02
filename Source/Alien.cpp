@@ -44,7 +44,7 @@ Alien& Alien::operator=(Alien&& other) noexcept
     return *this;
 }
 
-void Alien::Update()
+void Alien::Update() noexcept
 {
     if (moveRight)
     {

@@ -6,7 +6,7 @@
 #include <random>
 #include <ranges>
 
-using randomAlien = size_t;
+using alien = size_t;
 inline constexpr float shootTimerReset = 0.0f;
 
 struct Game::Private
@@ -40,7 +40,7 @@ struct Game::Private
     void UpdateTimeSinceLastShot() noexcept;
     bool CanFireShot() const noexcept;
     void FireShot() noexcept;
-    randomAlien GetRandomAlien(randomAlien range);
+    alien GetRandomAlien(alien range);
     void ResetShootTimer() noexcept;
     void RemoveInactiveAliens() noexcept;
     void ResetWalls();
@@ -229,7 +229,7 @@ inline void Game::Private::FireShot() noexcept
     if (randomAlien.IsActive()) { Projectiles.push_back(randomAlien.Shoot()); }
 }
 
-[[nodiscard]] inline randomAlien Game::Private::GetRandomAlien(randomAlien range)
+[[nodiscard]] inline alien Game::Private::GetRandomAlien(alien range)
 {
     static std::mt19937 gen{ std::random_device{}() };
     return std::uniform_int_distribution<size_t>{0, range - 1}(gen);
@@ -245,23 +245,18 @@ inline void Game::Private::RemoveInactiveAliens() noexcept
 
 void Game::Private::ResetWalls()
 {
-    constexpr auto window_width = static_cast<float>(Config::screenWidth);
-    constexpr auto window_height = static_cast<float>(Config::screenHeight);
-    constexpr auto wall_distance = window_width / (Config::defaultWallCount + 1);
-
     Walls.clear();
-    Walls.reserve(Config::defaultWallCount);
-
+    constexpr auto wallDistance = Config::screenWidth / (Config::defaultWallCount + 1);
     for (const int i : std::views::iota(1, Config::defaultWallCount + 1))
     {
-        Walls.emplace_back();
-        Walls.back().SetPosition({ wall_distance * static_cast<float>(i), window_height - 250.0f });
+        Walls.emplace_back().SetPosition({ wallDistance * static_cast<float>(i),
+                                           Config::screenHeight - Config::wallOffset });
     }
 }
 
 void Game::Private::RenderWalls() noexcept
 {
-    for (const auto& wall : Walls)
+    for (auto& wall : Walls)        //ToDo: See if we can make this const
     {
         wall.Render();
     }
@@ -312,6 +307,7 @@ void Game::Private::DetectCollisions() noexcept
     }
 }
 
+//ToDo: If we hide these in some kind of collision manager we can get some ugly code out of the way
 inline void Game::Private::CheckEnemyCollision(Projectile& projectile) noexcept
 {
     for (auto& alien : Aliens)

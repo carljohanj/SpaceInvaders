@@ -10,13 +10,13 @@ class Alien
 {
 public:
     Alien();
-    Alien(const Alien&);
+    Alien(const Alien&) = delete;
     Alien(Alien&& other) noexcept;
     ~Alien() = default;
-    Alien& operator=(const Alien&);
+    Alien& operator=(const Alien&) = delete;
     Alien& operator=(Alien&& other) noexcept;
 
-    void Update();
+    void Update() noexcept;
     void Render() const noexcept;
     Projectile Shoot() const noexcept;
 

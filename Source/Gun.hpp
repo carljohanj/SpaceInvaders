@@ -3,12 +3,11 @@
 #include "EntityType.hpp"
 #include "raylib.h"
 
-class Gun 
+class Gun
 {
 public:
-    Gun(float projectileSpeed, ProjectileType projectileType, Vector2 offset);
-
-    Projectile Shoot(Vector2 origin) const noexcept;
+    Gun(float speed, ProjectileType projectile, Vector2 offset);
+    Projectile Shoot(Vector2 whoIsShooting) const noexcept;
 
 private:
     float projectileSpeed;

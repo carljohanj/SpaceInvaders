@@ -39,7 +39,7 @@ Wall& Wall::operator=(Wall&& other) noexcept
     return *this;
 }
 
-void Wall::Render() const noexcept
+void Wall::Render() noexcept
 {
     const auto& textureRef = texture.GetTexture();
     if (textureRef.id == 0)
@@ -47,8 +47,13 @@ void Wall::Render() const noexcept
         std::cerr << "Wall texture is not valid!" << std::endl;
         return;
     }
+    RenderWallText();
+    RenderHealth();
+}
 
-    // Render the wall with texture; maybe make this a new method
+inline void Wall::RenderWallText() const noexcept
+{
+    const auto& textureRef = texture.GetTexture();
     DrawTexturePro(textureRef,
         { 0, 0, (float)textureRef.width, (float)textureRef.height },
         { position.x, position.y, 200.0f, 200.0f },
@@ -56,7 +61,10 @@ void Wall::Render() const noexcept
         0.0f,
         WHITE);
 
-    // Render health text (why isn't player health updated in the corresponding place in Player class??)
+}
+
+inline void Wall::RenderHealth() noexcept
+{
     DrawText(TextFormat("%i", health), position.x - 21, position.y + 10, 40, RED);
 }
 
