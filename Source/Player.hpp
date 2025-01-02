@@ -13,6 +13,7 @@ public:
     void Update() noexcept;
     void Render() const noexcept;
     Projectile Shoot() const noexcept;
+    Vector2 GetPosition() const noexcept;
     float GetXPosition() const noexcept { return x_pos; }
     float GetPlayerBaseHeight() const noexcept { return player_base_height; }
     float GetRadius() const noexcept { return radius; }

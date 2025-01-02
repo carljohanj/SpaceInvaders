@@ -4,7 +4,7 @@
 #include <string>
 #include "Player.hpp"
 #include "Alien.hpp"
-#include "ImplWrapper.hpp"
+#include "StackManager.hpp"
 #include "Projectile.hpp"
 #include "Wall.hpp"
 #include "Star.hpp"
@@ -34,5 +34,5 @@ public:
 
 private:
     struct Private;
-    ImplWrapper<256> impl;
+    StackManager<256> impl;
 };

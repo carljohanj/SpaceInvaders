@@ -64,3 +64,8 @@ void Wall::Render() const noexcept
     // Render health text (why isn't player health updated in the corresponding place in Player class??)
     DrawText(TextFormat("%i", health), position.x - 21, position.y + 10, 40, RED);
 }
+
+Rectangle Wall::GetRectangle() const noexcept
+{
+    return { position.x - radius, position.y - radius, radius * 2, radius * 2 };
+}

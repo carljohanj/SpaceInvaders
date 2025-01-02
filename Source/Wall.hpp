@@ -16,6 +16,7 @@ public:
     void Update() noexcept;
     void Render() const noexcept;
 
+    Rectangle GetRectangle() const noexcept;
     Vector2 GetPosition() const noexcept { return position; }
     void SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
     bool IsActive() const noexcept { return active; }
@@ -28,7 +29,7 @@ private:
     Vector2 position = { 0, 0 };
     bool active = true;
     int health = 50;
-    int radius = 60;
+    float radius = 60;
 
     TextureWrapper texture;
 };

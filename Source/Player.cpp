@@ -35,3 +35,8 @@ Projectile Player::Shoot() const noexcept
 {
     return gun.Shoot({ x_pos, GetScreenHeight() - player_base_height });
 }
+
+Vector2 Player::GetPosition() const noexcept
+{
+    return { x_pos, GetScreenHeight() - Config::playerBaseHeight };
+}

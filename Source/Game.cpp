@@ -2,7 +2,7 @@
 #include "Game.hpp"
 #include <algorithm>
 #include <cassert>
-#include "ImplWrapper.hpp"
+#include "StackManager.hpp"
 #include <random>
 #include <ranges>
 
@@ -42,11 +42,10 @@ struct Game::Private
     void RemoveInactiveWalls();
     void RenderProjectiles() const noexcept;
     void UpdateProjectiles();
-    void DetectCollisions();
-    void CheckPlayerCollision(Projectile& projectile);
-    void CheckEnemyCollision(Projectile& projectile);
-    void CheckWallCollisions(Projectile& projectile);
-    bool CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd);
+    void DetectCollisions() noexcept;
+    void CheckPlayerCollision(Projectile& projectile) noexcept;
+    void CheckEnemyCollision(Projectile& projectile) noexcept;
+    void CheckWallCollisions(Projectile& projectile) noexcept;
     void UpdateBackground();
     bool CheckNewHighScore() noexcept;
 };
@@ -293,67 +292,64 @@ void Game::Private::UpdateProjectiles()
     std::erase_if(Projectiles, [](const Projectile& p) { return !p.IsActive(); });
 }
 
-void Game::Private::DetectCollisions()
+void Game::Private::DetectCollisions() noexcept
 {
     for (auto& projectile : Projectiles)
     {
-        if (projectile.GetType() == EntityType::PLAYER_PROJECTILE) { CheckPlayerCollision(projectile); }
-        else if (projectile.GetType() == EntityType::ENEMY_PROJECTILE) { CheckEnemyCollision(projectile); }
+        if (!projectile.IsActive()) { continue; }
+        switch (projectile.GetType())
+        {
+        case EntityType::PLAYER_PROJECTILE:
+            CheckEnemyCollision(projectile);
+            break;
+        case EntityType::ENEMY_PROJECTILE:
+            CheckPlayerCollision(projectile);
+            break;
+        }
         CheckWallCollisions(projectile);
     }
 }
 
-void Game::Private::CheckPlayerCollision(Projectile& projectile)
+inline void Game::Private::CheckEnemyCollision(Projectile& projectile) noexcept
 {
     for (auto& alien : Aliens)
     {
-        if (alien.IsActive() && CheckCollision(alien.GetPosition(),
-            alien.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
+        if (!alien.IsActive()) { continue; }
+        if (CheckCollisionCircles(alien.GetPosition(), alien.GetRadius(),
+            { projectile.GetLineStart().x, projectile.GetLineStart().y }, 1.0f))
         {
-            projectile.SetActive(false);
             alien.SetActive(false);
+            projectile.SetActive(false);
             score += 100;
+            break;
         }
     }
 }
 
-void Game::Private::CheckEnemyCollision(Projectile& projectile)
-{
-    if (CheckCollision({ player.GetXPosition(), Config::screenHeight - player.GetPlayerBaseHeight() },
-        player.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
-    {
-        projectile.SetActive(false);
-        player.SetLives(player.GetLives() - 1);
-        if (player.GetLives() <= 0) { End(); }
-    }
-}
-
-void Game::Private::CheckWallCollisions(Projectile& projectile)
+inline void Game::Private::CheckWallCollisions(Projectile& projectile) noexcept
 {
     for (auto& wall : Walls)
     {
-        if (CheckCollision(wall.GetPosition(), wall.GetRadius(), projectile.GetLineStart(), projectile.GetLineEnd()))
+        if (!wall.IsActive()) { continue; }
+        if (CheckCollisionPointRec(projectile.GetPosition(), wall.GetRectangle()))
         {
-            projectile.SetActive(false);
             wall.SetHealth(wall.GetHealth() - 1);
             if (wall.GetHealth() <= 0) { wall.SetActive(false); }
+            projectile.SetActive(false);
+            break;
         }
     }
 }
 
-bool Game::Private::CheckCollision(Vector2 circlePos, float circleRadius, Vector2 lineStart, Vector2 lineEnd)
+inline void Game::Private::CheckPlayerCollision(Projectile& projectile) noexcept
 {
-    const auto dx = lineEnd.x - lineStart.x;
-    const auto dy = lineEnd.y - lineStart.y;
-    const auto lineLengthSquared = dx * dx + dy * dy;
-
-    const auto dotP = ((circlePos.x - lineStart.x) * dx + (circlePos.y - lineStart.y) * dy) / lineLengthSquared;
-    const auto closestX = std::clamp(lineStart.x + dotP * dx, std::min(lineStart.x, lineEnd.x), std::max(lineStart.x, lineEnd.x));
-    const auto closestY = std::clamp(lineStart.y + dotP * dy, std::min(lineStart.y, lineEnd.y), std::max(lineStart.y, lineEnd.y));
-    const auto distanceSquared = (closestX - circlePos.x) * (closestX - circlePos.x) +
-        (closestY - circlePos.y) * (closestY - circlePos.y);
-
-    return distanceSquared <= circleRadius * circleRadius;
+    if (CheckCollisionCircles(player.GetPosition(), player.GetRadius(),
+        { projectile.GetLineStart().x, projectile.GetLineStart().y }, 1.0f))
+    {
+        player.SetLives(player.GetLives() - 1);
+        projectile.SetActive(false);
+        if (player.GetLives() <= 0) { End(); }
+    }
 }
 
 void Game::Private::UpdateBackground()
@@ -367,7 +363,4 @@ void Game::Private::UpdateBackground()
     background.Update(backgroundOffset / Config::backgroundSpeed);
 }
 
-bool Game::Private::CheckNewHighScore() noexcept
-{
-    return true;
-}
+bool Game::Private::CheckNewHighScore() noexcept { return true; }

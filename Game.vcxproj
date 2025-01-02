@@ -182,7 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Gun.hpp" />
-    <ClInclude Include="Source\ImplWrapper.hpp" />
+    <ClInclude Include="Source\StackManager.hpp" />
     <ClInclude Include="Source\TextureLoadingException.hpp" />
     <ClInclude Include="Source\Alien.hpp" />
     <ClInclude Include="Source\Background.hpp" />

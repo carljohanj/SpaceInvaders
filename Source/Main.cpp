@@ -13,7 +13,7 @@ int main()
     }
     catch (const TextureLoadingException& e)
     {
-        std::println("Exception caught:\n {}:", e.what());
+        std::println("Exception caught:\n{}:", e.what());
     }
     return 0;
 }
