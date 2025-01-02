@@ -5,20 +5,20 @@
 
 namespace Config
 {
-    // Screen settings
+    // Window settings
     inline constexpr int screenWidth  = 1920;
     inline constexpr int screenHeight = 1080;
+    inline constexpr std::string_view title = "SPACE INVADERS";
+
+    // Menus and messages
+    inline constexpr std::string_view beginMessage = "PRESS SPACE TO BEGIN";
+    inline constexpr std::string_view continueMessage = "PRESS ENTER TO CONTINUE";
 
     // Assets
     inline const std::filesystem::path playerTexturePath     = "./Assets/Ship1.png";
     inline const std::filesystem::path projectileTexturePath = "./Assets/Laser.png";
     inline const std::filesystem::path alienTexturePath      = "./Assets/Alien.png";
     inline const std::filesystem::path wallTexturePath       = "./Assets/Barrier.png";
-
-    // Game title and messages
-    inline constexpr std::string_view title           = "SPACE INVADERS";
-    inline constexpr std::string_view beginMessage    = "PRESS SPACE TO BEGIN";
-    inline constexpr std::string_view continueMessage = "PRESS ENTER TO CONTINUE";
 
     //Player settings
     inline constexpr float playerBaseHeight  = 70.0f;

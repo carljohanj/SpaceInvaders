@@ -1,10 +1,15 @@
 #include "GameWindow.hpp"
+#include "GameWindowException.hpp"
 #include "Config.hpp"
 #include <complex>
 
 GameWindow::GameWindow()
 {
     InitWindow(Config::screenWidth, Config::screenHeight, Config::title.data());
+    if (!IsWindowReady())
+    {
+        throw GameWindowException("Window failed to initialize properly.");
+    }
     SetTargetFPS(60);
 }
 

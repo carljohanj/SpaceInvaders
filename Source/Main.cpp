@@ -15,5 +15,10 @@ int main()
     {
         std::println("Exception caught:\n{}:", e.what());
     }
+    catch (const GameWindowException& e)
+    {
+        std::println("Exception caught:\n{}:", e.what());
+    }
+
     return 0;
 }
