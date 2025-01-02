@@ -16,14 +16,23 @@ public:
     {
         static_assert(sizeof(T) <= BufferSize, "Type size exceeds the buffer size!");
         static_assert(alignof(T) <= alignof(AlignType), "Type alignment exceeds the buffer alignment!");
+        destroy();  // This is for cleanup if an exception throws; took me like a week to figure out :'(
         new (buffer.data()) T(std::forward<Args>(args)...);
         typeDestructor = [](std::byte* ptr) noexcept { reinterpret_cast<T*>(ptr)->~T(); };
     }
 
     ~StackManager() noexcept
     {
+        destroy();
+    }
+
+    void destroy() noexcept
+    {
         if (typeDestructor)
+        {
             typeDestructor(buffer.data());
+            typeDestructor = nullptr;
+        }
     }
 
     template <typename T>

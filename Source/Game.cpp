@@ -33,9 +33,16 @@ struct Game::Private
     void RenderHUD() const noexcept;
     void UpdateEverything();
     void UpdatePlayerInput();
+    void CreateNewAlien(int alienRow);
     void RenderAliens() noexcept;
     void UpdateAliens();
-    void TriggerAlienShot();
+    void UpdateAlienstates() noexcept;
+    void TriggerAlienShot() noexcept;
+    void UpdateTimeSinceLastShot() noexcept;
+    bool CanFireShot() const noexcept;
+    void FireShot() noexcept;
+    size_t GetRandomAlien(size_t range) noexcept;
+    void ResetShootTimer() noexcept;
     void RemoveInactiveAliens();
     void ResetWalls();
     void RenderWalls() noexcept;
@@ -175,18 +182,22 @@ void Game::Private::UpdatePlayerInput()
 
 void Game::Private::ResetAliens()
 {
-    if (Aliens.empty())
+    if (!Aliens.empty()) return;
+
+    for (const int row : std::views::iota(0, Config::alienFormationHeight))
     {
-        for (int row = 0; row < Config::alienFormationHeight; row++)
-        {
-            for (int col = 0; col < Config::alienFormationWidth; col++)
-            {
-                Alien newAlien;
-                newAlien.SetPosition({ static_cast<float>(Config::alienFormationX + 450 + (col * Config::alienSpacing)),
-                                       static_cast<float>(Config::alienFormationY + (row * Config::alienSpacing)) });
-                Aliens.push_back(std::move(newAlien));
-            }
-        }
+        CreateNewAlien(row);
+    }
+}
+
+inline void Game::Private::CreateNewAlien(int alienRow)
+{
+    for (const int alienCol : std::views::iota(0, Config::alienFormationWidth))
+    {
+        Aliens.emplace_back().SetPosition({
+        static_cast<float>(Config::alienFormationX + 450 + (alienCol * Config::alienSpacing)),
+        static_cast<float>(Config::alienFormationY + (alienRow * Config::alienSpacing))
+            });
     }
 }
 
@@ -202,31 +213,50 @@ void Game::Private::UpdateAliens()
 {
     RemoveInactiveAliens();
     TriggerAlienShot();
-    for (auto& alien : Aliens)
-    {
-        alien.Update();
-        if (alien.GetPosition().y > Config::screenHeight - player.GetPlayerBaseHeight()) { End(); }
-    }
+    UpdateAlienstates();
     if (Aliens.empty()) { ResetAliens(); }
 }
 
-void Game::Private::TriggerAlienShot()
+inline void Game::Private::UpdateAlienstates() noexcept
 {
-    shootTimer += GetFrameTime();
-    if (shootTimer >= Config::alienShootInterval && !Aliens.empty())
+    for (auto& alien : Aliens)
     {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        std::uniform_int_distribution<size_t> dist(0, Aliens.size() - 1);
-
-        const int randomAlienIndex = dist(gen);
-        assert(randomAlienIndex >= 0 && randomAlienIndex < Aliens.size());
-        auto& randomAlien = Aliens[randomAlienIndex];
-
-        if (randomAlien.IsActive()) { Projectiles.push_back(randomAlien.Shoot()); }
-        shootTimer = 0.0f;
+        alien.Update();
+        if (alien.GetPosition().y > Config::screenHeight - Config::playerBaseHeight) { End(); }
     }
 }
+
+void Game::Private::TriggerAlienShot() noexcept
+{
+    UpdateTimeSinceLastShot();
+    if (CanFireShot())
+    {
+        FireShot();
+        ResetShootTimer();
+    }
+}
+
+inline void Game::Private::UpdateTimeSinceLastShot() noexcept { shootTimer += GetFrameTime(); }
+
+[[nodiscard]] inline bool Game::Private::CanFireShot() const noexcept
+{
+    return Aliens.empty() ? false : shootTimer >= Config::alienShootInterval;
+}
+
+inline void Game::Private::FireShot() noexcept
+{
+    auto const& randomAlien = Aliens[GetRandomAlien(Aliens.size())];
+    if (randomAlien.IsActive()) { Projectiles.push_back(randomAlien.Shoot()); }
+}
+
+[[nodiscard]] inline size_t Game::Private::GetRandomAlien(size_t range) noexcept
+{
+    static std::mt19937 gen{ std::random_device{}() };
+    return std::uniform_int_distribution<size_t>{0, range - 1}(gen);
+}
+
+inline void Game::Private::ResetShootTimer() noexcept { shootTimer = Config::defaultCooldown; }
+
 
 void Game::Private::RemoveInactiveAliens()
 {
