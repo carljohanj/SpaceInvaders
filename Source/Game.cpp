@@ -51,6 +51,9 @@ struct Game::Private
     void UpdateBackground() noexcept;
     void DetectCollisions() noexcept;
     void CheckPlayerCollision(Projectile& projectile) noexcept;
+    void AlienGetsShot(Alien& alien, Projectile& projectile) noexcept;
+    void WallGetsHit(Wall& wall, Projectile& projectile) noexcept;
+    void PlayerGetsShot(Projectile& projectile) noexcept;
     void CheckEnemyCollision(Projectile& projectile) noexcept;
     void CheckWallCollisions(Projectile& projectile) noexcept;
 };
@@ -307,7 +310,6 @@ void Game::Private::DetectCollisions() noexcept
     }
 }
 
-//ToDo: If we hide these in some kind of collision manager we can get some ugly code out of the way
 inline void Game::Private::CheckEnemyCollision(Projectile& projectile) noexcept
 {
     for (auto& alien : Aliens)
@@ -316,9 +318,7 @@ inline void Game::Private::CheckEnemyCollision(Projectile& projectile) noexcept
         if (CheckCollisionCircles(alien.GetPosition(), alien.GetRadius(),
             { projectile.GetLineStart().x, projectile.GetLineStart().y }, 1.0f))
         {
-            alien.SetActive(false);
-            projectile.SetActive(false);
-            score += 100;
+            AlienGetsShot(alien, projectile);
             break;
         }
     }
@@ -331,9 +331,7 @@ inline void Game::Private::CheckWallCollisions(Projectile& projectile) noexcept
         if (!wall.IsActive()) { continue; }
         if (CheckCollisionPointRec(projectile.GetPosition(), wall.GetRectangle()))
         {
-            wall.SetHealth(wall.GetHealth() - 1);
-            if (wall.GetHealth() <= 0) { wall.SetActive(false); }
-            projectile.SetActive(false);
+            WallGetsHit(wall, projectile);
             break;
         }
     }
@@ -344,8 +342,27 @@ inline void Game::Private::CheckPlayerCollision(Projectile& projectile) noexcept
     if (CheckCollisionCircles(player.GetPosition(), player.GetRadius(),
         { projectile.GetLineStart().x, projectile.GetLineStart().y }, 1.0f))
     {
-        player.SetLives(player.GetLives() - 1);
-        projectile.SetActive(false);
-        if (player.GetLives() <= 0) { End(); }
+        PlayerGetsShot(projectile);
     }
+}
+
+inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) noexcept
+{
+    alien.SetActive(false);
+    projectile.SetActive(false);
+    score += 100;
+}
+
+inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexcept
+{
+    wall.SetHealth(wall.GetHealth() - 1);
+    if (wall.GetHealth() <= 0) { wall.SetActive(false); }
+    projectile.SetActive(false);
+}
+
+inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept
+{
+    player.SetLives(player.GetLives() - 1);
+    projectile.SetActive(false);
+    if (player.GetLives() <= 0) { End(); }
 }
