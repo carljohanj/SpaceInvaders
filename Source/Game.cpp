@@ -6,6 +6,9 @@
 #include <random>
 #include <ranges>
 
+using randomAlien = size_t;
+inline constexpr float shootTimerReset = 0.0f;
+
 struct Game::Private
 {
     State gameState = State::STARTSCREEN;
@@ -14,7 +17,6 @@ struct Game::Private
     bool newHighScore = false;
 
     GameWindow window;
-    Background background;
     Player player;
     std::vector<Alien> Aliens;
     std::vector<Projectile> Projectiles;
@@ -28,9 +30,6 @@ struct Game::Private
     void ResetGameState() noexcept;
     void ResetAliens();
     void RenderGameplay() noexcept;
-    void RenderStartScreen() const noexcept;
-    void RenderGameOverScreen() const noexcept;
-    void RenderHUD() const noexcept;
     void UpdateEverything();
     void UpdatePlayerInput();
     void CreateNewAlien(int alienRow);
@@ -41,20 +40,19 @@ struct Game::Private
     void UpdateTimeSinceLastShot() noexcept;
     bool CanFireShot() const noexcept;
     void FireShot() noexcept;
-    size_t GetRandomAlien(size_t range) noexcept;
+    randomAlien GetRandomAlien(randomAlien range);
     void ResetShootTimer() noexcept;
-    void RemoveInactiveAliens();
+    void RemoveInactiveAliens() noexcept;
     void ResetWalls();
     void RenderWalls() noexcept;
     void UpdateWalls() noexcept;
     void RenderProjectiles() const noexcept;
     void UpdateProjectiles();
+    void UpdateBackground() noexcept;
     void DetectCollisions() noexcept;
     void CheckPlayerCollision(Projectile& projectile) noexcept;
     void CheckEnemyCollision(Projectile& projectile) noexcept;
     void CheckWallCollisions(Projectile& projectile) noexcept;
-    void UpdateBackground();
-    bool CheckNewHighScore() noexcept;
 };
 
 Game::Game()
@@ -83,7 +81,7 @@ void Game::Private::Start()
     ResetWalls();
     player.Reset();
     ResetAliens();
-    background.Reset();
+    window.ResetBackground();
     ResetGameState();
 }
 
@@ -108,13 +106,13 @@ void Game::Private::Render() noexcept
     switch (gameState)
     {
     case State::STARTSCREEN:
-        RenderStartScreen();
+        window.RenderStartScreen();
         break;
     case State::GAMEPLAY:
         RenderGameplay();
         break;
     case State::ENDSCREEN:
-        RenderGameOverScreen();
+        window.RenderGameOverScreen();
         break;
     }
 }
@@ -124,7 +122,6 @@ void Game::Private::End() noexcept
     Projectiles.clear();
     Walls.clear();
     Aliens.clear();
-    newHighScore = CheckNewHighScore();
     gameState = State::ENDSCREEN;
 }
 
@@ -138,8 +135,8 @@ void Game::Private::ResetGameState() noexcept
 
 void Game::Private::RenderGameplay() noexcept
 {
-    background.Render();
-    RenderHUD();
+    window.RenderBackground();
+    window.RenderHUD(score, player.GetLives());
     player.Render();
     RenderProjectiles();
     RenderWalls();
@@ -154,23 +151,6 @@ void Game::Private::UpdateEverything()
     DetectCollisions();
     UpdateWalls();
     UpdateBackground();
-}
-
-void Game::Private::RenderStartScreen() const noexcept
-{
-    DrawText(Config::title.data(), 200, 100, Config::startScreenTitleFontSize, YELLOW);
-    DrawText(Config::beginMessage.data(), 200, 350, Config::startScreenSubtitleFontSize, YELLOW);
-}
-
-void Game::Private::RenderGameOverScreen() const noexcept
-{
-    DrawText(Config::continueMessage.data(), Config::textBoxX, 200, Config::endScreenFontSize, YELLOW);
-}
-
-void Game::Private::RenderHUD() const noexcept
-{
-    DrawText(TextFormat("Score: %i", score), 50, 20, Config::gameplayScoreFontSize, YELLOW);
-    DrawText(TextFormat("Lives: %i", player.GetLives()), 50, 70, Config::gameplayLivesFontSize, YELLOW);
 }
 
 void Game::Private::UpdatePlayerInput()
@@ -249,23 +229,18 @@ inline void Game::Private::FireShot() noexcept
     if (randomAlien.IsActive()) { Projectiles.push_back(randomAlien.Shoot()); }
 }
 
-[[nodiscard]] inline size_t Game::Private::GetRandomAlien(size_t range) noexcept
+[[nodiscard]] inline randomAlien Game::Private::GetRandomAlien(randomAlien range)
 {
     static std::mt19937 gen{ std::random_device{}() };
     return std::uniform_int_distribution<size_t>{0, range - 1}(gen);
 }
 
-inline void Game::Private::ResetShootTimer() noexcept { shootTimer = Config::defaultCooldown; }
+inline void Game::Private::ResetShootTimer() noexcept { shootTimer = shootTimerReset; }
 
 
-void Game::Private::RemoveInactiveAliens()
+inline void Game::Private::RemoveInactiveAliens() noexcept
 {
-    auto it = std::remove_if(Aliens.begin(), Aliens.end(), [](const Alien& alien) noexcept
-        {
-            return !alien.IsActive();
-        });
-
-    Aliens.erase(it, Aliens.end());
+    std::erase_if(Aliens, [](const Alien& alien) noexcept { return !alien.IsActive(); });
 }
 
 void Game::Private::ResetWalls()
@@ -312,6 +287,11 @@ void Game::Private::UpdateProjectiles()
         projectile.Update();
     }
     std::erase_if(Projectiles, [](const Projectile& p) noexcept { return !p.IsActive(); });
+}
+
+void Game::Private::UpdateBackground() noexcept
+{
+    window.UpdateBackground(player.GetXPosition());
 }
 
 void Game::Private::DetectCollisions() noexcept
@@ -373,16 +353,3 @@ inline void Game::Private::CheckPlayerCollision(Projectile& projectile) noexcept
         if (player.GetLives() <= 0) { End(); }
     }
 }
-
-void Game::Private::UpdateBackground()
-{
-    const auto playerBaseHeight = player.GetPlayerBaseHeight();
-    const Vector2 playerPosition = { player.GetXPosition(), playerBaseHeight };
-    const Vector2 screenCorner = { 0.0f, playerBaseHeight };
-    const auto dx = screenCorner.x - playerPosition.x;
-    const auto dy = screenCorner.y - playerPosition.y;
-    const auto backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
-    background.Update(backgroundOffset / Config::backgroundSpeed);
-}
-
-bool Game::Private::CheckNewHighScore() noexcept { return true; }
