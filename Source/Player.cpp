@@ -9,10 +9,7 @@ Player::Player()
     x_pos = GetScreenWidth() / 2;
 }
 
-void Player::Reset() noexcept
-{
-    x_pos = GetScreenWidth() / 2;
-}
+void Player::Reset() noexcept { x_pos = GetScreenWidth() / 2; }
 
 void Player::Update() noexcept
 {

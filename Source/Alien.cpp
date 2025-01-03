@@ -5,14 +5,12 @@
 
 Alien::Alien()
     : position({ 0.0f, 0.0f }),
-      radius(20.0f),  
+      radius(40.0f),  
       speed(2.0f),
       active(true),
       moveRight(true),
       gun(5.0f, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
-      texture(Config::alienTexturePath)
-{
-    std::println("Alien created!");
+      texture(Config::alienTexturePath) {
 }
 
 Alien::Alien(Alien&& other) noexcept
@@ -22,11 +20,8 @@ Alien::Alien(Alien&& other) noexcept
       active(other.active),
       moveRight(other.moveRight),
       gun(5.0f, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
-      texture(std::move(other.texture))
-{
-    std::println("Alien moved!");
+      texture(std::move(other.texture)) {
 }
-
 
 Alien& Alien::operator=(Alien&& other) noexcept
 {
@@ -38,8 +33,6 @@ Alien& Alien::operator=(Alien&& other) noexcept
         active = other.active;
         moveRight = other.moveRight;
         texture = std::move(other.texture);
-
-        std::println("Alien move-assigned!");
     }
     return *this;
 }
@@ -48,23 +41,25 @@ void Alien::Update() noexcept
 {
     if (moveRight)
     {
-        position.x += speed; // Move right
-        if (position.x >= GetScreenWidth() - radius)
-        {
-            moveRight = false;
-            position.y += 50; // Move down
-        }
+        MoveToRight();
+        if (position.x >= GetScreenWidth() - radius) { MoveDown(); }
     }
     else
     {
-        position.x -= speed; // Move left
-        if (position.x <= radius)
-        {
-            moveRight = true;
-            position.y += 50; // Move down
-        }
+        MoveToLeft();
+        if (position.x <= radius) { MoveDown(); }
     }
     if (position.y > GetScreenHeight()) { active = false; }
+}
+
+inline void Alien::MoveToRight() noexcept { position.x += speed; }
+
+inline void Alien::MoveToLeft() noexcept { position.x -= speed; }
+
+inline void Alien::MoveDown() noexcept
+{
+    moveRight = false;
+    position.y += 50;
 }
 
 void Alien::Render() const noexcept

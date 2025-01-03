@@ -1,7 +1,7 @@
 #include "Gun.hpp"
 #include "Config.hpp"
 
-Gun::Gun(float speed, ProjectileType projectile, Vector2 offset)
+Gun::Gun(float speed, ProjectileType projectile, Vector2 offset) noexcept
     : projectileSpeed(speed), projectileType(projectile), offset(offset) {
 }
 

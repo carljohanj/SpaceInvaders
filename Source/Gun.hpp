@@ -6,7 +6,7 @@
 class Gun
 {
 public:
-    Gun(float speed, ProjectileType projectile, Vector2 offset);
+    Gun(float speed, ProjectileType projectile, Vector2 offset) noexcept;
     Projectile Shoot(Vector2 whoIsShooting) const noexcept;
 
 private:

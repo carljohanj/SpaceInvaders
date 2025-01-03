@@ -27,6 +27,9 @@ public:
     void SetActive(bool isActive) noexcept { active = isActive; }
 
 private:
+    void MoveToRight() noexcept;
+    void MoveToLeft() noexcept;
+    void MoveDown() noexcept;
     Vector2 position;
     float radius = 20.0f;
     float speed = 2.0f;

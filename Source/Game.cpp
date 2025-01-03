@@ -1,19 +1,34 @@
+#include "Alien.hpp"
+#include "Background.hpp"
 #include "Config.hpp"
 #include "Game.hpp"
+#include "GameWindow.hpp"
+#include "Player.hpp"
+#include "StackManager.hpp"
+#include "Wall.hpp"
 #include <algorithm>
 #include <cassert>
-#include "StackManager.hpp"
 #include <random>
 #include <ranges>
 
 using alien = size_t;
 inline constexpr float shootTimerReset = 0.0f;
+inline constexpr int addToScore = 100;
+inline constexpr int alienFormationOffset = 450;    
 
 struct Game::Private
 {
+    enum class State { STARTSCREEN, GAMEPLAY, ENDSCREEN };
+
+    struct PlayerData
+    {
+        std::string name;
+        int score;
+    };
+
     State gameState = State::STARTSCREEN;
     int score = 0;
-    float shootTimer = Config::defaultCooldown;
+    float shootTimer = Config::alienGunCooldown;
     bool newHighScore = false;
 
     GameWindow window;
@@ -40,7 +55,7 @@ struct Game::Private
     void UpdateTimeSinceLastShot() noexcept;
     bool CanFireShot() const noexcept;
     void FireShot() noexcept;
-    alien GetRandomAlien(alien range);
+    [[nodiscard]] alien GetRandomAlien(alien range);
     void ResetShootTimer() noexcept;
     void RemoveInactiveAliens() noexcept;
     void ResetWalls();
@@ -167,9 +182,9 @@ void Game::Private::ResetAliens()
 {
     if (!Aliens.empty()) return;
 
-    for (const int row : std::views::iota(0, Config::alienFormationHeight))
+    for (const int alienRow : std::views::iota(0, Config::alienFormationHeight))
     {
-        CreateNewAlien(row);
+        CreateNewAlien(alienRow);
     }
 }
 
@@ -178,7 +193,7 @@ inline void Game::Private::CreateNewAlien(int alienRow)
     for (const int alienCol : std::views::iota(0, Config::alienFormationWidth))
     {
         Aliens.emplace_back().SetPosition({
-        static_cast<float>(Config::alienFormationX + 450 + (alienCol * Config::alienSpacing)),
+        static_cast<float>(Config::alienFormationX + alienFormationOffset + (alienCol * Config::alienSpacing)),
         static_cast<float>(Config::alienFormationY + (alienRow * Config::alienSpacing))
             });
     }
@@ -221,7 +236,7 @@ void Game::Private::TriggerAlienShot() noexcept
 
 inline void Game::Private::UpdateTimeSinceLastShot() noexcept { shootTimer += GetFrameTime(); }
 
-[[nodiscard]] inline bool Game::Private::CanFireShot() const noexcept
+inline bool Game::Private::CanFireShot() const noexcept
 {
     return Aliens.empty() ? false : shootTimer >= Config::alienShootInterval;
 }
@@ -239,7 +254,6 @@ inline void Game::Private::FireShot() noexcept
 }
 
 inline void Game::Private::ResetShootTimer() noexcept { shootTimer = shootTimerReset; }
-
 
 inline void Game::Private::RemoveInactiveAliens() noexcept
 {
@@ -350,7 +364,7 @@ inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) n
 {
     alien.SetActive(false);
     projectile.SetActive(false);
-    score += 100;
+    score += addToScore;
 }
 
 inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexcept

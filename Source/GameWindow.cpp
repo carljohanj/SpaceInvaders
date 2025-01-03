@@ -3,6 +3,15 @@
 #include "Config.hpp"
 #include <complex>
 
+inline constexpr int startTitleXPos = 200;
+inline constexpr int startTitleYPos = 100;
+inline constexpr int startSubtitleXPos = 200;
+inline constexpr int startSubtitleYPos = 350;
+inline constexpr int textBoxWidth = 225;
+inline constexpr int textBoxHeight = 50;
+inline constexpr int textBoxX = 600;
+inline constexpr int textBoxY = 500;
+
 GameWindow::GameWindow()
 {
     InitWindow(Config::screenWidth, Config::screenHeight, Config::title.data());
@@ -28,13 +37,13 @@ void GameWindow::EndDrawing() const noexcept { ::EndDrawing(); }
 
 void GameWindow::RenderStartScreen() const noexcept
 {
-    DrawText(Config::title.data(), 200, 100, Config::startScreenTitleFontSize, YELLOW);
-    DrawText(Config::beginMessage.data(), 200, 350, Config::startScreenSubtitleFontSize, YELLOW);
+    DrawText(Config::title.data(), startTitleXPos, startTitleYPos, Config::startScreenTitleFontSize, YELLOW);
+    DrawText(Config::beginMessage.data(), startSubtitleXPos, startSubtitleYPos, Config::startScreenSubtitleFontSize, YELLOW);
 }
 
 void GameWindow::RenderGameOverScreen() const noexcept
 {
-    DrawText(Config::continueMessage.data(), Config::textBoxX, 200, Config::endScreenFontSize, YELLOW);
+    DrawText(Config::continueMessage.data(), textBoxX, textBoxY, Config::endScreenFontSize, YELLOW);
 }
 
 void GameWindow::RenderHUD(int score, int playerLives) const noexcept
