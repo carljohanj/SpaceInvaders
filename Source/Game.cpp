@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "Game.hpp"
 #include "GameWindow.hpp"
+#include "Leaderboard.hpp"
 #include "Player.hpp"
 #include "StackManager.hpp"
 #include "Wall.hpp"
@@ -14,11 +15,11 @@
 using alien = size_t;
 inline constexpr float shootTimerReset = 0.0f;
 inline constexpr int addToScore = 100;
-inline constexpr int alienFormationOffset = 450;    
+inline constexpr int alienFormationOffset = 450;
 
 struct Game::Private
 {
-    enum class State { STARTSCREEN, GAMEPLAY, ENDSCREEN };
+    enum class State { STARTSCREEN, GAMEPLAY, ENDSCREEN, LEADERBOARD };
 
     struct PlayerData
     {
@@ -36,11 +37,13 @@ struct Game::Private
     std::vector<Alien> Aliens;
     std::vector<Projectile> Projectiles;
     std::vector<Wall> Walls;
+    Leaderboard leaderboard;
 
     void Start();
     void Update();
     void Render() noexcept;
     void End() noexcept;
+    void RenderEndScreen() noexcept;
     void Continue() noexcept;
     void ResetGameState() noexcept;
     void ResetAliens();
@@ -64,6 +67,9 @@ struct Game::Private
     void RenderProjectiles() const noexcept;
     void UpdateProjectiles();
     void UpdateBackground() noexcept;
+    void UpdateEndScreen() noexcept;
+    void UpdateShowLeaderboard() noexcept;
+    void RenderShowLeaderboard() noexcept;
     void DetectCollisions() noexcept;
     void CheckPlayerCollision(Projectile& projectile) noexcept;
     void AlienGetsShot(Alien& alien, Projectile& projectile) noexcept;
@@ -114,7 +120,10 @@ void Game::Private::Update()
         UpdateEverything();
         break;
     case State::ENDSCREEN:
-        if (IsKeyReleased(KEY_ENTER)) { Continue(); }
+        UpdateEndScreen();
+        break;
+    case State::LEADERBOARD:
+        UpdateShowLeaderboard();
         break;
     }
 }
@@ -130,7 +139,10 @@ void Game::Private::Render() noexcept
         RenderGameplay();
         break;
     case State::ENDSCREEN:
-        window.RenderGameOverScreen();
+        RenderEndScreen();
+        break;
+    case State::LEADERBOARD:
+        RenderShowLeaderboard();
         break;
     }
 }
@@ -143,7 +155,33 @@ void Game::Private::End() noexcept
     gameState = State::ENDSCREEN;
 }
 
-void Game::Private::Continue() noexcept { gameState = State::STARTSCREEN; }
+void Game::Private::RenderEndScreen() noexcept
+{
+    if (leaderboard.HasNewHighScore(score)) { leaderboard.RenderHighScoreEntry(score); }
+    else { leaderboard.RenderLeaderboard(); }
+}
+
+void Game::Private::UpdateEndScreen() noexcept
+{
+    if (leaderboard.HasNewHighScore(score) && leaderboard.SaveHighScore(score))
+    {
+        gameState = State::LEADERBOARD;
+        return;
+    }
+    if (IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_ENTER)) { Continue(); }
+}
+
+void Game::Private::UpdateShowLeaderboard() noexcept
+{
+    if (IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_ENTER)) { Continue(); }
+}
+
+void Game::Private::RenderShowLeaderboard() noexcept { leaderboard.RenderLeaderboard(); }
+
+void Game::Private::Continue() noexcept 
+{ 
+    gameState = State::STARTSCREEN; 
+}
 
 void Game::Private::ResetGameState() noexcept
 {
@@ -273,7 +311,7 @@ void Game::Private::ResetWalls()
 
 void Game::Private::RenderWalls() noexcept
 {
-    for (auto& wall : Walls)        //ToDo: See if we can make this const
+    for (const auto& wall : Walls)
     {
         wall.Render();
     }

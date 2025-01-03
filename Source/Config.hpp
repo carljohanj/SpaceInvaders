@@ -40,6 +40,7 @@ namespace Config
     inline constexpr float alienShootInterval = 1.0f;
     inline constexpr float alienGunCooldown   = 1.0f;
     inline constexpr int projectileSpeed      = 15;
+    inline constexpr int alienProjectileSpeed = 30;
 
     // Background settings
     inline constexpr int backgroundSpeed      = 15;
@@ -53,7 +54,6 @@ namespace Config
     inline constexpr int gameplayScoreFontSize       = 40;
     inline constexpr int gameplayLivesFontSize       = 40;
     inline constexpr int endScreenFontSize           = 40;
-
-    // High scores
-    inline constexpr std::array<int, 5> initialHighScores = { 500, 400, 300, 200, 100 };
+    inline constexpr int textBoxX                    = 600;
+    inline constexpr int textBoxY                    = 500;
 }

@@ -9,5 +9,5 @@ public:
 
 private:
     struct Private;
-    StackManager<300> impl;
+    StackManager<400> impl;
 };

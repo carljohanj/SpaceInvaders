@@ -41,15 +41,15 @@ void GameWindow::RenderStartScreen() const noexcept
     DrawText(Config::beginMessage.data(), startSubtitleXPos, startSubtitleYPos, Config::startScreenSubtitleFontSize, YELLOW);
 }
 
-void GameWindow::RenderGameOverScreen() const noexcept
-{
-    DrawText(Config::continueMessage.data(), textBoxX, textBoxY, Config::endScreenFontSize, YELLOW);
-}
-
 void GameWindow::RenderHUD(int score, int playerLives) const noexcept
 {
     DrawText(TextFormat("Score: %i", score), 50, 20, Config::gameplayScoreFontSize, YELLOW);
     DrawText(TextFormat("Lives: %i", playerLives), 50, 70, Config::gameplayLivesFontSize, YELLOW);
+}
+
+void GameWindow::RenderGameOverScreen() const noexcept
+{
+    DrawText(Config::continueMessage.data(), textBoxX, textBoxY, Config::endScreenFontSize, YELLOW);
 }
 
 void GameWindow::UpdateBackground(float playerPos) noexcept

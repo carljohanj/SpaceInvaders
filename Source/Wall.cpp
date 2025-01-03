@@ -39,7 +39,7 @@ Wall& Wall::operator=(Wall&& other) noexcept
     return *this;
 }
 
-void Wall::Render() noexcept
+void Wall::Render() const noexcept
 {
     const auto& textureRef = texture.GetTexture();
     if (textureRef.id == 0)
@@ -63,7 +63,7 @@ inline void Wall::RenderWallText() const noexcept
 
 }
 
-inline void Wall::RenderHealth() noexcept
+inline void Wall::RenderHealth() const noexcept
 {
     DrawText(TextFormat("%i", health), position.x - 21, position.y + 10, 40, RED);
 }

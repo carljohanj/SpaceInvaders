@@ -42,10 +42,6 @@ TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept
 const Texture2D& TextureWrapper::GetTexture() const
 {
     const auto textureEntry = textureCache.find(texturePath);
-    if (textureEntry == textureCache.end())
-    {
-        throw TextureLoadingException("Texture not found in cache: " + texturePath.string());
-    }
     return textureEntry->second.texture;
 }
 

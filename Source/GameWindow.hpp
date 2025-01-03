@@ -13,8 +13,8 @@ public:
     void BeginDrawing() const noexcept;
     void EndDrawing() const noexcept;
     void RenderStartScreen() const noexcept;
-    void RenderGameOverScreen() const noexcept;
     void RenderHUD(int score, int playerLives) const noexcept;
+    void RenderGameOverScreen() const noexcept;
     void UpdateBackground(float playerPos) noexcept;
     void RenderBackground() const noexcept;
     void ResetBackground() noexcept;

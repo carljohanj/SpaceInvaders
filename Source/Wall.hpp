@@ -13,7 +13,7 @@ public:
     ~Wall();
     Wall(const Wall&) = delete;
     Wall& operator=(const Wall&) = delete;
-    void Render() noexcept;
+    void Render() const noexcept;
     Rectangle GetRectangle() const noexcept;
     Vector2 GetPosition() const noexcept { return position; }
     void SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
@@ -25,7 +25,7 @@ public:
 
 private:
     void RenderWallText() const noexcept;
-    void RenderHealth() noexcept;
+    void RenderHealth() const noexcept;
     Vector2 position = { 0, 0 };
     bool active = true;
     int health = 50;
