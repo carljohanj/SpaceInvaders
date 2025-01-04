@@ -1,4 +1,5 @@
 #include "Alien.hpp"
+#include "AudioDevice.hpp"
 #include "Background.hpp"
 #include "Config.hpp"
 #include "Game.hpp"
@@ -38,6 +39,7 @@ struct Game::Private
     std::vector<Projectile> Projectiles;
     std::vector<Wall> Walls;
     Leaderboard leaderboard;
+    AudioDevice audioDevice;
 
     void Start();
     void Update();
@@ -402,6 +404,7 @@ inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept
 {
     player.SetLives(player.GetLives() - 1);
     projectile.SetActive(false);
+    audioDevice.PlaySoundEffect();
     if (player.GetLives() <= 0) { End(); }
 }
 
@@ -409,6 +412,7 @@ inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) n
 {
     alien.SetActive(false);
     projectile.SetActive(false);
+    audioDevice.PlaySoundEffect();
     score += addToScore;
 }
 
@@ -416,5 +420,6 @@ inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexc
 {
     wall.SetHealth(wall.GetHealth() - 1);
     if (wall.GetHealth() <= 0) { wall.SetActive(false); }
+    audioDevice.PlaySoundEffect();
     projectile.SetActive(false);
 }

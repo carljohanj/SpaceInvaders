@@ -20,6 +20,7 @@ namespace Config
     inline const std::filesystem::path alienTexturePath      = "./Assets/Alien.png";
     inline const std::filesystem::path wallTexturePath       = "./Assets/Barrier.png";
     inline const std::filesystem::path leaderBoardScores     = "./Resources/leaderboard.txt";
+    inline const std::filesystem::path soundEffect           = "./Resources/hitHurt.ogg";
 
     //Player settings
     inline constexpr float playerBaseHeight   = 70.0f;

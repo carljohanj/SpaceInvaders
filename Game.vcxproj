@@ -168,6 +168,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Alien.cpp" />
+    <ClCompile Include="Source\AudioDevice.cpp" />
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\FileHandler.cpp" />
     <ClCompile Include="Source\Game.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="Source\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AudioDevice.hpp" />
     <ClInclude Include="Source\FileHandler.hpp" />
     <ClInclude Include="Source\Gun.hpp" />
     <ClInclude Include="Source\Leaderboard.hpp" />

@@ -65,6 +65,9 @@
     <ClCompile Include="Source\FileHandler.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AudioDevice.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Game.hpp">
@@ -116,6 +119,9 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="Source\FileHandler.hpp">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AudioDevice.hpp">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
