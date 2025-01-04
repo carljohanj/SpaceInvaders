@@ -11,7 +11,7 @@ namespace Config
     inline constexpr std::string_view title = "SPACE INVADERS";
 
     // Menus and messages
-    inline constexpr std::string_view beginMessage = "PRESS SPACE TO BEGIN";
+    inline constexpr std::string_view beginMessage    = "PRESS SPACE TO BEGIN";
     inline constexpr std::string_view continueMessage = "PRESS ENTER TO CONTINUE";
 
     // Assets
@@ -19,6 +19,7 @@ namespace Config
     inline const std::filesystem::path projectileTexturePath = "./Assets/Laser.png";
     inline const std::filesystem::path alienTexturePath      = "./Assets/Alien.png";
     inline const std::filesystem::path wallTexturePath       = "./Assets/Barrier.png";
+    inline const std::filesystem::path leaderBoardScores     = "./Resources/leaderboard.txt";
 
     //Player settings
     inline constexpr float playerBaseHeight   = 70.0f;

@@ -1,22 +1,26 @@
 #pragma once
+#include <filesystem>
+#include <vector>
 #include <string>
 #include <string_view>
-#include <vector>
-#include <utility>
-#include <filesystem>
-#include <optional>
 #include <expected>
 
-class FileHandler 
+class FileHandler
 {
 public:
-    explicit FileHandler(std::filesystem::path filePath);
-
-    [[nodiscard]] bool FileExists() const noexcept;
-    [[nodiscard]] std::expected<void, std::string> EnsureFileExists() const noexcept;
-    [[nodiscard]] std::expected<std::vector<std::pair<std::string, int>>, std::string> LoadScores() const noexcept;
-    [[nodiscard]] std::expected<void, std::string> SaveScores(const std::vector<std::pair<std::string_view, int>>& scores) noexcept;
+    explicit FileHandler(std::filesystem::path path);
+    [[nodiscard]] std::expected<std::vector<std::pair<std::string, int>>, std::string> LoadScores() const;
+    [[nodiscard]] std::expected<void, std::string> SaveScores(const std::vector<std::pair<std::string_view, int>>& scores) const;
 
 private:
     std::filesystem::path filePath;
+    void EnsureFileExists(std::filesystem::path path) const;
+    std::expected<std::ifstream, std::string> OpenInputFile() const;
+    std::expected<std::vector<std::pair<std::string, int>>, std::string> ParseScores(std::ifstream& inputFile) const;
+    std::expected<std::pair<std::string, int>, std::string> ParseScoreEntry(const std::string& line) const;
+    std::expected<std::ofstream, std::string> OpenOutputFile() const;
+    std::expected<void, std::string> WriteScores(std::ofstream& outputFile,
+        const std::vector<std::pair<std::string_view, int>>& scores) const;
+
+
 };

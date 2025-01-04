@@ -1,10 +1,11 @@
 #pragma once
+#include "FileHandler.hpp"
 #include <vector>
 #include <string>
 #include <string_view>
 #include "raylib.h"
 
-struct PlayerData 
+struct PlayerData
 {
     std::string name;
     int score;
@@ -25,7 +26,6 @@ public:
     [[nodiscard]] bool HasNewHighScore(int score) const noexcept;
     [[nodiscard]] bool SaveHighScore(int score) noexcept;
     void RenderLeaderboard() const noexcept;
-    void RenderScores(ScoreRendering config) const noexcept;
     void RenderHighScoreEntry(int score) noexcept;
 
 private:
@@ -41,8 +41,11 @@ private:
     void RenderTextBox() const noexcept;
     void RenderNameInput() noexcept;
     void RenderPlayerTextInput() const noexcept;
+    void RenderScores(ScoreRendering config) const noexcept;
     [[nodiscard]] bool ShouldRenderCursor() const noexcept;
     void RenderBlinkingCursor() const noexcept;
+    void LoadScoresFromFile() noexcept;
+    void SaveScoresToFile() noexcept;
     std::vector<PlayerData> scores;
     static constexpr size_t maxEntries = 5;
     std::string playerName;
@@ -50,4 +53,5 @@ private:
     int letterCount = 0;
     int blinkTimer = 0;
     Rectangle textBox = { 600, 400, 200, 50 };
+    FileHandler fileHandler;
 };

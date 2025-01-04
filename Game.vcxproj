@@ -200,6 +200,9 @@
     <ClInclude Include="Source\Wall.hpp" />
     <ClInclude Include="Source\Config.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\leaderboard.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
