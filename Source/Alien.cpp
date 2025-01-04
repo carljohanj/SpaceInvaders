@@ -58,7 +58,7 @@ inline void Alien::MoveToLeft() noexcept { position.x -= speed; }
 
 inline void Alien::MoveDown() noexcept
 {
-    moveRight = false;
+    moveRight = !moveRight;
     position.y += 50;
 }
 
