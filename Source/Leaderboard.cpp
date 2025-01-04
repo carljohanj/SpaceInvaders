@@ -5,19 +5,25 @@
 #include <ranges>
 #include <string_view>
 
-// Constants
-inline constexpr int textBoxX = 600;
-inline constexpr int textBoxY = 500;
-inline constexpr int textBoxWidth = 300;
-inline constexpr int textBoxHeight = 50;
+inline constexpr int textBoxX = 600.0f;
+inline constexpr int textBoxY = 500.0f;
+inline constexpr int textBoxWidth = 300.0f;
+inline constexpr int textBoxHeight = 50.0f;
 inline constexpr int leaderboardFontSize = 40;
 inline constexpr int highScoreFontSize = 60;
 inline constexpr int maxNameLength = 9;
-inline constexpr std::string_view enterMessage = "PRESS ENTER OR SPACE TO CONTINUE";
-inline constexpr std::string_view leaderboardHeader = "LEADERBOARD";
+inline constexpr std::string_view enterMessage = "PRESS ENTER TO CONTINUE";
+inline constexpr std::string_view leaderboardHeader = "CURRENT LEADERBOARD";
 inline constexpr std::string_view highScoreHeader = "NEW HIGHSCORE!";
 
-// Constructor
+inline constexpr ScoreRendering drawScoresTopLeftCorner
+{
+    .startX = 50,
+    .currentY = 100,
+    .ySpacing = (leaderboardFontSize - 10) + 5,
+    .fontSize = leaderboardFontSize - 10
+};
+
 Leaderboard::Leaderboard()
     : scores
     {
@@ -34,8 +40,19 @@ Leaderboard::Leaderboard()
 
 [[nodiscard]] bool Leaderboard::SaveHighScore(int score) noexcept
 {
-    HandleTextInput();
+    CapturePlayerNameInput();
     return TrySaveScore(score);
+}
+
+void Leaderboard::CapturePlayerNameInput() noexcept
+{
+    const int key = GetCharPressed();
+    if ((key >= 32) && (key <= 125) && playerName.size() < maxNameLength)
+    {
+        playerName.push_back(static_cast<char>(key));
+    }
+    if (IsKeyPressed(KEY_BACKSPACE) && !playerName.empty()) { playerName.pop_back(); }
+    blinkTimer++;
 }
 
 [[nodiscard]] inline bool Leaderboard::TrySaveScore(int score) noexcept
@@ -65,30 +82,35 @@ void Leaderboard::InsertNewHighScore(const std::string& name, int score) noexcep
 {
     auto lowestScore = FindLowestScore();
     if (score > lowestScore->score) { *lowestScore = { name, score }; }
-    std::ranges::sort(scores, [](const PlayerData& a, const PlayerData& b) { return a.score > b.score; });
+    std::ranges::sort(scores, [] (const PlayerData& a, const PlayerData& b) { return a.score > b.score; });
+}
+
+inline void Leaderboard::ResetInputState() noexcept
+{
+    playerName.clear();
+    blinkTimer = 0;
 }
 
 void Leaderboard::RenderLeaderboard() const noexcept
 {
     RenderHeader(leaderboardHeader, -100);
-    RenderScores();
+    RenderScores(drawScoresTopLeftCorner);
     RenderFooter(enterMessage, scores.size() * (leaderboardFontSize + 10) + 50);
 }
 
-inline void Leaderboard::RenderScores() const noexcept
+inline void Leaderboard::RenderScores(ScoreRendering screenPos) const noexcept
 {
-    std::ranges::for_each (scores | std::views::enumerate, [&] (const auto& entry) noexcept
+    std::ranges::for_each(scores, [&](const PlayerData& data) noexcept
         {
-            DrawScoreEntry(entry);
+            DrawScoreEntry(data, screenPos);
+            screenPos.currentY += screenPos.ySpacing;
         });
 }
 
-inline void Leaderboard::DrawScoreEntry(const std::pair<size_t, PlayerData>& entry) const noexcept
+inline void Leaderboard::DrawScoreEntry(const PlayerData& data, const ScoreRendering& screenPos) const noexcept
 {
-    const auto& [index, data] = entry;
-    const int yOffset = textBoxY + static_cast<int>(index) * (leaderboardFontSize + 10);
-    DrawText(data.name.c_str(), textBoxX, yOffset, leaderboardFontSize, YELLOW);
-    DrawText(TextFormat("%d", data.score), textBoxX + 300, yOffset, leaderboardFontSize, YELLOW);
+    DrawText(data.name.c_str(), screenPos.startX, screenPos.currentY, screenPos.fontSize, YELLOW);
+    DrawText(TextFormat("%d", data.score), screenPos.startX + 300, screenPos.currentY, screenPos.fontSize, YELLOW);
 }
 
 inline void Leaderboard::RenderHeader(std::string_view text, int yOffset) const noexcept
@@ -101,53 +123,40 @@ inline void Leaderboard::RenderFooter(std::string_view message, int yOffset) con
     DrawText(message.data(), textBoxX, textBoxY + yOffset, leaderboardFontSize, YELLOW);
 }
 
-
-
-
-
-
-
-void Leaderboard::RenderHighScoreEntry(int score) const noexcept
+void Leaderboard::RenderHighScoreEntry(int score) noexcept
 {
     RenderHeader(highScoreHeader, -200);
-    std::ranges::for_each(scores | std::views::enumerate, [&](auto entry) noexcept {
-        const auto& [index, data] = entry;
-        DrawText(data.name.c_str(), 50, 100 + index * (leaderboardFontSize - 10), leaderboardFontSize - 10, YELLOW);
-        DrawText(TextFormat("%d", data.score), 250, 100 + index * (leaderboardFontSize - 10), leaderboardFontSize - 10, YELLOW);
-        });
+    RenderScores(drawScoresTopLeftCorner);
+    RenderTextBox();
+    RenderNameInput();
+    if (!playerName.empty()) { RenderFooter(enterMessage, 200); }
+}
 
+inline void Leaderboard::RenderTextBox() const noexcept
+{
     DrawRectangleRec(textBox, LIGHTGRAY);
-    DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, RED);
-
-    DrawText(playerName.c_str(), (int)textBox.x + 5, (int)textBox.y + 8, leaderboardFontSize, MAROON);
-
-    if (playerName.size() < maxNameLength && ((framesCounter / 20) % 2) == 0) {
-        DrawText("_", (int)textBox.x + 8 + MeasureText(playerName.c_str(), leaderboardFontSize), (int)textBox.y + 12, leaderboardFontSize, MAROON);
-    }
-
-    if (!playerName.empty()) { RenderFooter("PRESS ENTER TO CONTINUE", 200); }
+    DrawRectangleLines(textBox.x, textBox.y, textBox.width, textBox.height, RED);
 }
 
-void Leaderboard::HandleTextInput() noexcept 
+inline void Leaderboard::RenderNameInput() noexcept
 {
-    SetMouseCursor(MOUSE_CURSOR_IBEAM);
-
-    int key = GetCharPressed();
-    while (key > 0) 
-    {
-        if ((key >= 32) && (key <= 125) && playerName.size() < maxNameLength) 
-        {
-            playerName.push_back(static_cast<char>(key));
-        }
-        key = GetCharPressed();
-    }
-
-    if (IsKeyPressed(KEY_BACKSPACE) && !playerName.empty()) { playerName.pop_back(); }
-    framesCounter++;
+    RenderPlayerTextInput();
+    if (ShouldRenderCursor()) { RenderBlinkingCursor(); }
 }
 
-void Leaderboard::ResetInputState() noexcept 
+inline void Leaderboard::RenderPlayerTextInput() const noexcept
 {
-    playerName.clear();
-    framesCounter = 0;
+    DrawText(playerName.c_str(), static_cast<int>(textBox.x) + 5,
+        static_cast<int>(textBox.y) + 8, leaderboardFontSize, MAROON);
+}
+
+[[nodiscard]] inline bool Leaderboard::ShouldRenderCursor() const noexcept
+{
+    return playerName.size() < maxNameLength && ((blinkTimer / 20) % 2) == 0;
+}
+
+inline void Leaderboard::RenderBlinkingCursor() const noexcept
+{
+    DrawText("_", static_cast<int>(textBox.x) + 8 + MeasureText(playerName.c_str(), leaderboardFontSize),
+        static_cast<int>(textBox.y) + 12, leaderboardFontSize, MAROON);
 }

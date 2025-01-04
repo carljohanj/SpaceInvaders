@@ -168,7 +168,7 @@ void Game::Private::UpdateEndScreen() noexcept
         gameState = State::LEADERBOARD;
         return;
     }
-    if (IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_ENTER)) { Continue(); }
+    if (IsKeyReleased(KEY_ENTER)) { Continue(); }
 }
 
 void Game::Private::UpdateShowLeaderboard() noexcept
@@ -398,6 +398,13 @@ inline void Game::Private::CheckPlayerCollision(Projectile& projectile) noexcept
     }
 }
 
+inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept
+{
+    player.SetLives(player.GetLives() - 1);
+    projectile.SetActive(false);
+    if (player.GetLives() <= 0) { End(); }
+}
+
 inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) noexcept
 {
     alien.SetActive(false);
@@ -410,11 +417,4 @@ inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexc
     wall.SetHealth(wall.GetHealth() - 1);
     if (wall.GetHealth() <= 0) { wall.SetActive(false); }
     projectile.SetActive(false);
-}
-
-inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept
-{
-    player.SetLives(player.GetLives() - 1);
-    projectile.SetActive(false);
-    if (player.GetLives() <= 0) { End(); }
 }
