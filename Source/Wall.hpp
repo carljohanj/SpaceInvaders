@@ -10,7 +10,6 @@ public:
     Wall& operator=(Wall&& other) noexcept;
     Wall(Wall& other) = delete;
     Wall& operator=(Wall& other) = delete;
-    ~Wall();
     Wall(const Wall&) = delete;
     Wall& operator=(const Wall&) = delete;
     void Render() const noexcept;

@@ -39,7 +39,7 @@ TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept
     return *this;
 }
 
-const Texture2D& TextureWrapper::GetTexture() const
+const Texture2D& TextureWrapper::GetTexture() const noexcept
 {
     const auto textureEntry = textureCache.find(texturePath);
     return textureEntry->second.texture;

@@ -12,7 +12,7 @@ public:
     TextureWrapper& operator=(const TextureWrapper&) = delete;
     TextureWrapper(TextureWrapper&& other) noexcept;
     TextureWrapper& operator=(TextureWrapper&& other) noexcept;
-    const Texture2D& GetTexture() const;
+    const Texture2D& GetTexture() const noexcept;
 
 private:
     struct TextureData
