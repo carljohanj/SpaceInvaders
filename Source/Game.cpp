@@ -6,6 +6,7 @@
 #include "GameWindow.hpp"
 #include "Leaderboard.hpp"
 #include "Player.hpp"
+#include "raylib.h"
 #include "StackManager.hpp"
 #include "Wall.hpp"
 #include <algorithm>
@@ -46,7 +47,8 @@ struct Game::Private
     void Render() noexcept;
     void End() noexcept;
     void RenderEndScreen() noexcept;
-    void Continue() noexcept;
+    void UpdateStartScreen() noexcept;
+    void Continue();
     void ResetGameState() noexcept;
     void ResetAliens();
     void RenderGameplay() noexcept;
@@ -116,7 +118,7 @@ void Game::Private::Update()
     switch (gameState)
     {
     case State::STARTSCREEN:
-        if (IsKeyReleased(KEY_SPACE)) { Start(); }
+        UpdateStartScreen();
         break;
     case State::GAMEPLAY:
         UpdateEverything();
@@ -163,7 +165,16 @@ void Game::Private::RenderEndScreen() noexcept
     else { leaderboard.RenderLeaderboard(); }
 }
 
-void Game::Private::UpdateEndScreen() noexcept
+inline void Game::Private::UpdateStartScreen() noexcept
+{
+    if (IsKeyReleased(KEY_SPACE))
+    {
+        ResetGameState();
+        gameState = State::GAMEPLAY;
+    }
+}
+
+inline void Game::Private::UpdateEndScreen() noexcept
 {
     if (leaderboard.HasNewHighScore(score) && leaderboard.SaveHighScore(score))
     {
@@ -173,22 +184,23 @@ void Game::Private::UpdateEndScreen() noexcept
     if (IsKeyReleased(KEY_ENTER)) { Continue(); }
 }
 
-void Game::Private::UpdateShowLeaderboard() noexcept
+inline void Game::Private::UpdateShowLeaderboard() noexcept
 {
     if (IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_ENTER)) { Continue(); }
 }
 
 void Game::Private::RenderShowLeaderboard() noexcept { leaderboard.RenderLeaderboard(); }
 
-void Game::Private::Continue() noexcept 
+inline void Game::Private::Continue() 
 { 
+    Start();
     gameState = State::STARTSCREEN; 
 }
 
-void Game::Private::ResetGameState() noexcept
+inline void Game::Private::ResetGameState() noexcept
 {
     score = 0;
-    gameState = State::GAMEPLAY;
+    gameState = State::STARTSCREEN;
 }
 
 void Game::Private::RenderGameplay() noexcept
@@ -341,7 +353,7 @@ void Game::Private::UpdateProjectiles()
     std::erase_if(Projectiles, [](const Projectile& p) noexcept { return !p.IsActive(); });
 }
 
-void Game::Private::UpdateBackground() noexcept
+inline void Game::Private::UpdateBackground() noexcept
 {
     window.UpdateBackground(player.GetXPosition());
 }
@@ -378,17 +390,12 @@ inline void Game::Private::CheckEnemyCollision(Projectile& projectile) noexcept
     }
 }
 
-inline void Game::Private::CheckWallCollisions(Projectile& projectile) noexcept
+inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) noexcept
 {
-    for (auto& wall : Walls)
-    {
-        if (!wall.IsActive()) { continue; }
-        if (CheckCollisionPointRec(projectile.GetPosition(), wall.GetRectangle()))
-        {
-            WallGetsHit(wall, projectile);
-            break;
-        }
-    }
+    alien.SetActive(false);
+    projectile.SetActive(false);
+    audioDevice.PlaySoundEffect();
+    score += addToScore;
 }
 
 inline void Game::Private::CheckPlayerCollision(Projectile& projectile) noexcept
@@ -408,12 +415,17 @@ inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept
     if (player.GetLives() <= 0) { End(); }
 }
 
-inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) noexcept
+inline void Game::Private::CheckWallCollisions(Projectile& projectile) noexcept
 {
-    alien.SetActive(false);
-    projectile.SetActive(false);
-    audioDevice.PlaySoundEffect();
-    score += addToScore;
+    for (auto& wall : Walls)
+    {
+        if (!wall.IsActive()) { continue; }
+        if (CheckCollisionPointRec(projectile.GetPosition(), wall.GetRectangle()))
+        {
+            WallGetsHit(wall, projectile);
+            break;
+        }
+    }
 }
 
 inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexcept

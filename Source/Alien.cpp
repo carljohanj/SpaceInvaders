@@ -1,7 +1,6 @@
 #include "Alien.hpp"
 #include "Config.hpp"
 #include <utility>
-#include <print>
 
 Alien::Alien()
     : position({ 0.0f, 0.0f }),
@@ -9,7 +8,7 @@ Alien::Alien()
       speed(2.0f),
       active(true),
       moveRight(true),
-      gun(5.0f, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
+      gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
       texture(Config::alienTexturePath) {
 }
 
@@ -19,7 +18,7 @@ Alien::Alien(Alien&& other) noexcept
       speed(other.speed),
       active(other.active),
       moveRight(other.moveRight),
-      gun(5.0f, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
+      gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
       texture(std::move(other.texture)) {
 }
 

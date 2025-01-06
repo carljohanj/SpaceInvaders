@@ -23,13 +23,13 @@ namespace Config
     inline const std::filesystem::path soundEffect           = "./Resources/hitHurt.ogg";
 
     //Player settings
-    inline constexpr float playerBaseHeight   = 70.0f;
-    inline constexpr float playerSpeed        = 7.0f;
-    inline constexpr int playerStartingLives  = 3;
+    inline constexpr float playerBaseHeight  = 70.0f;
+    inline constexpr float playerSpeed       = 7.0f;
+    inline constexpr int playerStartingLives = 3;
 
     // Wall settings
-    inline constexpr int defaultWallCount     = 5;
-    inline constexpr int wallOffset           = 250;
+    inline constexpr int defaultWallCount = 5;
+    inline constexpr int wallOffset       = 250;
 
     // Alien settings
     inline constexpr int alienFormationWidth  = 8;
@@ -39,10 +39,10 @@ namespace Config
     inline constexpr int alienFormationY      = 60;
 
     // Shooting settings
-    inline constexpr float alienShootInterval = 1.0f;
-    inline constexpr float alienGunCooldown   = 1.0f;
-    inline constexpr int projectileSpeed      = 15;
-    inline constexpr int alienProjectileSpeed = 30;
+    inline constexpr float alienShootInterval  = 1.0f;
+    inline constexpr float alienGunCooldown    = 1.0f;
+    inline constexpr int playerProjectileSpeed = -15;
+    inline constexpr int alienProjectileSpeed  = 15;
 
     // Background settings
     inline constexpr int backgroundSpeed      = 15;

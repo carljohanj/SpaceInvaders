@@ -3,7 +3,7 @@
 #include "Config.hpp"
 
 Player::Player()
-    : gun(-15.0f, ProjectileType::PLAYER_PROJECTILE, { 0, -10 }),
+    : gun(Config::playerProjectileSpeed, ProjectileType::PLAYER_PROJECTILE, { 0, -10 }),
       texture(Config::playerTexturePath)
 {
     x_pos = GetScreenWidth() / 2;
