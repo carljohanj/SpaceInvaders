@@ -4,22 +4,24 @@
 
 Alien::Alien()
     : position({ 0.0f, 0.0f }),
-      radius(40.0f),  
-      speed(2.0f),
-      active(true),
-      moveRight(true),
-      gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
-      texture(Config::alienTexturePath) {
+    radius(40.0f),
+    speed(2.0f),
+    active(true),
+    moveRight(true),
+    gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
+    texture(Config::alienTexturePath, Config::alienWidth, Config::alienHeight)
+{
 }
 
 Alien::Alien(Alien&& other) noexcept
     : position(std::move(other.position)),
-      radius(other.radius),
-      speed(other.speed),
-      active(other.active),
-      moveRight(other.moveRight),
-      gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
-      texture(std::move(other.texture)) {
+    radius(other.radius),
+    speed(other.speed),
+    active(other.active),
+    moveRight(other.moveRight),
+    gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
+    texture(std::move(other.texture))
+{
 }
 
 Alien& Alien::operator=(Alien&& other) noexcept
@@ -65,8 +67,8 @@ void Alien::Render() const noexcept
 {
     DrawTexturePro(texture.GetTexture(),
         { 0, 0, (float)texture.GetTexture().width, (float)texture.GetTexture().height },
-        { position.x, position.y, 100.0f, 100.0f },
-        { 50.0f, 50.0f },
+        { position.x, position.y, (float)Config::alienWidth, (float)Config::alienHeight },
+        { Config::alienWidth / 2.0f, Config::alienHeight / 2.0f },
         0.0f,
         WHITE);
 }

@@ -8,12 +8,12 @@ public:
     Wall();
     Wall(Wall&& other) noexcept;
     Wall& operator=(Wall&& other) noexcept;
-    Wall(Wall& other) = delete;
-    Wall& operator=(Wall& other) = delete;
     Wall(const Wall&) = delete;
     Wall& operator=(const Wall&) = delete;
+
     void Render() const noexcept;
     Rectangle GetRectangle() const noexcept;
+
     Vector2 GetPosition() const noexcept { return position; }
     void SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
     bool IsActive() const noexcept { return active; }
@@ -25,10 +25,10 @@ public:
 private:
     void RenderWallText() const noexcept;
     void RenderHealth() const noexcept;
+
     Vector2 position = { 0, 0 };
     bool active = true;
     int health = 50;
     float radius = 60;
-
     TextureWrapper texture;
 };

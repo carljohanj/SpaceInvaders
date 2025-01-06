@@ -5,15 +5,17 @@
 #include <iostream>
 
 Wall::Wall()
-    : texture(Config::wallTexturePath) {
+    : texture(Config::wallTexturePath, Config::wallWidth, Config::wallHeight)
+{
 }
 
 Wall::Wall(Wall&& other) noexcept
     : position(std::exchange(other.position, { 0, 0 })),
-      active(std::exchange(other.active, false)),
-      health(std::exchange(other.health, 50)),
-      radius(std::exchange(other.radius, 60)),
-      texture(std::move(other.texture)) {
+    active(std::exchange(other.active, false)),
+    health(std::exchange(other.health, 50)),
+    radius(std::exchange(other.radius, 60)),
+    texture(std::move(other.texture))
+{
 }
 
 Wall& Wall::operator=(Wall&& other) noexcept
@@ -40,11 +42,10 @@ inline void Wall::RenderWallText() const noexcept
     const auto& textureRef = texture.GetTexture();
     DrawTexturePro(textureRef,
         { 0, 0, (float)textureRef.width, (float)textureRef.height },
-        { position.x, position.y, 200.0f, 200.0f },
-        { 100.0f, 100.0f },
+        { position.x, position.y, (float)Config::wallWidth, (float)Config::wallHeight },
+        { Config::wallWidth / 2.0f, Config::wallHeight / 2.0f },
         0.0f,
         WHITE);
-
 }
 
 inline void Wall::RenderHealth() const noexcept

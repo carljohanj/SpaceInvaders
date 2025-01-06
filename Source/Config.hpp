@@ -22,6 +22,19 @@ namespace Config
     inline const std::filesystem::path leaderBoardScores     = "./Resources/leaderboard.txt";
     inline const std::filesystem::path soundEffect           = "./Resources/hitHurt.ogg";
 
+    // Texture scaling sizes
+    inline constexpr int alienWidth = 100;
+    inline constexpr int alienHeight = 100;
+
+    inline constexpr int wallWidth = 200;
+    inline constexpr int wallHeight = 200;
+
+    inline constexpr int playerWidth = 100;
+    inline constexpr int playerHeight = 100;
+
+    inline constexpr int laserWidth = 50;
+    inline constexpr int laserHeight = 50;
+
     //Player settings
     inline constexpr float playerBaseHeight  = 70.0f;
     inline constexpr float playerSpeed       = 7.0f;
