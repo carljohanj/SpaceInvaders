@@ -1,17 +1,18 @@
 #pragma once
 #include "raylib.h"
 #include "EntityType.hpp"
-#include "TextureWrapper.hpp"
 #include <string_view>
 
 class Projectile
 {
 public:
-    Projectile();
+    Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture);
+
     Projectile(const Projectile&) = delete;
     Projectile& operator=(const Projectile&) = delete;
     Projectile(Projectile&& other) noexcept;
     Projectile& operator=(Projectile&& other) noexcept;
+
     void Update();
     void Render() const noexcept;
 
@@ -32,9 +33,7 @@ private:
     int speed = 15;
     bool active = true;
     ProjectileType type;
-
     Vector2 lineStart = { 0, 0 };
     Vector2 lineEnd = { 0, 0 };
-
-    TextureWrapper texture;
+    const Texture2D* texture = nullptr;
 };
