@@ -17,7 +17,7 @@ public:
     Alien& operator=(Alien&& other) noexcept;
 
     void Update() noexcept;
-    void Render() const noexcept;
+    void Render() const;
     Projectile Shoot() const noexcept;
 
     void SetPosition(Vector2 pos) noexcept { position = pos; }

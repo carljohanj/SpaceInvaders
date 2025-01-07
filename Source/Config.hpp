@@ -32,8 +32,8 @@ namespace Config
     inline constexpr int playerWidth = 100;
     inline constexpr int playerHeight = 100;
 
-    inline constexpr int laserWidth = 50;
-    inline constexpr int laserHeight = 50;
+    inline constexpr int projectileWidth = 50;
+    inline constexpr int projectileHeight = 50;
 
     //Player settings
     inline constexpr float playerBaseHeight  = 70.0f;

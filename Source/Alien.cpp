@@ -1,6 +1,7 @@
 #include "Alien.hpp"
 #include "Config.hpp"
 #include <utility>
+#include "Utilities.hpp"
 
 Alien::Alien()
     : position({ 0.0f, 0.0f }),
@@ -9,8 +10,7 @@ Alien::Alien()
     active(true),
     moveRight(true),
     gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
-    texture(Config::alienTexturePath, Config::alienWidth, Config::alienHeight)
-{
+    texture(Config::alienTexturePath, Config::alienWidth, Config::alienHeight) {
 }
 
 Alien::Alien(Alien&& other) noexcept
@@ -20,8 +20,7 @@ Alien::Alien(Alien&& other) noexcept
     active(other.active),
     moveRight(other.moveRight),
     gun(Config::alienProjectileSpeed, ProjectileType::ENEMY_PROJECTILE, { 0, 40 }),
-    texture(std::move(other.texture))
-{
+    texture(std::move(other.texture)) {
 }
 
 Alien& Alien::operator=(Alien&& other) noexcept
@@ -63,14 +62,9 @@ inline void Alien::MoveDown() noexcept
     position.y += 50;
 }
 
-void Alien::Render() const noexcept
+void Alien::Render() const 
 {
-    DrawTexturePro(texture.GetTexture(),
-        { 0, 0, (float)texture.GetTexture().width, (float)texture.GetTexture().height },
-        { position.x, position.y, (float)Config::alienWidth, (float)Config::alienHeight },
-        { Config::alienWidth / 2.0f, Config::alienHeight / 2.0f },
-        0.0f,
-        WHITE);
+    RenderRectangle(texture.GetTexture(), position, Config::alienWidth, Config::alienHeight);
 }
 
 Projectile Alien::Shoot() const noexcept { return gun.Shoot(position); }

@@ -13,7 +13,7 @@ public:
     Projectile(Projectile&& other) noexcept;
     Projectile& operator=(Projectile&& other) noexcept;
 
-    void Update();
+    void Update() noexcept;
     void Render() const noexcept;
 
     Vector2 GetPosition() const noexcept { return position; }

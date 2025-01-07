@@ -1,7 +1,7 @@
 #include "Config.hpp"
 #include "Projectile.hpp"
+#include "Utilities.hpp"
 #include <utility>
-#include <iostream>
 
 Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture)
     : position(position), speed(static_cast<int>(speed)), type(type), texture(&sharedTexture), active(true)
@@ -10,7 +10,7 @@ Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const
     lineEnd = { 0, 0 };
 }
 
-void Projectile::Update()
+void Projectile::Update() noexcept
 {
     position.y += speed;
     lineStart.y = position.y - 15;
@@ -24,16 +24,10 @@ void Projectile::Update()
     }
 }
 
-void Projectile::Render() const noexcept
+void Projectile::Render() const noexcept 
 {
     if (!active) return;
-
-    DrawTexturePro(*texture, // Use shared texture
-        { 0, 0, 176, 176 },
-        { position.x, position.y, 50, 50 },
-        { 25, 25 },
-        0,
-        WHITE);
+    RenderRectangle(*texture, position, Config::projectileWidth, Config::projectileHeight);
 }
 
 Projectile::Projectile(Projectile&& other) noexcept
