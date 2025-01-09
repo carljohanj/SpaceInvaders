@@ -190,6 +190,7 @@
     <ClInclude Include="Source\FileHandler.hpp" />
     <ClInclude Include="Source\Gun.hpp" />
     <ClInclude Include="Source\Leaderboard.hpp" />
+    <ClInclude Include="Source\SoundEffects.hpp" />
     <ClInclude Include="Source\Utilities.hpp" />
     <ClInclude Include="Source\StackManager.hpp" />
     <ClInclude Include="Source\TextureLoadingException.hpp" />

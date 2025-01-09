@@ -127,6 +127,9 @@
     <ClInclude Include="Source\Utilities.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\SoundEffects.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\leaderboard.txt" />

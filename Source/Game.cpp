@@ -8,11 +8,13 @@
 #include "Player.hpp"
 #include "raylib.h"
 #include "StackManager.hpp"
+#include "SoundEffects.hpp"
 #include "Wall.hpp"
 #include <algorithm>
 #include <cassert>
 #include <random>
 #include <ranges>
+
 
 using alien = size_t;
 inline constexpr float shootTimerReset = 0.0f;
@@ -157,6 +159,8 @@ void Game::Private::End() noexcept
     Walls.clear();
     Aliens.clear();
     gameState = State::ENDSCREEN;
+    audioDevice.Play(SoundEffect::PlayerDies);
+    audioDevice.StopBackgroundMusic();
 }
 
 void Game::Private::RenderEndScreen() noexcept
@@ -171,6 +175,8 @@ inline void Game::Private::UpdateStartScreen() noexcept
     {
         ResetGameState();
         gameState = State::GAMEPLAY;
+        audioDevice.Play(SoundEffect::StartSound);
+        audioDevice.PlayBackgroundMusic();
     }
 }
 
@@ -179,6 +185,7 @@ inline void Game::Private::UpdateEndScreen() noexcept
     if (leaderboard.HasNewHighScore(score) && leaderboard.SaveHighScore(score))
     {
         gameState = State::LEADERBOARD;
+        audioDevice.Play(SoundEffect::NewHighScore);
         return;
     }
     if (IsKeyReleased(KEY_ENTER)) { Continue(); }
@@ -221,13 +228,18 @@ void Game::Private::UpdateEverything()
     DetectCollisions();
     UpdateWalls();
     UpdateBackground();
+    audioDevice.UpdateMusic();
 }
 
 void Game::Private::UpdatePlayerInput()
 {
     if (IsKeyReleased(KEY_Q)) { End(); }
     player.Update();
-    if (IsKeyPressed(KEY_SPACE)) { Projectiles.push_back(player.Shoot()); }
+    if (IsKeyPressed(KEY_SPACE))
+    { 
+        Projectiles.push_back(player.Shoot());
+        audioDevice.Play(SoundEffect::PlayerShoots);
+    }
 }
 
 void Game::Private::ResetAliens()
@@ -296,7 +308,11 @@ inline bool Game::Private::CanFireShot() const noexcept
 inline void Game::Private::FireShot() noexcept
 {
     auto const& randomAlien = Aliens[GetRandomAlien(Aliens.size())];
-    if (randomAlien.IsActive()) { Projectiles.push_back(randomAlien.Shoot()); }
+    if (randomAlien.IsActive())
+    { 
+        Projectiles.push_back(randomAlien.Shoot()); 
+        audioDevice.Play(SoundEffect::AlienShoots);
+    }
 }
 
 [[nodiscard]] inline alien Game::Private::GetRandomAlien(alien range)
@@ -394,7 +410,7 @@ inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) n
 {
     alien.SetActive(false);
     projectile.SetActive(false);
-    audioDevice.PlaySoundEffect();
+    audioDevice.Play(SoundEffect::IsHit);
     score += addToScore;
 }
 
@@ -411,7 +427,7 @@ inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept
 {
     player.SetLives(player.GetLives() - 1);
     projectile.SetActive(false);
-    audioDevice.PlaySoundEffect();
+    audioDevice.Play(SoundEffect::IsHit);
     if (player.GetLives() <= 0) { End(); }
 }
 
@@ -432,6 +448,6 @@ inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexc
 {
     wall.SetHealth(wall.GetHealth() - 1);
     if (wall.GetHealth() <= 0) { wall.SetActive(false); }
-    audioDevice.PlaySoundEffect();
+    audioDevice.Play(SoundEffect::IsHit);
     projectile.SetActive(false);
 }

@@ -20,7 +20,15 @@ namespace Config
     inline const std::filesystem::path alienTexturePath      = "./Assets/Alien.png";
     inline const std::filesystem::path wallTexturePath       = "./Assets/Barrier.png";
     inline const std::filesystem::path leaderBoardScores     = "./Resources/leaderboard.txt";
-    inline const std::filesystem::path soundEffect           = "./Resources/hitHurt.ogg";
+
+    // Sound effects
+    inline const std::filesystem::path backgroundMusic = "./Resources/Sounds/Invading2.wav";
+    inline const std::filesystem::path startGame       = "./Resources/Sounds/StartSound.wav";
+    inline const std::filesystem::path playerShot      = "./Resources/Sounds/playerShooting.wav";
+    inline const std::filesystem::path alienShot       = "./Resources/Sounds/alienShooting.wav";
+    inline const std::filesystem::path highScore       = "./Resources/Sounds/newHighScore2.wav";
+    inline const std::filesystem::path dead            = "./Resources/Sounds/death.wav";
+    inline const std::filesystem::path hitSound        = "./Resources/Sounds/hitHurt.ogg";
 
     // Texture scaling sizes
     inline constexpr int alienWidth = 100;
@@ -52,7 +60,7 @@ namespace Config
     inline constexpr int alienFormationY      = 60;
 
     // Shooting settings
-    inline constexpr float alienShootInterval  = 1.0f;
+    inline constexpr float alienShootInterval  = 1.5f;
     inline constexpr float alienGunCooldown    = 1.0f;
     inline constexpr int playerProjectileSpeed = -15;
     inline constexpr int alienProjectileSpeed  = 15;

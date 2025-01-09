@@ -10,6 +10,8 @@ inline constexpr int textBoxY = 500.0f;
 inline constexpr int textBoxWidth = 300.0f;
 inline constexpr int textBoxHeight = 50.0f;
 inline constexpr int leaderboardFontSize = 40;
+inline constexpr int bigYOffset = 200;
+inline constexpr int smallYOffset = 100;
 inline constexpr int highScoreFontSize = 60;
 inline constexpr int maxNameLength = 9;
 inline constexpr int blinkTimerReset = 0;
@@ -92,7 +94,7 @@ inline void Leaderboard::ResetInputState() noexcept
 
 void Leaderboard::RenderLeaderboard() const noexcept
 {
-    RenderHeader(leaderboardHeader, -100);
+    RenderHeader(leaderboardHeader, smallYOffset);
     RenderScores(drawScoresTopLeftCorner);
     RenderFooter(enterMessage, scores.size() * (leaderboardFontSize + 10) + 50);
 }
@@ -124,11 +126,11 @@ inline void Leaderboard::RenderFooter(std::string_view message, int yOffset) con
 
 void Leaderboard::RenderHighScoreEntry(int score) noexcept
 {
-    RenderHeader(highScoreHeader, -200);
+    RenderHeader(highScoreHeader, bigYOffset);
     RenderScores(drawScoresTopLeftCorner);
     RenderTextBox();
     RenderNameInput();
-    if (!playerName.empty()) { RenderFooter(enterMessage, 200); }
+    if (!playerName.empty()) { RenderFooter(enterMessage, smallYOffset); }
 }
 
 inline void Leaderboard::RenderTextBox() const noexcept
