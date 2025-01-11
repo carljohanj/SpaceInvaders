@@ -7,12 +7,12 @@ Player::Player()
     : gun(Config::playerProjectileSpeed, ProjectileType::PLAYER_PROJECTILE, { 0, -10 }),
     texture(Config::playerTexturePath, Config::playerWidth, Config::playerHeight)
 {
-    x_pos = GetScreenWidth() / 2;
+    x_pos = GetScreenWidth() / 2.0f;
 }
 
 void Player::Reset() noexcept
 {
-    x_pos = GetScreenWidth() / 2;
+    x_pos = GetScreenWidth() / 2.0f;
     lives = Config::playerStartingLives;
 }
 

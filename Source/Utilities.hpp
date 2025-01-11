@@ -1,6 +1,5 @@
 #pragma once
 #include "raylib.h"
-#include <filesystem>
 
 inline void RenderRectangle(const Texture2D& texture, Vector2 position, int width, int height) noexcept
 {
@@ -20,9 +19,4 @@ inline void RenderCircle(const Texture2D& texture, Vector2 position, float radiu
         { radius, radius },
         0.0f,
         WHITE);
-}
-
-inline const char* FilePathToCString(const std::filesystem::path& path) noexcept
-{
-    return path.string().c_str();
 }

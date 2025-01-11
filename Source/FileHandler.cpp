@@ -60,7 +60,7 @@ FileHandler::ParseScoreEntry(const std::string& line) const
     return std::unexpected("Failed to parse line: " + line);
 }
 
-[[nodiscard]] std::expected<void, std::string>
+std::expected<void, std::string>
 FileHandler::SaveScores(const std::vector<std::pair<std::string_view, int>>& scores) const
 {
     auto outputFile = OpenOutputFile();

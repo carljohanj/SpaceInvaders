@@ -1,25 +1,38 @@
 #pragma once
 #include <array>
-#include <cstddef>
-#include <new>
-#include <utility>
-#include <type_traits>
 #include <cassert>
+#include <cstddef>
 #include <memory>
+#include <new>
+#include <type_traits>
+#include <utility>
+
 
 template <std::size_t BufferSize = 256, typename AlignType = std::max_align_t>
 class StackManager
 {
 public:
+    StackManager() = default;
+    StackManager(const StackManager& other) = delete;
+    StackManager& operator=(const StackManager& other) = delete;
+    StackManager(StackManager&& other) noexcept { moveFrom(std::move(other)); }
+    StackManager& operator=(StackManager&& other) noexcept
+    {
+        destroy();
+        moveFrom(std::move(other));
+        return *this;
+    }
+
     template <typename Type, typename... Args>
     void initialize(Args&&... args)
     {
         static_assert(sizeof(Type) <= BufferSize, "Type size exceeds the buffer size!");
         static_assert(alignof(Type) <= alignof(AlignType), "Type alignment exceeds the buffer alignment!");
-        
+
         destroy();
         new (buffer.data()) Type(std::forward<Args>(args)...);
-        typeDestructor = [] (std::byte* ptr) noexcept { std::launder(reinterpret_cast<Type*>(ptr))->~Type(); };
+        //C26490: We have to use reinterpret_cast, but we can make it compiler safe with std::destroy_at and std::launder
+        typeDestructor = [](std::byte* ptr) noexcept { std::destroy_at(std::launder(reinterpret_cast<Type*>(ptr))); };
     }
 
     ~StackManager() noexcept { destroy(); }
@@ -34,7 +47,7 @@ public:
     }
 
     template <typename Type>
-    Type* get()
+    Type* get() noexcept
     {
         return std::launder(reinterpret_cast<Type*>(buffer.data()));
     }
@@ -43,6 +56,13 @@ public:
     const Type* get() const
     {
         return std::launder(reinterpret_cast<const Type*>(buffer.data()));
+    }
+
+    void moveFrom(StackManager&& other) noexcept
+    {
+        buffer = std::move(other.buffer);
+        typeDestructor = other.typeDestructor;
+        other.typeDestructor = nullptr;
     }
 
 private:

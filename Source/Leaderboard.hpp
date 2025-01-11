@@ -26,10 +26,10 @@ public:
     [[nodiscard]] bool HasNewHighScore(int score) const noexcept;
     [[nodiscard]] bool SaveHighScore(int score) noexcept;
     void RenderLeaderboard() const noexcept;
-    void RenderHighScoreEntry(int score) noexcept;
+    void RenderHighScoreEntry() noexcept;
 
 private:
-    void InsertNewHighScore(const std::string& playerName, int score) noexcept;
+    void InsertNewHighScore(const std::string& playerName, int score);
     auto FindLowestScore() noexcept;
     void ResetInputState() noexcept;
     void CapturePlayerNameInput() noexcept;
@@ -44,8 +44,8 @@ private:
     void RenderScores(ScoreRendering config) const noexcept;
     [[nodiscard]] bool ShouldRenderCursor() const noexcept;
     void RenderBlinkingCursor() const noexcept;
-    void LoadScoresFromFile() noexcept;
-    void SaveScoresToFile() noexcept;
+    void LoadScoresFromFile();
+    void SaveScoresToFile();
     std::vector<PlayerData> scores;
     static constexpr size_t maxEntries = 5;
     std::string playerName;

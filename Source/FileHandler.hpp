@@ -10,7 +10,7 @@ class FileHandler
 public:
     explicit FileHandler(std::filesystem::path path);
     [[nodiscard]] std::expected<std::vector<std::pair<std::string, int>>, std::string> LoadScores() const;
-    [[nodiscard]] std::expected<void, std::string> SaveScores(const std::vector<std::pair<std::string_view, int>>& scores) const;
+    std::expected<void, std::string> SaveScores(const std::vector<std::pair<std::string_view, int>>& scores) const;
 
 private:
     std::filesystem::path filePath;

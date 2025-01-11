@@ -15,8 +15,6 @@
 #include <random>
 #include <ranges>
 
-
-using alien = size_t;
 inline constexpr float shootTimerReset = 0.0f;
 inline constexpr int addToScore = 100;
 inline constexpr int alienFormationOffset = 450;
@@ -46,25 +44,24 @@ struct Game::Private
 
     void Start();
     void Update();
-    void Render() noexcept;
+    void Render();
     void End() noexcept;
-    void RenderEndScreen() noexcept;
+    void RenderEndScreen();
     void UpdateStartScreen() noexcept;
-    void Continue();
+    void Continue() noexcept;
     void ResetGameState() noexcept;
     void ResetAliens();
-    void RenderGameplay() noexcept;
+    void RenderGameplay();
     void UpdateEverything();
     void UpdatePlayerInput();
     void CreateNewAlien(int alienRow);
-    void RenderAliens() noexcept;
+    void RenderAliens();
     void UpdateAliens();
     void UpdateAlienstates() noexcept;
     void TriggerAlienShot() noexcept;
     void UpdateTimeSinceLastShot() noexcept;
     bool CanFireShot() const noexcept;
     void FireShot() noexcept;
-    [[nodiscard]] alien GetRandomAlien(alien range);
     void ResetShootTimer() noexcept;
     void RemoveInactiveAliens() noexcept;
     void ResetWalls();
@@ -75,7 +72,7 @@ struct Game::Private
     void UpdateBackground() noexcept;
     void UpdateEndScreen() noexcept;
     void UpdateShowLeaderboard() noexcept;
-    void RenderShowLeaderboard() noexcept;
+    void RenderShowLeaderboard();
     void DetectCollisions() noexcept;
     void CheckPlayerCollision(Projectile& projectile) noexcept;
     void AlienGetsShot(Alien& alien, Projectile& projectile) noexcept;
@@ -85,6 +82,7 @@ struct Game::Private
     void CheckWallCollisions(Projectile& projectile) noexcept;
 };
 
+//C26455: We want the default constructor to throw if textures or window can't be loaded
 Game::Game()
 {
     impl.initialize<Private>();
@@ -134,7 +132,7 @@ void Game::Private::Update()
     }
 }
 
-void Game::Private::Render() noexcept
+void Game::Private::Render()
 {
     switch (gameState)
     {
@@ -163,9 +161,9 @@ void Game::Private::End() noexcept
     audioDevice.StopBackgroundMusic();
 }
 
-void Game::Private::RenderEndScreen() noexcept
+void Game::Private::RenderEndScreen()
 {
-    if (leaderboard.HasNewHighScore(score)) { leaderboard.RenderHighScoreEntry(score); }
+    if (leaderboard.HasNewHighScore(score)) { leaderboard.RenderHighScoreEntry(); }
     else { leaderboard.RenderLeaderboard(); }
 }
 
@@ -196,9 +194,9 @@ inline void Game::Private::UpdateShowLeaderboard() noexcept
     if (IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_ENTER)) { Continue(); }
 }
 
-void Game::Private::RenderShowLeaderboard() noexcept { leaderboard.RenderLeaderboard(); }
+void Game::Private::RenderShowLeaderboard() { leaderboard.RenderLeaderboard(); }
 
-inline void Game::Private::Continue() 
+inline void Game::Private::Continue() noexcept
 { 
     Start();
     gameState = State::STARTSCREEN; 
@@ -210,7 +208,7 @@ inline void Game::Private::ResetGameState() noexcept
     gameState = State::STARTSCREEN;
 }
 
-void Game::Private::RenderGameplay() noexcept
+void Game::Private::RenderGameplay()
 {
     window.RenderBackground();
     window.RenderHUD(score, player.GetLives());
@@ -245,7 +243,6 @@ void Game::Private::UpdatePlayerInput()
 void Game::Private::ResetAliens()
 {
     if (!Aliens.empty()) return;
-
     for (const int alienRow : std::views::iota(0, Config::alienFormationHeight))
     {
         CreateNewAlien(alienRow);
@@ -263,7 +260,7 @@ inline void Game::Private::CreateNewAlien(int alienRow)
     }
 }
 
-void Game::Private::RenderAliens() noexcept
+void Game::Private::RenderAliens()
 {
     for (const auto& alien : Aliens)
     {
@@ -307,18 +304,13 @@ inline bool Game::Private::CanFireShot() const noexcept
 
 inline void Game::Private::FireShot() noexcept
 {
-    auto const& randomAlien = Aliens[GetRandomAlien(Aliens.size())];
+    auto const randomIndexValue = GetRandomValue(0, (Aliens.size() - 1));
+    auto const& randomAlien = Aliens[randomIndexValue];
     if (randomAlien.IsActive())
     { 
         Projectiles.push_back(randomAlien.Shoot()); 
         audioDevice.Play(SoundEffect::AlienShoots);
     }
-}
-
-[[nodiscard]] inline alien Game::Private::GetRandomAlien(alien range)
-{
-    static std::mt19937 gen{ std::random_device{}() };
-    return std::uniform_int_distribution<size_t>{0, range - 1}(gen);
 }
 
 inline void Game::Private::ResetShootTimer() noexcept { shootTimer = shootTimerReset; }
@@ -450,4 +442,4 @@ inline void Game::Private::WallGetsHit(Wall& wall, Projectile& projectile) noexc
     if (wall.GetHealth() <= 0) { wall.SetActive(false); }
     audioDevice.Play(SoundEffect::IsHit);
     projectile.SetActive(false);
-}
+} 

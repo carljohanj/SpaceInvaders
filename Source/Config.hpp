@@ -3,6 +3,7 @@
 #include <string_view>
 #include <array>
 
+    
 namespace Config
 {
     // Window settings
@@ -15,32 +16,32 @@ namespace Config
     inline constexpr std::string_view continueMessage = "PRESS ENTER TO CONTINUE";
 
     // Assets
-    inline const std::filesystem::path playerTexturePath     = "./Assets/Ship1.png";
-    inline const std::filesystem::path projectileTexturePath = "./Assets/Laser.png";
-    inline const std::filesystem::path alienTexturePath      = "./Assets/Alien.png";
-    inline const std::filesystem::path wallTexturePath       = "./Assets/Barrier.png";
+    inline const std::filesystem::path playerTexturePath     = "./Resources/Assets/Ship1.png";
+    inline const std::filesystem::path projectileTexturePath = "./Resources/Assets/Laser.png";
+    inline const std::filesystem::path alienTexturePath      = "./Resources/Assets/Alien.png";
+    inline const std::filesystem::path wallTexturePath       = "./Resources/Assets/Barrier.png";
     inline const std::filesystem::path leaderBoardScores     = "./Resources/leaderboard.txt";
 
     // Sound effects
-    inline const std::filesystem::path backgroundMusic = "./Resources/Sounds/Invading2.wav";
+    inline const std::filesystem::path backgroundMusic = "./Resources/Sounds/chip-mode.mp3";
     inline const std::filesystem::path startGame       = "./Resources/Sounds/StartSound.wav";
     inline const std::filesystem::path playerShot      = "./Resources/Sounds/playerShooting.wav";
     inline const std::filesystem::path alienShot       = "./Resources/Sounds/alienShooting.wav";
     inline const std::filesystem::path highScore       = "./Resources/Sounds/newHighScore2.wav";
     inline const std::filesystem::path dead            = "./Resources/Sounds/death.wav";
-    inline const std::filesystem::path hitSound        = "./Resources/Sounds/hitHurt.ogg";
+    inline const std::filesystem::path hitSound        = "./Resources/Sounds/hit.wav";
 
     // Texture scaling sizes
-    inline constexpr int alienWidth = 100;
+    inline constexpr int alienWidth  = 100;
     inline constexpr int alienHeight = 100;
 
-    inline constexpr int wallWidth = 200;
+    inline constexpr int wallWidth  = 200;
     inline constexpr int wallHeight = 200;
 
-    inline constexpr int playerWidth = 100;
+    inline constexpr int playerWidth  = 100;
     inline constexpr int playerHeight = 100;
 
-    inline constexpr int projectileWidth = 50;
+    inline constexpr int projectileWidth  = 50;
     inline constexpr int projectileHeight = 50;
 
     //Player settings

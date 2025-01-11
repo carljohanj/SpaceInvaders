@@ -5,10 +5,10 @@
 #include <ranges>
 #include <string_view>
 
-inline constexpr int textBoxX = 600.0f;
-inline constexpr int textBoxY = 500.0f;
-inline constexpr int textBoxWidth = 300.0f;
-inline constexpr int textBoxHeight = 50.0f;
+inline constexpr int textBoxX = 600;
+inline constexpr int textBoxY = 500;
+inline constexpr int textBoxWidth = 300;
+inline constexpr int textBoxHeight = 50;
 inline constexpr int leaderboardFontSize = 40;
 inline constexpr int bigYOffset = 200;
 inline constexpr int smallYOffset = 100;
@@ -55,13 +55,10 @@ void Leaderboard::CapturePlayerNameInput() noexcept
 
 [[nodiscard]] inline bool Leaderboard::TrySaveScore(int score) noexcept
 {
-    if (InputIsComplete())
-    {
-        InsertNewHighScore(playerName, score);
-        ResetInputState();
-        return true;
-    }
-    return false;
+    if (!InputIsComplete()) { return false; }
+    InsertNewHighScore(playerName, score);
+    ResetInputState();
+    return true;
 }
 
 [[nodiscard]] inline bool Leaderboard::InputIsComplete() const noexcept
@@ -77,7 +74,7 @@ void Leaderboard::CapturePlayerNameInput() noexcept
     });
 }
 
-void Leaderboard::InsertNewHighScore(const std::string& name, int score) noexcept
+void Leaderboard::InsertNewHighScore(const std::string& name, int score)
 {
     auto lowestScore = FindLowestScore();
     if (score > lowestScore->score) { *lowestScore = { name, score }; }
@@ -124,7 +121,7 @@ inline void Leaderboard::RenderFooter(std::string_view message, int yOffset) con
     DrawText(message.data(), textBoxX, textBoxY + yOffset, leaderboardFontSize, YELLOW);
 }
 
-void Leaderboard::RenderHighScoreEntry(int score) noexcept
+void Leaderboard::RenderHighScoreEntry() noexcept
 {
     RenderHeader(highScoreHeader, bigYOffset);
     RenderScores(drawScoresTopLeftCorner);
@@ -162,7 +159,7 @@ inline void Leaderboard::RenderBlinkingCursor() const noexcept
              static_cast<int>(textBox.y) + 12, leaderboardFontSize, MAROON);
 }
 
-void Leaderboard::LoadScoresFromFile() noexcept
+void Leaderboard::LoadScoresFromFile()
 {
     auto fileContent = fileHandler.LoadScores();
     if (!fileContent) { return; }
@@ -173,7 +170,7 @@ void Leaderboard::LoadScoresFromFile() noexcept
     });
 }
 
-void Leaderboard::SaveScoresToFile() noexcept
+void Leaderboard::SaveScoresToFile()
 {
     std::vector<std::pair<std::string_view, int>> scoreViews;
     scoreViews.reserve(scores.size());
