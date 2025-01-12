@@ -7,7 +7,7 @@
 class Background
 {
 public:
-    Background();
+    Background() noexcept;
     void Reset() noexcept;
     void Update(float offset) noexcept;
     void Render() const noexcept;

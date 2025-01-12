@@ -1,10 +1,11 @@
 #include "Background.hpp"
 #include <algorithm>
 #include "Config.hpp"
+#include "Utilities.hpp"
 #include <random>
 #include <ranges>
 
-Background::Background()
+Background::Background() noexcept
     : Stars(),
       starAmount(Config::backgroundStarAmount),
       xMinOffset(Config::backgroundXMinOffset),
@@ -15,10 +16,10 @@ Background::Background()
     for ([[maybe_unused]] auto i : std::views::iota(0, starAmount))
     {
         Star newStar;
-        newStar.initPosition.x = GetRandomValue(xMinOffset, GetScreenWidth() + xMaxOffset);
-        newStar.initPosition.y = GetRandomValue(0, GetScreenHeight());
+        newStar.initPosition.x = Util::GetRandomValue(xMinOffset, GetScreenWidth() + xMaxOffset);
+        newStar.initPosition.y = Util::GetRandomValue(0, GetScreenHeight());
         newStar.color = SKYBLUE;
-        newStar.size = GetRandomValue(1, 4) / 2.0f;
+        newStar.size = Util::GetRandomValue(1, 4) / 2.0f;
         Stars.push_back(std::move(newStar));
     }
 }
@@ -30,10 +31,10 @@ void Background::Reset() noexcept
     for ([[maybe_unused]] auto i : std::views::iota(0, starAmount))
     {
         Star newStar;
-        newStar.initPosition.x = GetRandomValue(xMinOffset, GetScreenWidth() + xMaxOffset);
-        newStar.initPosition.y = GetRandomValue(0, GetScreenHeight());
+        newStar.initPosition.x = Util::GetRandomValue(xMinOffset, GetScreenWidth() + xMaxOffset);
+        newStar.initPosition.y = Util::GetRandomValue(0, GetScreenHeight());
         newStar.color = SKYBLUE;
-        newStar.size = GetRandomValue(1, 4) / 2.0f;
+        newStar.size = Util::GetRandomValue(1, 4) / 2.0f;
         Stars.push_back(std::move(newStar));
     }
 }

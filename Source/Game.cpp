@@ -1,3 +1,4 @@
+#pragma once
 #include "Alien.hpp"
 #include "AudioDevice.hpp"
 #include "Background.hpp"
@@ -9,11 +10,13 @@
 #include "raylib.h"
 #include "StackManager.hpp"
 #include "SoundEffects.hpp"
+#include "Utilities.hpp"
 #include "Wall.hpp"
 #include <algorithm>
 #include <cassert>
 #include <random>
 #include <ranges>
+
 
 inline constexpr float shootTimerReset = 0.0f;
 inline constexpr int addToScore = 100;
@@ -46,7 +49,7 @@ struct Game::Private
     void Update();
     void Render();
     void End() noexcept;
-    void RenderEndScreen();
+    void RenderEndScreen() noexcept;
     void UpdateStartScreen() noexcept;
     void Continue() noexcept;
     void ResetGameState() noexcept;
@@ -72,7 +75,7 @@ struct Game::Private
     void UpdateBackground() noexcept;
     void UpdateEndScreen() noexcept;
     void UpdateShowLeaderboard() noexcept;
-    void RenderShowLeaderboard();
+    void RenderShowLeaderboard() noexcept;
     void DetectCollisions() noexcept;
     void CheckPlayerCollision(Projectile& projectile) noexcept;
     void AlienGetsShot(Alien& alien, Projectile& projectile) noexcept;
@@ -161,7 +164,7 @@ void Game::Private::End() noexcept
     audioDevice.StopBackgroundMusic();
 }
 
-void Game::Private::RenderEndScreen()
+void Game::Private::RenderEndScreen() noexcept
 {
     if (leaderboard.HasNewHighScore(score)) { leaderboard.RenderHighScoreEntry(); }
     else { leaderboard.RenderLeaderboard(); }
@@ -194,7 +197,7 @@ inline void Game::Private::UpdateShowLeaderboard() noexcept
     if (IsKeyReleased(KEY_SPACE) || IsKeyReleased(KEY_ENTER)) { Continue(); }
 }
 
-void Game::Private::RenderShowLeaderboard() { leaderboard.RenderLeaderboard(); }
+void Game::Private::RenderShowLeaderboard() noexcept { leaderboard.RenderLeaderboard(); }
 
 inline void Game::Private::Continue() noexcept
 { 
@@ -304,7 +307,7 @@ inline bool Game::Private::CanFireShot() const noexcept
 
 inline void Game::Private::FireShot() noexcept
 {
-    auto const randomIndexValue = GetRandomValue(0, (Aliens.size() - 1));
+    auto const randomIndexValue = GetRandomValue(0, static_cast<int>(Aliens.size()) - 1);
     auto const& randomAlien = Aliens[randomIndexValue];
     if (randomAlien.IsActive())
     { 

@@ -18,7 +18,7 @@ Wall::Wall(Wall&& other) noexcept
     position(std::exchange(other.position, { 0, 0 })),
     active(std::exchange(other.active, false)),
     health(std::exchange(other.health, 50)),
-    radius(std::exchange(other.radius, 60))
+    radius(std::exchange(other.radius, 60.0f))
 {
 }
 
@@ -30,14 +30,14 @@ Wall& Wall::operator=(Wall&& other) noexcept
         position = std::exchange(other.position, { 0, 0 });
         active = std::exchange(other.active, false);
         health = std::exchange(other.health, 50);
-        radius = std::exchange(other.radius, 60);
+        radius = std::exchange(other.radius, 60.0f);
     }
     return *this;
 }
 
 void Wall::Render() const noexcept
 {
-    RenderRectangle(texture.GetTexture(), position, Config::wallWidth, Config::wallHeight);
+    Util::RenderRectangle(texture.GetTexture(), position, Config::wallWidth, Config::wallHeight);
     RenderHealth();
 }
 

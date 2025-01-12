@@ -64,7 +64,7 @@ inline void Alien::MoveDown() noexcept
 
 void Alien::Render() const 
 {
-    RenderRectangle(texture.GetTexture(), position, Config::alienWidth, Config::alienHeight);
+    Util::RenderRectangle(texture.GetTexture(), position, Config::alienWidth, Config::alienHeight);
 }
 
 Projectile Alien::Shoot() const noexcept { return gun.Shoot(position); }

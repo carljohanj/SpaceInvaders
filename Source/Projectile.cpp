@@ -27,7 +27,7 @@ void Projectile::Update() noexcept
 void Projectile::Render() const noexcept 
 {
     if (!active) return;
-    RenderRectangle(*texture, position, Config::projectileWidth, Config::projectileHeight);
+    Util::RenderRectangle(*texture, position, Config::projectileWidth, Config::projectileHeight);
 }
 
 Projectile::Projectile(Projectile&& other) noexcept

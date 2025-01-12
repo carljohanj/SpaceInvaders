@@ -25,7 +25,7 @@ void Player::Update() noexcept
 
 void Player::Render() const 
 {
-    RenderRectangle(texture.GetTexture(), { x_pos, GetScreenHeight() - player_base_height },
+    Util::RenderRectangle(texture.GetTexture(), { x_pos, GetScreenHeight() - player_base_height },
                     Config::playerWidth, Config::playerHeight);
 }
 

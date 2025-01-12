@@ -1,9 +1,12 @@
 #include "Leaderboard.hpp"
 #include "Config.hpp"
+#include <gsl/gsl>
 #include "raylib.h"
+#include "Utilities.hpp"
 #include <algorithm>
 #include <ranges>
 #include <string_view>
+#include <print>
 
 inline constexpr int textBoxX = 600;
 inline constexpr int textBoxY = 500;
@@ -27,9 +30,9 @@ inline constexpr ScoreRendering drawScoresTopLeftCorner
     .fontSize = leaderboardFontSize - 10
 };
 
-Leaderboard::Leaderboard()
+Leaderboard::Leaderboard() noexcept
     : fileHandler(Config::leaderBoardScores),
-      textBox({ textBoxX, textBoxY, textBoxWidth, textBoxHeight })
+    textBox({ textBoxX, textBoxY, textBoxWidth, textBoxHeight })
 {
     LoadScoresFromFile();
 }
@@ -47,7 +50,7 @@ void Leaderboard::CapturePlayerNameInput() noexcept
     const int key = GetCharPressed();
     if ((key >= 32) && (key <= 125) && playerName.size() < maxNameLength)
     {
-        playerName.push_back(static_cast<char>(key));
+        playerName.push_back(gsl::narrow_cast<char>(key));
     }
     if (IsKeyPressed(KEY_BACKSPACE) && !playerName.empty()) { playerName.pop_back(); }
     blinkTimer++;
@@ -69,9 +72,9 @@ void Leaderboard::CapturePlayerNameInput() noexcept
 [[nodiscard]] inline auto Leaderboard::FindLowestScore() noexcept
 {
     return std::ranges::min_element(scores, [](const PlayerData& a, const PlayerData& b)
-    {
-        return a.score < b.score;
-    });
+        {
+            return a.score < b.score;
+        });
 }
 
 void Leaderboard::InsertNewHighScore(const std::string& name, int score)
@@ -81,7 +84,6 @@ void Leaderboard::InsertNewHighScore(const std::string& name, int score)
     std::ranges::sort(scores, [](const PlayerData& a, const PlayerData& b) { return a.score > b.score; });
     SaveScoresToFile();
 }
-
 
 inline void Leaderboard::ResetInputState() noexcept
 {
@@ -99,10 +101,10 @@ void Leaderboard::RenderLeaderboard() const noexcept
 inline void Leaderboard::RenderScores(ScoreRendering screenPos) const noexcept
 {
     std::ranges::for_each(scores, [&](const PlayerData& data) noexcept
-    {
-        DrawScoreEntry(data, screenPos);
-        screenPos.currentY += screenPos.ySpacing;
-    });
+        {
+            DrawScoreEntry(data, screenPos);
+            screenPos.currentY += screenPos.ySpacing;
+        });
 }
 
 inline void Leaderboard::DrawScoreEntry(const PlayerData& data, const ScoreRendering& screenPos) const noexcept
@@ -116,9 +118,9 @@ inline void Leaderboard::RenderHeader(std::string_view text, int yOffset) const 
     DrawText(text.data(), textBoxX, textBoxY + yOffset, leaderboardFontSize, YELLOW);
 }
 
-inline void Leaderboard::RenderFooter(std::string_view message, int yOffset) const noexcept
+inline void Leaderboard::RenderFooter(std::string_view message, size_t yOffset) const noexcept
 {
-    DrawText(message.data(), textBoxX, textBoxY + yOffset, leaderboardFontSize, YELLOW);
+    DrawText(message.data(), textBoxX, textBoxY + static_cast<int>(yOffset), leaderboardFontSize, YELLOW);
 }
 
 void Leaderboard::RenderHighScoreEntry() noexcept
@@ -133,7 +135,7 @@ void Leaderboard::RenderHighScoreEntry() noexcept
 inline void Leaderboard::RenderTextBox() const noexcept
 {
     DrawRectangleRec(textBox, LIGHTGRAY);
-    DrawRectangleLines(textBox.x, textBox.y, textBox.width, textBox.height, RED);
+    Util::DrawRectangleLines(textBox, RED);
 }
 
 inline void Leaderboard::RenderNameInput() noexcept
@@ -156,27 +158,63 @@ inline void Leaderboard::RenderPlayerTextInput() const noexcept
 inline void Leaderboard::RenderBlinkingCursor() const noexcept
 {
     DrawText("_", static_cast<int>(textBox.x) + 8 + MeasureText(playerName.c_str(), leaderboardFontSize),
-             static_cast<int>(textBox.y) + 12, leaderboardFontSize, MAROON);
+        static_cast<int>(textBox.y) + 12, leaderboardFontSize, MAROON);
 }
 
-void Leaderboard::LoadScoresFromFile()
+void Leaderboard::LoadScoresFromFile() noexcept
 {
-    auto fileContent = fileHandler.LoadScores();
-    if (!fileContent) { return; }
-    scores.clear();
-    std::ranges::transform(fileContent.value(), std::back_inserter(scores), [](const auto& pair) 
+    auto fileContent = TryLoadScores();
+    if (fileContent)
     {
-        return PlayerData{ pair.first, pair.second };
-    });
+        PopulateScores(fileContent.value());
+        return;
+    }
+    HandleScoreError("loading", fileContent.error());
+    scores.clear();
+}
+
+[[nodiscard]] std::expected<std::vector<std::pair<std::string, int>>, std::string>
+Leaderboard::TryLoadScores() const
+{
+    return fileHandler.LoadScores();
+}
+
+void Leaderboard::PopulateScores(const std::vector<std::pair<std::string, int>>& loadedScores)
+{
+    scores.clear();
+    std::ranges::transform(loadedScores, std::back_inserter(scores), [](const auto& pair)
+        {
+            return PlayerData{ pair.first, pair.second };
+        });
 }
 
 void Leaderboard::SaveScoresToFile()
 {
+    auto const saveResult = TrySaveScores();
+    if (!saveResult)
+    {
+        HandleScoreError("saving", saveResult.error());
+    }
+}
+
+[[nodiscard]] std::expected<void, std::string> Leaderboard::TrySaveScores() const
+{
+    auto const scoreViews = PrepareScoreViews();
+    return fileHandler.SaveScores(scoreViews);
+}
+
+[[nodiscard]] std::vector<std::pair<std::string_view, int>> Leaderboard::PrepareScoreViews() const
+{
     std::vector<std::pair<std::string_view, int>> scoreViews;
     scoreViews.reserve(scores.size());
-    std::ranges::transform(scores, std::back_inserter(scoreViews), [](const PlayerData& data) 
-    {
-        return std::make_pair(std::string_view(data.name), data.score);
-    });
-    fileHandler.SaveScores(scoreViews);
+    std::ranges::transform(scores, std::back_inserter(scoreViews), [](const PlayerData& data)
+        {
+            return std::make_pair(std::string_view(data.name), data.score);
+        });
+    return scoreViews;
+}
+
+void Leaderboard::HandleScoreError(std::string_view action, std::string_view error) const
+{
+    std::print("Error {} scores: {}\n", action, error);
 }

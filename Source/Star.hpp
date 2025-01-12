@@ -6,7 +6,7 @@ struct Star
     Vector2 initPosition = { 0, 0 };
     Vector2 position = { 0, 0 };
     Color color = GRAY;
-    int size = 0;
+    float size = 0;
 
     void Update(float starOffset) noexcept;
     void Render() const noexcept;

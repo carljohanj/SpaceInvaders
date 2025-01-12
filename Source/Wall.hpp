@@ -20,10 +20,9 @@ public:
     void SetActive(bool isActive) noexcept { active = isActive; }
     int GetHealth() const noexcept { return health; }
     void SetHealth(int newHealth) noexcept { health = newHealth; }
-    int GetRadius() const noexcept { return radius; }
+    float GetRadius() const noexcept { return radius; }
 
 private:
-    void RenderWallText() const noexcept;
     void RenderHealth() const noexcept;
 
     Vector2 position = { 0, 0 };

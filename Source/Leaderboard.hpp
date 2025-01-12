@@ -22,7 +22,7 @@ struct ScoreRendering
 class Leaderboard
 {
 public:
-    Leaderboard();
+    Leaderboard() noexcept;
     [[nodiscard]] bool HasNewHighScore(int score) const noexcept;
     [[nodiscard]] bool SaveHighScore(int score) noexcept;
     void RenderLeaderboard() const noexcept;
@@ -37,15 +37,20 @@ private:
     [[nodiscard]] bool InputIsComplete() const noexcept;
     void DrawScoreEntry(const PlayerData& data, const ScoreRendering& config) const noexcept;
     void RenderHeader(std::string_view text, int yOffset) const noexcept;
-    void RenderFooter(std::string_view message, int yOffset) const noexcept;
+    void RenderFooter(std::string_view message, size_t yOffset) const noexcept;
     void RenderTextBox() const noexcept;
     void RenderNameInput() noexcept;
     void RenderPlayerTextInput() const noexcept;
     void RenderScores(ScoreRendering config) const noexcept;
     [[nodiscard]] bool ShouldRenderCursor() const noexcept;
     void RenderBlinkingCursor() const noexcept;
-    void LoadScoresFromFile();
+    void LoadScoresFromFile() noexcept;
+    std::expected<std::vector<std::pair<std::string, int>>, std::string> TryLoadScores() const;
+    void PopulateScores(const std::vector<std::pair<std::string, int>>& loadedScores);
     void SaveScoresToFile();
+    std::expected<void, std::string> TrySaveScores() const;
+    std::vector<std::pair<std::string_view, int>> PrepareScoreViews() const;
+    void HandleScoreError(std::string_view action, std::string_view error) const;
     std::vector<PlayerData> scores;
     static constexpr size_t maxEntries = 5;
     std::string playerName;

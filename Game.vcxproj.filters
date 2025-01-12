@@ -134,4 +134,7 @@
   <ItemGroup>
     <Text Include="Resources\leaderboard.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

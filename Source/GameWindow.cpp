@@ -12,6 +12,7 @@ inline constexpr int textBoxHeight = 50;
 inline constexpr int textBoxX = 600;
 inline constexpr int textBoxY = 500;
 
+//C26455: We want GameWindow to throw if the window can't be initialized
 GameWindow::GameWindow()
 {
     InitWindow(Config::screenWidth, Config::screenHeight, Config::title.data());

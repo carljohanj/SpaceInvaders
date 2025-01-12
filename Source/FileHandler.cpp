@@ -29,7 +29,8 @@ FileHandler::LoadScores() const
     return scores.value();
 }
 
-[[nodiscard]] std::expected<std::ifstream, std::string> FileHandler::OpenInputFile() const
+[[nodiscard]] std::expected<std::ifstream, std::string>
+FileHandler::OpenInputFile() const
 {
     std::ifstream inputFile(filePath);
     if (!inputFile.is_open()) { return std::unexpected("Failed to open file: " + filePath.string()); }
