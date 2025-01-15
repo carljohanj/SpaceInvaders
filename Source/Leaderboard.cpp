@@ -131,19 +131,23 @@ void Leaderboard::Private::RenderHighScoreEntry() noexcept
 
 [[nodiscard]] auto Leaderboard::Private::FindLowestScore() noexcept -> std::vector<PlayerData>::iterator
 {
-    return std::ranges::min_element(scores, [](const PlayerData& a, const PlayerData& b) {
-        return a.score < b.score;
+    return std::ranges::min_element(scores, [](const PlayerData& a, const PlayerData& b) 
+        {
+            return a.score < b.score;
         });
 }
 
 void Leaderboard::Private::InsertNewHighScore(const std::string& name, int score)
 {
     auto lowestScore = FindLowestScore();
-    if (lowestScore != scores.end() && score > lowestScore->score) {
+    if (lowestScore != scores.end() && score > lowestScore->score)
+    {
         *lowestScore = { name, score };
     }
-    std::ranges::sort(scores, [](const PlayerData& a, const PlayerData& b) {
-        return a.score > b.score;
+
+    std::ranges::sort(scores, [](const PlayerData& a, const PlayerData& b) 
+        {
+            return a.score > b.score;
         });
     SaveScoresToFile();
 }
@@ -157,20 +161,17 @@ void Leaderboard::Private::ResetInputState() noexcept
 void Leaderboard::Private::CapturePlayerNameInput() noexcept
 {
     const int key = GetCharPressed();
-    if ((key >= 32) && (key <= 125) && playerName.size() < maxNameLength) {
+    if ((key >= 32) && (key <= 125) && playerName.size() < maxNameLength)
+    {
         playerName.push_back(gsl::narrow_cast<char>(key));
     }
-    if (IsKeyPressed(KEY_BACKSPACE) && !playerName.empty()) {
-        playerName.pop_back();
-    }
+    if (IsKeyPressed(KEY_BACKSPACE) && !playerName.empty()) { playerName.pop_back(); }
     blinkTimer++;
 }
 
 [[nodiscard]] bool Leaderboard::Private::TrySaveScore(int score)
 {
-    if (!InputIsComplete()) {
-        return false;
-    }
+    if (!InputIsComplete()) { return false; }
     InsertNewHighScore(playerName, score);
     ResetInputState();
     return true;
@@ -214,9 +215,7 @@ void Leaderboard::Private::RenderTextBox() const noexcept
 void Leaderboard::Private::RenderNameInput() noexcept
 {
     RenderPlayerTextInput();
-    if (ShouldRenderCursor()) {
-        RenderBlinkingCursor();
-    }
+    if (ShouldRenderCursor()) { RenderBlinkingCursor(); }
 }
 
 void Leaderboard::Private::RenderPlayerTextInput() const noexcept
@@ -239,7 +238,8 @@ void Leaderboard::Private::RenderBlinkingCursor() const noexcept
 void Leaderboard::Private::LoadScoresFromFile()
 {
     auto fileContent = TryLoadScores();
-    if (fileContent) {
+    if (fileContent) 
+    {
         PopulateScores(fileContent.value());
         return;
     }
@@ -256,17 +256,16 @@ Leaderboard::Private::TryLoadScores() const
 void Leaderboard::Private::PopulateScores(const std::vector<std::pair<std::string, int>>& loadedScores)
 {
     scores.clear();
-    std::ranges::transform(loadedScores, std::back_inserter(scores), [](const auto& pair) {
-        return PlayerData{ pair.first, pair.second };
+    std::ranges::transform(loadedScores, std::back_inserter(scores), [](const auto& pair) 
+        {
+            return PlayerData{ pair.first, pair.second };
         });
 }
 
 void Leaderboard::Private::SaveScoresToFile()
 {
     auto saveResult = TrySaveScores();
-    if (!saveResult) {
-        HandleScoreError("saving", saveResult.error());
-    }
+    if (!saveResult) { HandleScoreError("saving", saveResult.error()); }
 }
 
 [[nodiscard]] std::expected<void, std::string> Leaderboard::Private::TrySaveScores() const

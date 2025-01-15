@@ -15,5 +15,5 @@ public:
 
 private:
     struct Private;
-    class StackManager<160> impl;
+    class StackManager<200> impl;
 };

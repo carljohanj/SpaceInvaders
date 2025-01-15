@@ -19,14 +19,12 @@
 #include <random>
 #include <ranges>
 
-
 inline constexpr float shootTimerReset = 0.0f;
 inline constexpr int addToScore = 100;
 inline constexpr int alienFormationOffset = 450;
 
 struct Game::Private
 {
-
 	Private(int screenWidth, int screenHeight)
 		: window(screenWidth, screenHeight),
 		  leaderboard(Config::leaderBoardScores) {
