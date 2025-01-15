@@ -21,6 +21,4 @@ private:
     std::expected<std::ofstream, std::string> OpenOutputFile() const;
     std::expected<void, std::string> WriteScores(std::ofstream& outputFile,
         const std::vector<std::pair<std::string_view, int>>& scores) const;
-
-
 };

@@ -56,7 +56,7 @@ public:
     }
 
     template <typename Type>
-    const Type* get() const
+    const Type* get() const noexcept
     {
         [[gsl::suppress(type .1, justification: "We have to use reinterpret_cast, but we can make it compiler safe with std::launder")]]
         return std::launder(reinterpret_cast<const Type*>(buffer.data()));
