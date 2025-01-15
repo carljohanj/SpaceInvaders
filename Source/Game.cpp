@@ -57,6 +57,7 @@ struct Game::Private
 	void Start();
 	void Update();
 	void Render();
+	void RenderState();
 	void End() noexcept;
 	void RenderEndScreen() noexcept;
 	void UpdateStartScreen() noexcept;
@@ -64,7 +65,7 @@ struct Game::Private
 	void ResetGameState() noexcept;
 	void ResetAliens();
 	void RenderGameplay();
-	void UpdateEverything();
+	void UpdateGameplay();
 	void UpdatePlayerInput();
 	void CreateNewAlien(int alienRow);
 	void RenderAliens();
@@ -108,10 +109,7 @@ void Game::Run()
 	while (!WindowShouldClose())
 	{
 		game->Update();
-		game->window.BeginDrawing();
-		ClearBackground(BLACK);
 		game->Render();
-		game->window.EndDrawing();
 	}
 }
 
@@ -132,7 +130,7 @@ void Game::Private::Update()
 		UpdateStartScreen();
 		break;
 	case State::GAMEPLAY:
-		UpdateEverything();
+		UpdateGameplay();
 		break;
 	case State::ENDSCREEN:
 		UpdateEndScreen();
@@ -144,6 +142,15 @@ void Game::Private::Update()
 }
 
 void Game::Private::Render()
+{
+	window.BeginDrawing();
+	ClearBackground(BLACK);
+	RenderState();
+	window.EndDrawing();
+}
+
+
+void Game::Private::RenderState()
 {
 	switch (gameState)
 	{
@@ -229,7 +236,7 @@ void Game::Private::RenderGameplay()
 	RenderAliens();
 }
 
-void Game::Private::UpdateEverything()
+void Game::Private::UpdateGameplay()
 {
 	UpdatePlayerInput();
 	UpdateAliens();
