@@ -7,7 +7,7 @@
 class AudioDevice
 {
 public:
-    AudioDevice() noexcept;
+    AudioDevice();
     ~AudioDevice() noexcept;
 
     void Play(SoundEffect sound) noexcept;
@@ -19,7 +19,7 @@ private:
     std::unordered_map<SoundEffect, Sound> sounds;
     Music backgroundMusic;
 
-    void LoadAllSounds();
+    void LoadAllSounds() noexcept;
     void UnloadAllSounds() noexcept;
     void LoadMusic() noexcept;
     void UnloadMusic() const noexcept;

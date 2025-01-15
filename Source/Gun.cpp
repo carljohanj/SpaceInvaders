@@ -1,6 +1,6 @@
 #include "Gun.hpp"
 
-Gun::Gun(float speed, ProjectileType projectileType, Vector2 offset) noexcept
+Gun::Gun(float speed, ProjectileType projectileType, Vector2 offset)
     : projectileSpeed(speed),
     projectileType(projectileType),
     offset(offset),
@@ -8,7 +8,7 @@ Gun::Gun(float speed, ProjectileType projectileType, Vector2 offset) noexcept
 {
 }
 
-Projectile Gun::Shoot(Vector2 whoIsShooting) const noexcept
+Projectile Gun::Shoot(Vector2 whoIsShooting) const
 {
     Projectile projectile(
         { whoIsShooting.x + offset.x, whoIsShooting.y + offset.y },

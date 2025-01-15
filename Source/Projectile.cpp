@@ -4,7 +4,7 @@
 #include <utility>
 #include <gsl/gsl>
 
-Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture)
+Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture) noexcept
     : position(position), speed(static_cast<int>(speed)), type(type), texture(&sharedTexture), active(true)
 {
     lineStart = { 0, 0 };

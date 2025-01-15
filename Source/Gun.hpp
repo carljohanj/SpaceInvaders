@@ -8,8 +8,8 @@
 class Gun
 {
 public:
-    Gun(float speed, ProjectileType projectileType, Vector2 offset) noexcept;
-    Projectile Shoot(Vector2 whoIsShooting) const noexcept;
+    Gun(float speed, ProjectileType projectileType, Vector2 offset);
+    Projectile Shoot(Vector2 position) const;
 
 private:
     float projectileSpeed;

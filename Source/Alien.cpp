@@ -14,6 +14,7 @@ Alien::Alien(float x, float y)
 {
 }
 
+[[gsl::suppress(f .6, justification: "We want the constructor to throw if textureloading fails")]]
 Alien::Alien(Alien&& other) noexcept
     : position(std::move(other.position)),
     radius(other.radius),

@@ -5,7 +5,7 @@
 class Projectile
 {
 public:
-    Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture);
+    Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture) noexcept;
     Projectile(const Projectile&) = delete;
     Projectile& operator=(const Projectile&) = delete;
     Projectile(Projectile&& other) noexcept;

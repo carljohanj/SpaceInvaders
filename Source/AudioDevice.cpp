@@ -12,7 +12,7 @@ static const std::unordered_map<SoundEffect, std::filesystem::path> SoundFilePat
     { SoundEffect::BackgroundMusic, Config::backgroundMusic }
 };
 
-AudioDevice::AudioDevice() noexcept
+AudioDevice::AudioDevice()
 {
     InitAudioDevice();
     LoadAllSounds();
@@ -26,6 +26,7 @@ AudioDevice::~AudioDevice() noexcept
     CloseAudioDevice();
 }
 
+[[gsl::suppress(f .6, justification: "This will not be out of bounds")]]
 void AudioDevice::Play(SoundEffect sound) noexcept { PlaySound(sounds[sound]); }
 
 void AudioDevice::UpdateMusic() const noexcept { UpdateMusicStream(backgroundMusic);}
@@ -34,7 +35,7 @@ void AudioDevice::PlayBackgroundMusic() const noexcept { PlayMusicStream(backgro
 
 void AudioDevice::StopBackgroundMusic() const noexcept { StopMusicStream(backgroundMusic); }
 
-void AudioDevice::LoadAllSounds()
+void AudioDevice::LoadAllSounds() noexcept
 {
     for (const auto& [effect, filePath] : SoundFilePaths)
     {

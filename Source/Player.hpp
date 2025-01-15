@@ -12,7 +12,7 @@ public:
     void Reset() noexcept;
     void Update() noexcept;
     void Render() const;
-    Projectile Shoot() const noexcept;
+    Projectile Shoot() const;
     Vector2 GetPosition() const noexcept;
     float GetXPosition() const noexcept;
     float GetPlayerBaseHeight() const noexcept;

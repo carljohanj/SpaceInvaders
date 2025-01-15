@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "Utilities.hpp"
 
+[[gsl::suppress(f .6, justification: "We want the constructor to throw if textureloading fails")]]
 Player::Player()
     : x_pos(GetScreenWidth() / 2.0f),
     speed(7.0f),
@@ -48,7 +49,7 @@ Vector2 Player::GetPosition() const noexcept
     return { x_pos, static_cast<float>(GetScreenHeight()) - player_base_height };
 }
 
-Projectile Player::Shoot() const noexcept
+Projectile Player::Shoot() const
 {
     return gun.Shoot({ x_pos, static_cast<float>(GetScreenHeight()) - player_base_height });
 }

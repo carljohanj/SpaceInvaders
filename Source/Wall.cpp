@@ -4,6 +4,7 @@
 #include <utility>
 #include <iostream>
 
+[[gsl::suppress(f .6, justification: "We want the constructor to throw if textureloading fails")]]
 Wall::Wall()
     : texture(Config::wallTexturePath, Config::wallWidth, Config::wallHeight),
     position({ 0, 0 }),
