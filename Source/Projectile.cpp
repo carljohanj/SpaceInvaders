@@ -2,8 +2,8 @@
 #include "Projectile.hpp"
 #include "Utilities.hpp"
 #include <utility>
+#include <gsl/gsl>
 
-[[gsl::suppress(f .6, justification: "We want the constructor to throw if the texture can't be loaded")]]
 Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture)
     : position(position), speed(static_cast<int>(speed)), type(type), texture(&sharedTexture), active(true)
 {
@@ -11,25 +11,7 @@ Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const
     lineEnd = { 0, 0 };
 }
 
-void Projectile::Update() noexcept
-{
-    position.y += speed;
-    lineStart.y = position.y - 15;
-    lineEnd.y = position.y + 15;
-    lineStart.x = position.x;
-    lineEnd.x = position.x;
-
-    if (position.y < 0 || position.y > GetScreenHeight())
-    {
-        active = false;
-    }
-}
-
-void Projectile::Render() const noexcept 
-{
-    if (!active) return;
-    Util::RenderRectangle(*texture, position, Config::projectileWidth, Config::projectileHeight);
-}
+Projectile::~Projectile() = default;
 
 Projectile::Projectile(Projectile&& other) noexcept
     : position(std::move(other.position)),
@@ -38,7 +20,7 @@ Projectile::Projectile(Projectile&& other) noexcept
     type(std::move(other.type)),
     lineStart(std::move(other.lineStart)),
     lineEnd(std::move(other.lineEnd)),
-    texture(other.texture) // Copy shared reference
+    texture(other.texture)
 {
     other.texture = nullptr;
 }
@@ -58,3 +40,45 @@ Projectile& Projectile::operator=(Projectile&& other) noexcept
     }
     return *this;
 }
+
+void Projectile::Update() noexcept
+{
+    position.y += speed;
+    lineStart.y = position.y - 15;
+    lineEnd.y = position.y + 15;
+    lineStart.x = position.x;
+    lineEnd.x = position.x;
+
+    if (position.y < 0 || position.y > GetScreenHeight())
+    {
+        active = false;
+    }
+}
+
+void Projectile::Render() const noexcept
+{
+    if (!active) return;
+    Util::RenderRectangle(*texture, position, Config::projectileWidth, Config::projectileHeight);
+}
+
+Vector2 Projectile::GetPositionForCollision() const noexcept { return { position.x, position.y }; }
+
+Vector2 Projectile::GetPosition() const noexcept { return position; }
+
+bool Projectile::IsActive() const noexcept { return active; }
+
+int Projectile::GetSpeed() const noexcept { return speed; }
+
+ProjectileType Projectile::GetType() const noexcept { return type; }
+
+Vector2 Projectile::GetLineStart() const noexcept { return lineStart;}
+
+Vector2 Projectile::GetLineEnd() const noexcept { return lineEnd; }
+
+void Projectile::SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
+
+void Projectile::SetSpeed(int newSpeed) noexcept { speed = newSpeed; }
+
+void Projectile::SetType(ProjectileType newType) noexcept { type = newType; }
+
+void Projectile::SetActive(bool isActive) noexcept { active = isActive; }

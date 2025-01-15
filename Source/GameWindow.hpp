@@ -1,7 +1,6 @@
 #pragma once
 #include "raylib.h"
 #include <string>
-#include "Config.hpp"
 
 class GameWindow
 {

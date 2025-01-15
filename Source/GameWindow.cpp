@@ -2,14 +2,17 @@
 #include "GameWindowException.hpp"
 #include "Config.hpp"
 
-inline constexpr int startTitleXPos = 200;
-inline constexpr int startTitleYPos = 100;
-inline constexpr int startSubtitleXPos = 200;
-inline constexpr int startSubtitleYPos = 350;
-inline constexpr int textBoxWidth = 225;
-inline constexpr int textBoxHeight = 50;
-inline constexpr int textBoxX = 600;
-inline constexpr int textBoxY = 500;
+namespace
+{
+    constexpr int startTitleXPos = 200;
+    constexpr int startTitleYPos = 100;
+    constexpr int startSubtitleXPos = 200;
+    constexpr int startSubtitleYPos = 350;
+    constexpr int textBoxWidth = 225;
+    constexpr int textBoxHeight = 50;
+    constexpr int textBoxX = 600;
+    constexpr int textBoxY = 500;
+}
 
 GameWindow::GameWindow(int screenWidth, int screenHeight)
 {

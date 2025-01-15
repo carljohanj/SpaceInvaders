@@ -6,7 +6,6 @@ class Leaderboard
 {
 public:
     explicit Leaderboard(std::filesystem::path scores);
-    ~Leaderboard();
 
     [[nodiscard]] bool HasNewHighScore(int score) const noexcept;
     [[nodiscard]] bool SaveHighScore(int score);

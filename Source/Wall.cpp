@@ -4,13 +4,12 @@
 #include <utility>
 #include <iostream>
 
-[[gsl::suppress(f .6, justification: "We want the constructor to throw if the texture can't be loaded")]]
 Wall::Wall()
     : texture(Config::wallTexturePath, Config::wallWidth, Config::wallHeight),
     position({ 0, 0 }),
     active(true),
     health(50),
-    radius(60){
+    radius(60.0f) {
 }
 
 Wall::Wall(Wall&& other) noexcept
@@ -18,7 +17,8 @@ Wall::Wall(Wall&& other) noexcept
     position(std::exchange(other.position, { 0, 0 })),
     active(std::exchange(other.active, false)),
     health(std::exchange(other.health, 50)),
-    radius(std::exchange(other.radius, 60.0f)){
+    radius(std::exchange(other.radius, 60.0f))
+{
 }
 
 Wall& Wall::operator=(Wall&& other) noexcept
@@ -53,3 +53,17 @@ Rectangle Wall::GetRectangle() const noexcept
 {
     return { position.x - radius, position.y - radius, radius * 2, radius * 2 };
 }
+
+Vector2 Wall::GetPosition() const noexcept { return position; }
+
+void Wall::SetPosition(Vector2 newPosition) noexcept { position = newPosition; }
+
+bool Wall::IsActive() const noexcept { return active; }
+
+void Wall::SetActive(bool isActive) noexcept { active = isActive; }
+
+int Wall::GetHealth() const noexcept { return health; }
+
+void Wall::SetHealth(int newHealth) noexcept { health = newHealth; }
+
+float Wall::GetRadius() const noexcept { return radius; }

@@ -14,19 +14,19 @@ public:
     void Render() const;
     Projectile Shoot() const noexcept;
     Vector2 GetPosition() const noexcept;
-    float GetXPosition() const noexcept { return x_pos; }
-    float GetPlayerBaseHeight() const noexcept { return player_base_height; }
-    float GetRadius() const noexcept { return radius; }
-    int GetLives() const noexcept { return lives; }
-    void SetLives(int newLives) noexcept { lives = newLives; }
-    void SetXPosition(float newXPos) noexcept { x_pos = newXPos; }
+    float GetXPosition() const noexcept;
+    float GetPlayerBaseHeight() const noexcept;
+    float GetRadius() const noexcept;
+    int GetLives() const noexcept;
+    void SetLives(int newLives) noexcept;
+    void SetXPosition(float newXPos) noexcept;
 
 private:
-    float x_pos = 0;
-    float speed = 7;
-    float player_base_height = 70.0f;
-    float radius = 50;
-    int lives = 3;
+    float x_pos;
+    float speed;
+    float player_base_height;
+    float radius;
+    int lives;
     Gun gun;
     TextureWrapper texture;
 };

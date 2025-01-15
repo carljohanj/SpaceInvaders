@@ -429,10 +429,7 @@ inline void Game::Private::AlienGetsShot(Alien& alien, Projectile& projectile) n
 inline void Game::Private::CheckPlayerCollision(Projectile& projectile) noexcept
 {
 	if (CheckCollisionCircles(player.GetPosition(), player.GetRadius(),
-		{ projectile.GetLineStart().x, projectile.GetLineStart().y }, 1.0f))
-	{
-		PlayerGetsShot(projectile);
-	}
+		projectile.GetPositionForCollision(), 1.0f)) { PlayerGetsShot(projectile); }
 }
 
 inline void Game::Private::PlayerGetsShot(Projectile& projectile) noexcept

@@ -83,14 +83,9 @@ private:
 
 Leaderboard::Leaderboard(std::filesystem::path scores) { impl.initialize<Private>(std::move(scores)); }
 
-Leaderboard::~Leaderboard() = default;
-
 bool Leaderboard::HasNewHighScore(int score) const noexcept { return impl.get<Private>()->HasNewHighScore(score); }
-
 bool Leaderboard::SaveHighScore(int score) { return impl.get<Private>()->SaveHighScore(score); }
-
 void Leaderboard::RenderLeaderboard() const noexcept { impl.get<Private>()->RenderLeaderboard(); }
-
 void Leaderboard::RenderHighScoreEntry() noexcept { impl.get<Private>()->RenderHighScoreEntry(); }
 
 Leaderboard::Private::Private(std::filesystem::path scoresPath)
@@ -124,9 +119,7 @@ void Leaderboard::Private::RenderHighScoreEntry() noexcept
     RenderScores(drawScoresTopLeftCorner);
     RenderTextBox();
     RenderNameInput();
-    if (!playerName.empty()) {
-        RenderFooter(enterMessage, smallYOffset);
-    }
+    if (!playerName.empty()) { RenderFooter(enterMessage, smallYOffset); }
 }
 
 [[nodiscard]] auto Leaderboard::Private::FindLowestScore() noexcept -> std::vector<PlayerData>::iterator

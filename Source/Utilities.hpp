@@ -6,12 +6,17 @@ namespace Util
 {
     inline void RenderRectangle(const Texture2D& texture, Vector2 position, int width, int height) noexcept
     {
-        DrawTexturePro(texture,
+        //For Ulf: I looked this up - this function doesn't scale the bitmap if source dimensions matches original dimensions
+        //I decided to keep this instead of DrawTextureV() because that one offset the textures relative to the original game
+        //Code looks a little less clean as a result but adheres better to the original look of the game
+        DrawTexturePro(
+            texture,
             { 0, 0, static_cast<float>(texture.width), static_cast<float>(texture.height) },
             { position.x, position.y, static_cast<float>(width), static_cast<float>(height) },
             { static_cast<float>(width) / 2.0f, static_cast<float>(height) / 2.0f },
             0.0f,
-            WHITE);
+            WHITE
+        );
     }
 
     inline void RenderCircle(const Texture2D& texture, Vector2 position, float radius) noexcept
