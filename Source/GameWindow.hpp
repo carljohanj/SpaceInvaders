@@ -1,6 +1,5 @@
 #pragma once
 #include "raylib.h"
-#include "Background.hpp"
 #include <string>
 #include "Config.hpp"
 
@@ -19,10 +18,4 @@ public:
     void RenderStartScreen() const noexcept;
     void RenderHUD(int score, int playerLives) const noexcept;
     void RenderGameOverScreen() const noexcept;
-    void UpdateBackground(float playerPos) noexcept;
-    void RenderBackground() const noexcept;
-    void ResetBackground() noexcept;
-
-private:
-    Background background;
 };

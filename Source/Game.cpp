@@ -31,6 +31,7 @@ struct Game::Private
 		: window(screenWidth, screenHeight),
 		  leaderboard(Config::leaderBoardScores) {
 	}
+
 	enum class State { STARTSCREEN, GAMEPLAY, ENDSCREEN, LEADERBOARD };
 
 	struct PlayerData
@@ -51,6 +52,7 @@ struct Game::Private
 	std::vector<Wall> Walls;
 	Leaderboard leaderboard;
 	AudioDevice audioDevice;
+	Background background;
 
 	void Start();
 	void Update();
@@ -79,7 +81,7 @@ struct Game::Private
 	void UpdateWalls() noexcept;
 	void RenderProjectiles() const noexcept;
 	void UpdateProjectiles();
-	void UpdateBackground() noexcept;
+	void UpdateBackground(float playerPos) noexcept;
 	void UpdateEndScreen();
 	void UpdateShowLeaderboard();
 	void RenderShowLeaderboard() const noexcept;
@@ -118,7 +120,7 @@ void Game::Private::Start()
 	ResetWalls();
 	player.Reset();
 	ResetAliens();
-	window.ResetBackground();
+	background.Reset();
 	ResetGameState();
 }
 
@@ -219,7 +221,7 @@ inline void Game::Private::ResetGameState() noexcept
 
 void Game::Private::RenderGameplay()
 {
-	window.RenderBackground();
+	background.Render();
 	window.RenderHUD(score, player.GetLives());
 	player.Render();
 	RenderProjectiles();
@@ -234,7 +236,7 @@ void Game::Private::UpdateEverything()
 	UpdateProjectiles();
 	DetectCollisions();
 	UpdateWalls();
-	UpdateBackground();
+	UpdateBackground(player.GetXPosition());
 	audioDevice.UpdateMusic();
 }
 
@@ -369,9 +371,14 @@ void Game::Private::UpdateProjectiles()
 	std::erase_if(Projectiles, [](const Projectile& p) noexcept { return !p.IsActive(); });
 }
 
-inline void Game::Private::UpdateBackground() noexcept
+inline void Game::Private::UpdateBackground(float playerPos) noexcept
 {
-	window.UpdateBackground(player.GetXPosition());
+	const Vector2 playerPosition = { playerPos, Config::playerBaseHeight };
+	const Vector2 screenCorner = { 0.0f, Config::playerBaseHeight };
+	const auto dx = screenCorner.x - playerPosition.x;
+	const auto dy = screenCorner.y - playerPosition.y;
+	const auto backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
+	background.Update(backgroundOffset / Config::backgroundSpeed);
 }
 
 void Game::Private::DetectCollisions() noexcept

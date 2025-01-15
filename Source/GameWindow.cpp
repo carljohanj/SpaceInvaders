@@ -1,7 +1,6 @@
 #include "GameWindow.hpp"
 #include "GameWindowException.hpp"
 #include "Config.hpp"
-#include <complex>
 
 inline constexpr int startTitleXPos = 200;
 inline constexpr int startTitleYPos = 100;
@@ -22,15 +21,12 @@ GameWindow::GameWindow(int screenWidth, int screenHeight)
     SetTargetFPS(60);
 }
 
-GameWindow::~GameWindow() noexcept
-{
-   CloseWindow();
-}
+GameWindow::~GameWindow() noexcept { CloseWindow(); }
 
 void GameWindow::BeginDrawing() const noexcept
 {
     ::BeginDrawing();
-    ClearBackground(BLACK);
+    ::ClearBackground(BLACK);
 }
 
 void GameWindow::EndDrawing() const noexcept { ::EndDrawing(); }
@@ -51,17 +47,3 @@ void GameWindow::RenderGameOverScreen() const noexcept
 {
     DrawText(Config::continueMessage.data(), textBoxX, textBoxY, Config::endScreenFontSize, YELLOW);
 }
-
-void GameWindow::UpdateBackground(float playerPos) noexcept
-{
-    const Vector2 playerPosition = { playerPos, Config::playerBaseHeight };
-    const Vector2 screenCorner = { 0.0f, Config::playerBaseHeight };
-    const auto dx = screenCorner.x - playerPosition.x;
-    const auto dy = screenCorner.y - playerPosition.y;
-    const auto backgroundOffset = std::sqrt(dx * dx + dy * dy) * -1.0f;
-    background.Update(backgroundOffset / Config::backgroundSpeed);
-}
-
-void GameWindow::RenderBackground() const noexcept { background.Render(); }
-
-void GameWindow::ResetBackground() noexcept { background.Reset(); }
