@@ -1,5 +1,6 @@
 #include "TextureWrapper.hpp"
 #include <stdexcept>
+#include <gsl/gsl>
 #include "TextureLoadingException.hpp"
 
 std::unordered_map<std::filesystem::path, TextureWrapper::TextureData> TextureWrapper::textureCache;
@@ -11,6 +12,7 @@ TextureWrapper::TextureWrapper(const std::filesystem::path& path, int targetWidt
     else { textureCache[path] = LoadAndCacheTexture(path, targetWidth, targetHeight); }
 }
 
+[[gsl::suppress(f. 6, justification: "This will never happen; just ignore")]]
 TextureWrapper::~TextureWrapper() { DecrementTextureReference(texturePath); }
 
 TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept
@@ -19,6 +21,7 @@ TextureWrapper::TextureWrapper(TextureWrapper&& other) noexcept
     other.texturePath.clear();
 }
 
+[[gsl::suppress(f. 6, justification: "This will never happen; just ignore")]]
 TextureWrapper& TextureWrapper::operator=(TextureWrapper&& other) noexcept
 {
     if (this != &other)
@@ -36,7 +39,7 @@ const Texture2D& TextureWrapper::GetTexture() const
     return textureEntry->second.texture;
 }
 
-void TextureWrapper::DecrementTextureReference(const std::filesystem::path& path) noexcept
+void TextureWrapper::DecrementTextureReference(const std::filesystem::path& path)
 {
     if (TextureIsInCache(path)) { MaybeUnload(path); }
 }
@@ -46,7 +49,7 @@ void TextureWrapper::DecrementTextureReference(const std::filesystem::path& path
     return textureCache.find(path) != textureCache.end();
 }
 
-void TextureWrapper::MaybeUnload(const std::filesystem::path& path) noexcept
+void TextureWrapper::MaybeUnload(const std::filesystem::path& path)
 {
     auto& textureData = textureCache[path];
     if (--textureData.referenceCount == 0)

@@ -2,6 +2,7 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
+#include <gsl/gsl>
 #include <memory>
 #include <new>
 #include <type_traits>
@@ -31,7 +32,8 @@ public:
 
         destroy();
         new (buffer.data()) Type(std::forward<Args>(args)...);
-        //C26490: We have to use reinterpret_cast, but we can make it compiler safe with std::destroy_at and std::launder
+
+        [[gsl::suppress(type .1, justification: "We have to use reinterpret_cast, but we can make it compiler safe with std::launder")]]
         typeDestructor = [](std::byte* ptr) noexcept { std::destroy_at(std::launder(reinterpret_cast<Type*>(ptr))); };
     }
 
@@ -49,12 +51,14 @@ public:
     template <typename Type>
     Type* get() noexcept
     {
+        [[gsl::suppress(type .1, justification: "We have to use reinterpret_cast, but we can make it compiler safe with std::launder")]]
         return std::launder(reinterpret_cast<Type*>(buffer.data()));
     }
 
     template <typename Type>
     const Type* get() const
     {
+        [[gsl::suppress(type .1, justification: "We have to use reinterpret_cast, but we can make it compiler safe with std::launder")]]
         return std::launder(reinterpret_cast<const Type*>(buffer.data()));
     }
 

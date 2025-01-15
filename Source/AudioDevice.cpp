@@ -1,7 +1,8 @@
 #include "AudioDevice.hpp"
 #include "Config.hpp"
 
-static const std::unordered_map<SoundEffect, std::filesystem::path> SoundFilePaths = {
+static const std::unordered_map<SoundEffect, std::filesystem::path> SoundFilePaths = 
+{
     { SoundEffect::IsHit, Config::hitSound },
     { SoundEffect::PlayerShoots, Config::playerShot },
     { SoundEffect::AlienShoots, Config::alienShot },
@@ -11,7 +12,7 @@ static const std::unordered_map<SoundEffect, std::filesystem::path> SoundFilePat
     { SoundEffect::BackgroundMusic, Config::backgroundMusic }
 };
 
-AudioDevice::AudioDevice()
+AudioDevice::AudioDevice() noexcept
 {
     InitAudioDevice();
     LoadAllSounds();

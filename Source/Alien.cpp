@@ -3,8 +3,8 @@
 #include <utility>
 #include "Utilities.hpp"
 
-Alien::Alien()
-    : position({ 0.0f, 0.0f }),
+Alien::Alien(float x, float y)
+    : position{ x, y },
     radius(40.0f),
     speed(2.0f),
     active(true),

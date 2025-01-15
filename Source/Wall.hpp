@@ -10,8 +10,9 @@ public:
     Wall& operator=(Wall&& other) noexcept;
     Wall(const Wall&) = delete;
     Wall& operator=(const Wall&) = delete;
+    ~Wall() = default;
 
-    void Render() const noexcept;
+    void Render() const;
     Rectangle GetRectangle() const noexcept;
 
     Vector2 GetPosition() const noexcept { return position; }

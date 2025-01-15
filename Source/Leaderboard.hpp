@@ -22,9 +22,9 @@ struct ScoreRendering
 class Leaderboard
 {
 public:
-    Leaderboard() noexcept;
+    Leaderboard(std::filesystem::path scores);
     [[nodiscard]] bool HasNewHighScore(int score) const noexcept;
-    [[nodiscard]] bool SaveHighScore(int score) noexcept;
+    [[nodiscard]] bool SaveHighScore(int score);
     void RenderLeaderboard() const noexcept;
     void RenderHighScoreEntry() noexcept;
 
@@ -33,7 +33,7 @@ private:
     auto FindLowestScore() noexcept;
     void ResetInputState() noexcept;
     void CapturePlayerNameInput() noexcept;
-    [[nodiscard]] bool TrySaveScore(int score) noexcept;
+    [[nodiscard]] bool TrySaveScore(int score);
     [[nodiscard]] bool InputIsComplete() const noexcept;
     void DrawScoreEntry(const PlayerData& data, const ScoreRendering& config) const noexcept;
     void RenderHeader(std::string_view text, int yOffset) const noexcept;
@@ -44,7 +44,7 @@ private:
     void RenderScores(ScoreRendering config) const noexcept;
     [[nodiscard]] bool ShouldRenderCursor() const noexcept;
     void RenderBlinkingCursor() const noexcept;
-    void LoadScoresFromFile() noexcept;
+    void LoadScoresFromFile();
     std::expected<std::vector<std::pair<std::string, int>>, std::string> TryLoadScores() const;
     void PopulateScores(const std::vector<std::pair<std::string, int>>& loadedScores);
     void SaveScoresToFile();

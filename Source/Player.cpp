@@ -3,6 +3,7 @@
 #include "Config.hpp"
 #include "Utilities.hpp"
 
+[[gsl::suppress(f .6, justification: "We want the constructor to throw if the texture can't be loaded")]]
 Player::Player()
     : gun(Config::playerProjectileSpeed, ProjectileType::PLAYER_PROJECTILE, { 0, -10 }),
     texture(Config::playerTexturePath, Config::playerWidth, Config::playerHeight)

@@ -1,5 +1,5 @@
 Carl 50000
 Ella 3700
+Ulf 1400
+Nils 1400
 Tim 1300
-John 700
-Steve 600

@@ -3,6 +3,7 @@
 #include "Utilities.hpp"
 #include <utility>
 
+[[gsl::suppress(f .6, justification: "We want the constructor to throw if the texture can't be loaded")]]
 Projectile::Projectile(Vector2 position, float speed, ProjectileType type, const Texture2D& sharedTexture)
     : position(position), speed(static_cast<int>(speed)), type(type), texture(&sharedTexture), active(true)
 {

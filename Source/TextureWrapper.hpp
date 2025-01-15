@@ -28,7 +28,7 @@ private:
     static Image LoadImageWithValidation(const std::filesystem::path& path);
     static void ResizeImageIfNeeded(Image& image, int targetWidth, int targetHeight) noexcept;
     static Texture2D CreateTextureFromImage(const Image& image);
-    void DecrementTextureReference(const std::filesystem::path& path) noexcept;
+    void DecrementTextureReference(const std::filesystem::path& path);
     [[nodiscard]] bool TextureIsInCache(const std::filesystem::path& path) const;
-    void MaybeUnload(const std::filesystem::path& path) noexcept;
+    void MaybeUnload(const std::filesystem::path& path);
 };

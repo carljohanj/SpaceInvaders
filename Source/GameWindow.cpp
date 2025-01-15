@@ -12,10 +12,9 @@ inline constexpr int textBoxHeight = 50;
 inline constexpr int textBoxX = 600;
 inline constexpr int textBoxY = 500;
 
-//C26455: We want GameWindow to throw if the window can't be initialized
-GameWindow::GameWindow()
+GameWindow::GameWindow(int screenWidth, int screenHeight)
 {
-    InitWindow(Config::screenWidth, Config::screenHeight, Config::title.data());
+    InitWindow(screenWidth, screenHeight, Config::title.data());
     if (!IsWindowReady())
     {
         throw GameWindowException("Window failed to initialize properly.");
@@ -23,9 +22,9 @@ GameWindow::GameWindow()
     SetTargetFPS(60);
 }
 
-GameWindow::~GameWindow()
+GameWindow::~GameWindow() noexcept
 {
-    if (IsWindowReady()) { CloseWindow(); }
+   CloseWindow();
 }
 
 void GameWindow::BeginDrawing() const noexcept

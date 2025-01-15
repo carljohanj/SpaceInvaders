@@ -7,7 +7,7 @@
 class AudioDevice
 {
 public:
-    AudioDevice();
+    AudioDevice() noexcept;
     ~AudioDevice() noexcept;
 
     void Play(SoundEffect sound) noexcept;

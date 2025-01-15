@@ -9,7 +9,7 @@
 class Alien
 {
 public:
-    Alien();
+    Alien(float x, float y);
     Alien(const Alien&) = delete;
     Alien(Alien&& other) noexcept;
     ~Alien() = default;

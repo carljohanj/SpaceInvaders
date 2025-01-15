@@ -4,7 +4,7 @@
 class Game
 {
 public:
-    Game();
+    Game(int screenWidth, int screenHeight);
     void Run();
 
 private:

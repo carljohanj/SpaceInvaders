@@ -7,8 +7,12 @@
 class GameWindow
 {
 public:
-    GameWindow();
-    ~GameWindow();
+    GameWindow(int screenWidth, int screenHeight);
+    ~GameWindow() noexcept;
+    GameWindow(const GameWindow&) = delete;
+    GameWindow& operator=(const GameWindow&) = delete;
+    GameWindow(GameWindow&&) noexcept = default;
+    GameWindow& operator=(GameWindow&&) noexcept = default;
 
     void BeginDrawing() const noexcept;
     void EndDrawing() const noexcept;

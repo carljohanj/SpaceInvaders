@@ -56,8 +56,8 @@ namespace Config
     inline constexpr int alienFormationWidth  = 8;
     inline constexpr int alienFormationHeight = 5;
     inline constexpr int alienSpacing         = 80;
-    inline constexpr int alienFormationX      = 100;
-    inline constexpr int alienFormationY      = 60;
+    inline constexpr float alienFormationX    = 100.0f;
+    inline constexpr float alienFormationY    = 60.0f;
 
     // Shooting settings
     inline constexpr float alienShootInterval  = 1.5f;

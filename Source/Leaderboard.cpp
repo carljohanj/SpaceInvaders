@@ -12,7 +12,7 @@ inline constexpr int textBoxX = 600;
 inline constexpr int textBoxY = 500;
 inline constexpr int textBoxWidth = 300;
 inline constexpr int textBoxHeight = 50;
-inline constexpr int leaderboardFontSize = 40;
+inline constexpr size_t leaderboardFontSize = 40;
 inline constexpr int bigYOffset = 200;
 inline constexpr int smallYOffset = 100;
 inline constexpr int highScoreFontSize = 60;
@@ -30,8 +30,8 @@ inline constexpr ScoreRendering drawScoresTopLeftCorner
     .fontSize = leaderboardFontSize - 10
 };
 
-Leaderboard::Leaderboard() noexcept
-    : fileHandler(Config::leaderBoardScores),
+Leaderboard::Leaderboard(std::filesystem::path scores)
+    : fileHandler(scores),
     textBox({ textBoxX, textBoxY, textBoxWidth, textBoxHeight })
 {
     LoadScoresFromFile();
@@ -39,7 +39,7 @@ Leaderboard::Leaderboard() noexcept
 
 [[nodiscard]] bool Leaderboard::HasNewHighScore(int score) const noexcept { return score > scores.back().score; }
 
-[[nodiscard]] bool Leaderboard::SaveHighScore(int score) noexcept
+[[nodiscard]] bool Leaderboard::SaveHighScore(int score)
 {
     CapturePlayerNameInput();
     return TrySaveScore(score);
@@ -56,7 +56,7 @@ void Leaderboard::CapturePlayerNameInput() noexcept
     blinkTimer++;
 }
 
-[[nodiscard]] inline bool Leaderboard::TrySaveScore(int score) noexcept
+[[nodiscard]] inline bool Leaderboard::TrySaveScore(int score)
 {
     if (!InputIsComplete()) { return false; }
     InsertNewHighScore(playerName, score);
@@ -120,7 +120,7 @@ inline void Leaderboard::RenderHeader(std::string_view text, int yOffset) const 
 
 inline void Leaderboard::RenderFooter(std::string_view message, size_t yOffset) const noexcept
 {
-    DrawText(message.data(), textBoxX, textBoxY + static_cast<int>(yOffset), leaderboardFontSize, YELLOW);
+    DrawText(message.data(), textBoxX, textBoxY + gsl::narrow_cast<int>(yOffset), leaderboardFontSize, YELLOW);
 }
 
 void Leaderboard::RenderHighScoreEntry() noexcept
@@ -161,7 +161,7 @@ inline void Leaderboard::RenderBlinkingCursor() const noexcept
         static_cast<int>(textBox.y) + 12, leaderboardFontSize, MAROON);
 }
 
-void Leaderboard::LoadScoresFromFile() noexcept
+void Leaderboard::LoadScoresFromFile()
 {
     auto fileContent = TryLoadScores();
     if (fileContent)
